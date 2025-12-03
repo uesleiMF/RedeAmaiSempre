@@ -54,6 +54,41 @@ export default class Dashboard extends Component {
     this.fileInputEditRef = React.createRef();
   }
 
+  // ---------------------------------------------------
+  // UTILITÁRIAS DE DATA (evitam -1 dia e formatam BR)
+  // ---------------------------------------------------
+
+  // Converte data da API (qualquer formato ISO) para value de <input type="date"> (YYYY-MM-DD)
+  formatDateToInput = (dateString) => {
+    if (!dateString) return "";
+    // Garante que o construtor interprete como UTC start-of-day
+    const d = new Date(dateString);
+    // Ajusta pelo offset para normalizar a data local -> evita o -1 dia
+    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+    return d.toISOString().substring(0, 10);
+  }
+
+  // Converte valor do input (YYYY-MM-DD) para uma string segura para salvar (YYYY-MM-DD)
+  // e evita problemas de timezone ao enviar ao backend
+  formatDateForSave = (inputValue) => {
+    if (!inputValue) return "";
+    // inputValue já costuma vir no formato YYYY-MM-DD (por type="date")
+    // Criamos um Date em meia-noite local e subtraímos o offset para preservar a data correta no backend
+    const d = new Date(inputValue + "T00:00:00");
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().split("T")[0];
+  }
+
+  // Formata qualquer data (ISO ou YYYY-MM-DD) para DD/MM/YYYY para exibição (Tabela/CSV/PDF)
+  formatBR = (dateString) => {
+    if (!dateString) return "";
+    const d = new Date(dateString);
+    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  // ---------------------------------------------------
+
   componentDidMount = () => {
     this._isMounted = true;
     const token = localStorage.getItem('token');
@@ -122,6 +157,7 @@ export default class Dashboard extends Component {
   }
 
   onChange = (e) => {
+    // upload file
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (this._isMounted) this.setState({
@@ -151,8 +187,10 @@ export default class Dashboard extends Component {
     fd.append('name', this.state.name);
     fd.append('desc', this.state.desc);
     fd.append('tel', this.state.tel);
-    fd.append('niverH', this.state.niverH);
-    fd.append('niverM', this.state.niverM);
+
+    // converte data do input (YYYY-MM-DD) para formato seguro ao salvar
+    fd.append('niverH', this.formatDateForSave(this.state.niverH));
+    fd.append('niverM', this.formatDateForSave(this.state.niverM));
 
     try {
       const res = await axios.post('https://backtestmar.onrender.com/add-casal', fd, {
@@ -185,8 +223,10 @@ export default class Dashboard extends Component {
     fd.append('name', this.state.name);
     fd.append('desc', this.state.desc);
     fd.append('tel', this.state.tel);
-    fd.append('niverH', this.state.niverH);
-    fd.append('niverM', this.state.niverM);
+
+    // converte data do input de edição para formato seguro ao salvar
+    fd.append('niverH', this.formatDateForSave(this.state.niverH));
+    fd.append('niverM', this.formatDateForSave(this.state.niverM));
 
     if (fileInput && fileInput.files[0]) fd.append('file', fileInput.files[0]);
 
@@ -217,20 +257,23 @@ export default class Dashboard extends Component {
   };
 
   handleCasalClose = () => this.setState({ openCasalModal: false });
+
   handleCasalEditOpen = (data) => {
+    // Ao abrir modal de edição, convertemos as datas vindas da API para o formato do input (YYYY-MM-DD)
     this.setState({
       openCasalEditModal: true,
       id: data._id,
       name: data.name,
       desc: data.desc,
       tel: data.tel,
-      niverH: data.niverH?.substring(0, 10),
-      niverM: data.niverM?.substring(0, 10),
+      niverH: this.formatDateToInput(data.niverH),
+      niverM: this.formatDateToInput(data.niverM),
       fileName: data.image,
       filePreview: data.image
     });
     if (this.fileInputEditRef.current) this.fileInputEditRef.current.value = null;
   };
+
   handleCasaltEditClose = () => this.setState({ openCasalEditModal: false });
 
   generatePDF = async () => {
@@ -259,6 +302,7 @@ export default class Dashboard extends Component {
       return { ...c, imgBase64 };
     }));
 
+    // Monta o body da tabela usando formatBR para as datas
     const body = [['Imagem','Nome Casal','Descrição','Contato','Aniversário Homem','Aniversário Mulher']];
     casaisComImg.forEach(c => {
       body.push([
@@ -266,8 +310,8 @@ export default class Dashboard extends Component {
         c.name,
         c.desc,
         c.tel,
-        c.niverH?.substring(0, 10) || '',
-        c.niverM?.substring(0, 10) || ''
+        this.formatBR(c.niverH),
+        this.formatBR(c.niverM)
       ]);
     });
 
@@ -333,8 +377,8 @@ export default class Dashboard extends Component {
                       Nome: c.name,
                       Descrição: c.desc,
                       Contato: c.tel,
-                      "Aniversário Homem": c.niverH?.substring(0,10),
-                      "Aniversário Mulher": c.niverM?.substring(0,10)
+                      "Aniversário Homem": this.formatBR(c.niverH),
+                      "Aniversário Mulher": this.formatBR(c.niverM)
                     }))}
                     filename={"casais.csv"}
                     style={{ textDecoration: 'none' }}
@@ -355,6 +399,7 @@ export default class Dashboard extends Component {
                 <TextField type="text" name="name" value={this.state.name} onChange={this.onChange} placeholder="Nome Casal" fullWidth margin="dense" />
                 <TextField type="text" name="desc" value={this.state.desc} onChange={this.onChange} placeholder="Descrição" fullWidth margin="dense" />
                 <TextField type="text" name="tel" value={this.state.tel} onChange={this.onChange} placeholder="Contato" fullWidth margin="dense" />
+                {/* No modal de adicionar mantemos type="date" — o valor salvo é tratado ao enviar */}
                 <TextField type="date" name="niverH" value={this.state.niverH} onChange={this.onChange} fullWidth margin="dense" />
                 <TextField type="date" name="niverM" value={this.state.niverM} onChange={this.onChange} fullWidth margin="dense" />
                 <div className="file-input-row">
@@ -375,6 +420,7 @@ export default class Dashboard extends Component {
                 <TextField type="text" name="name" value={this.state.name} onChange={this.onChange} placeholder="Nome Casal" fullWidth margin="dense" />
                 <TextField type="text" name="desc" value={this.state.desc} onChange={this.onChange} placeholder="Descrição" fullWidth margin="dense" />
                 <TextField type="text" name="tel" value={this.state.tel} onChange={this.onChange} placeholder="Contato" fullWidth margin="dense" />
+                {/* Aqui mostramos o value já convertido para YYYY-MM-DD com formatDateToInput */}
                 <TextField type="date" name="niverH" value={this.state.niverH} onChange={this.onChange} fullWidth margin="dense" />
                 <TextField type="date" name="niverM" value={this.state.niverM} onChange={this.onChange} fullWidth margin="dense" />
                 <div className="file-input-row">
@@ -407,17 +453,27 @@ export default class Dashboard extends Component {
                   </TableRow>
                 </TableHead>
                 <TableBody>
+                  {casais.length === 0 && !loading && (
+                    <TableRow>
+                      <TableCell colSpan={7} align="center">Nenhum casal encontrado</TableCell>
+                    </TableRow>
+                  )}
+
                   {casais.map(row => (
                     <TableRow key={row._id || row.name}>
                       <TableCell align="center">{row.image ? <img src={row.image} alt={row.name} className="table-img" /> : '—'}</TableCell>
                       <TableCell align="center">{row.name}</TableCell>
                       <TableCell align="center">{row.desc}</TableCell>
                       <TableCell align="center">{row.tel}</TableCell>
-                      <TableCell align="center">{row.niverH?.substring(0, 10)}</TableCell>
-                      <TableCell align="center">{row.niverM?.substring(0, 10)}</TableCell>
+                      <TableCell align="center">{this.formatBR(row.niverH)}</TableCell>
+                      <TableCell align="center">{this.formatBR(row.niverM)}</TableCell>
                       <TableCell align="center">
-                        <IconButton onClick={() => this.handleCasalEditOpen(row)} color="primary"><EditIcon /></IconButton>
-                        <IconButton onClick={() => this.deleteCasal(row._id)} color="secondary"><DeleteIcon /></IconButton>
+                        <Tooltip title="Editar">
+                          <IconButton onClick={() => this.handleCasalEditOpen(row)} color="primary"><EditIcon /></IconButton>
+                        </Tooltip>
+                        <Tooltip title="Excluir">
+                          <IconButton onClick={() => this.deleteCasal(row._id)} color="secondary"><DeleteIcon /></IconButton>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))}
