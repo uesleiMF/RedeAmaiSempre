@@ -1,87 +1,259 @@
 import React, { useState } from "react";
 import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import "./ListaChamadas.css";
 
+// ... (imports continuam iguais)
 export default function ListaChamadas() {
+  // Estado para alunos
   const [students, setStudents] = useState([]);
   const [name, setName] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
 
+  // Estado para ofertas
+  const [ofertas, setOfertas] = useState([]);
+  const [descricaoOferta, setDescricaoOferta] = useState("");
+  const [valorOferta, setValorOferta] = useState("");
+
+  // Função para formatar data em DD/MM/YYYY
+  const formatDateBR = (dateString) => {
+    if (!dateString) return "Sem data";
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("pt-BR").format(date);
+  };
+
+  // Adicionar aluno
   const addStudent = () => {
-    if (!name.trim()) return;
-    setStudents([...students, { nome: name, presenca: false }]);
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+    if (students.some((s) => s.nome.toLowerCase() === trimmedName.toLowerCase())) {
+      alert("Aluno já está na lista!");
+      return;
+    }
+    setStudents([...students, { nome: trimmedName, presenca: false }]);
     setName("");
   };
 
+  // Alternar presença
   const togglePresenca = (index) => {
     const updated = [...students];
     updated[index].presenca = !updated[index].presenca;
     setStudents(updated);
   };
 
+  // Remover casal
+  const removeStudent = (index) => {
+    setStudents(students.filter((_, i) => i !== index));
+  };
+
+  // Limpar lista de Casais
+  const clearList = () => {
+    if (window.confirm("Deseja realmente limpar toda a lista de Casais?")) {
+      setStudents([]);
+    }
+  };
+
+  // Adicionar oferta
+  const addOferta = () => {
+    const desc = descricaoOferta.trim();
+    const val = parseFloat(valorOferta);
+    if (!desc || isNaN(val) || val <= 0) return;
+    setOfertas([...ofertas, { descricao: desc, valor: val }]);
+    setDescricaoOferta("");
+    setValorOferta("");
+  };
+
+  // Remover oferta
+  const removeOferta = (index) => {
+    setOfertas(ofertas.filter((_, i) => i !== index));
+  };
+
+  // Limpar ofertas
+  const limparOfertas = () => {
+    if (window.confirm("Deseja realmente limpar todas as ofertas?")) {
+      setOfertas([]);
+    }
+  };
+
+  // Exportar PDF
   const exportPDF = () => {
+    if (students.length === 0 && ofertas.length === 0) {
+      alert("Não há dados para exportar!");
+      return;
+    }
+
     const doc = new jsPDF();
-    doc.setFontSize(14);
-    doc.text(`Lista de Presença - ${selectedDate || "Sem data"}`, 10, 10);
+    doc.setFontSize(16);
+    doc.text(`Lista de Casais - ${formatDateBR(selectedDate)}`, 14, 20);
 
-    let y = 20;
-    students.forEach((aluno, i) => {
-      doc.text(`${i + 1}. ${aluno.nome} - ${aluno.presenca ? "Presente" : "Ausente"}`, 10, y);
-      y += 8;
-    });
+    // Tabela de presença
+    if (students.length > 0) {
+      autoTable(doc, {
+        head: [["#", "Nome de Casais", "Presença"]],
+        body: students.map((s, i) => [i + 1, s.nome, s.presenca ? "Presente" : "Ausente"]),
+        startY: 30,
+        didParseCell: (data) => {
+          if (data.column.index === 2) {
+            if (data.cell.raw === "Presente") {
+              data.cell.styles.fillColor = [144, 238, 144];
+            } else if (data.cell.raw === "Ausente") {
+              data.cell.styles.fillColor = [255, 182, 193];
+            }
+          }
+        },
+      });
+    }
 
-    doc.save("lista-chamada.pdf");
+    // Tabela de ofertas
+    if (ofertas.length > 0) {
+      const startY = doc.lastAutoTable?.finalY + 10 || 50;
+      doc.text("Contribuições/Ofertas", 14, startY);
+
+      autoTable(doc, {
+        head: [["#", "Descrição", "Valor"]],
+        body: ofertas.map((o, i) => [
+          i + 1,
+          o.descricao,
+          new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor),
+        ]),
+        startY: startY + 5,
+      });
+    }
+
+    doc.save("lista-chamada-ofertas.pdf");
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto space-y-4">
-      <h2 className="text-xl font-bold">Lista de Chamada</h2>
+    <div className="lista-chamadas-container">
+      <h2>Lista-Chamada-De-Casais</h2>
 
       <input
         type="date"
         value={selectedDate}
         onChange={(e) => setSelectedDate(e.target.value)}
-        className="p-2 border w-full rounded"
       />
 
-      <div className="flex gap-2 mt-2">
+      {/* Mostrar data formatada na tela */}
+      {selectedDate && (
+        <p style={{ textAlign: "center", marginBottom: "1rem" }}>
+          Data: {formatDateBR(selectedDate)}
+        </p>
+      )}
+
+      {/* Adicionar aluno */}
+      <div className="input-group">
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="p-2 border flex-1 rounded"
-          placeholder="Nome do aluno"
+          placeholder="Nome dos Casais"
         />
-        <button
-          onClick={addStudent}
-          className="p-2 bg-blue-600 text-white rounded"
-        >
+        <button onClick={addStudent} className="btn-adicionar">
           Adicionar
         </button>
       </div>
 
-      <ul className="space-y-2 mt-2">
-        {students.map((aluno, index) => (
-          <li
-            key={index}
-            className="p-2 border rounded flex justify-between items-center"
-          >
-            <span>{aluno.nome}</span>
-            <button
-              onClick={() => togglePresenca(index)}
-              className={`px-3 py-1 rounded text-white ${
-                aluno.presenca ? "bg-green-600" : "bg-red-600"
-              }`}
-            >
-              {aluno.presenca ? "Presente" : "Ausente"}
-            </button>
-          </li>
-        ))}
-      </ul>
+      {/* Lista de alunos */}
+      {students.length > 0 && (
+        <>
+          <div className="presenca-contagem">
+            <span>Presentes: {students.filter((s) => s.presenca).length}</span>
+            <span>Ausentes: {students.filter((s) => !s.presenca).length}</span>
+          </div>
 
-      <button
-        onClick={exportPDF}
-        className="p-3 bg-purple-600 text-white w-full rounded mt-2"
-      >
+          <ul className="lista-alunos">
+            {students.map((aluno, index) => (
+              <li key={index}>
+                <span>{aluno.nome}</span>
+                <div className="aluno-buttons">
+                  <button
+                    onClick={() => togglePresenca(index)}
+                    className={aluno.presenca ? "btn-presente" : "btn-ausente"}
+                  >
+                    {aluno.presenca ? "Presente" : "Ausente"}
+                  </button>
+                  <button
+                    onClick={() => removeStudent(index)}
+                    className="btn-remover"
+                  >
+                    Remover
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="bottom-buttons">
+            <button onClick={clearList} className="btn-limpar">
+              Limpar Lista
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Ofertas */}
+      <h2>Contribuições/Ofertas</h2>
+      <div className="input-group">
+        <input
+          type="text"
+          value={descricaoOferta}
+          onChange={(e) => setDescricaoOferta(e.target.value)}
+          placeholder="Descrição da oferta"
+        />
+        <input
+          type="number"
+          value={valorOferta}
+          onChange={(e) => setValorOferta(e.target.value)}
+          placeholder="Valor (R$)"
+          min="0.01"
+          step="0.01"
+        />
+        <button onClick={addOferta} className="btn-adicionar">
+          Adicionar
+        </button>
+      </div>
+
+      {ofertas.length > 0 && (
+        <>
+          <ul className="lista-alunos">
+            {ofertas.map((o, index) => (
+              <li key={index}>
+                <span>
+                  {o.descricao} -{" "}
+                  {new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: "BRL",
+                  }).format(o.valor)}
+                </span>
+                <div className="aluno-buttons">
+                  <button
+                    onClick={() => removeOferta(index)}
+                    className="btn-remover"
+                  >
+                    Remover
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="presenca-contagem">
+            Total arrecadado:{" "}
+            {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
+              ofertas.reduce((acc, o) => acc + o.valor, 0)
+            )}
+          </div>
+
+          <div className="bottom-buttons">
+            <button onClick={limparOfertas} className="btn-limpar">
+              Limpar Ofertas
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Exportar PDF */}
+      <button onClick={exportPDF} className="btn-exportar">
         Exportar PDF
       </button>
     </div>
