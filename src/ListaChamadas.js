@@ -27,7 +27,7 @@ export default function ListaChamadas() {
     const trimmedName = name.trim();
     if (!trimmedName) return;
     if (students.some((s) => s.nome.toLowerCase() === trimmedName.toLowerCase())) {
-      alert("Aluno já está na lista!");
+      alert("Casais já estão na lista!");
       return;
     }
     setStudents([...students, { nome: trimmedName, presenca: false }]);
