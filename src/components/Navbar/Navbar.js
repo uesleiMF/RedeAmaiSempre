@@ -62,15 +62,19 @@ export default function Navbar() {
       <OverlayMenu open={open}>
         <Link to="/home" onClick={handleClose}>
           <FaHeartbeat />
+           <span>Início</span>
         </Link>
         <Link to="/sobrenos" onClick={handleClose}>
           <ImManWoman />
+           <span>sobrenos</span>
         </Link>
         <Link to="/app" onClick={handleClose}>
           <GiMusicalNotes />
+           <span>Hinos</span>
         </Link>
         <Link to="/" onClick={handleClose}>
           <FaRegUser />
+           <span>Login</span>
         </Link>
       </OverlayMenu>
     </Container>

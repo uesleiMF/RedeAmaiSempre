@@ -65,7 +65,6 @@ export const Hamburger = styled.div`
     display: flex;
   }
 `;
-
 export const OverlayMenu = styled.div`
   display: none;
 
@@ -78,14 +77,30 @@ export const OverlayMenu = styled.div`
     height: 100vh;
     background: rgba(26, 26, 26, 0.95);
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
+    
+    justify-content: flex-start; /* ÍCONES NO TOPO */
+    padding-right: 20px; /* AFASTAMENTO DA LATERAL DIREITA */
+    align-items: flex-end;
+    padding-top: 80px; /* aumenta ou diminui para subir/descer */
+    gap: 40px; /* espaço entre os itens */
     transform: ${({ open }) => (open ? "translateY(0)" : "translateY(-100%)")};
     transition: transform 0.3s ease-in-out;
     z-index: 998;
+
+    /* Ícones dentro do menu */
+    a, svg {
+      font-size: 1.5rem; /* aumenta tamanho dos ícones */
+      color: #fff;
+      transition: 0.2s;
+    }
+
+    a:hover, svg:hover {
+      opacity: 0.7;
+      transform: scale(1.1); /* aumenta no hover */
+    }
   }
 `;
+
 
 export const List = styled.ul`
   display: flex;
