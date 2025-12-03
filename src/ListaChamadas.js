@@ -3,33 +3,59 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import "./ListaChamadas.css";
 
-// ... (imports continuam iguais)
 export default function ListaChamadas() {
-  // Estado para alunos
+  // --------------------------
+  // Funções de correção de data
+  // --------------------------
+
+  // Ajusta data do input para não reduzir 1 dia
+  const ajustarDataInput = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr + "T00:00:00");
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date.toISOString().split("T")[0];
+  };
+
+  // Ajusta data para salvar corretamente
+  const ajustarDataSalvar = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
+    return date.toISOString().split("T")[0];
+  };
+
+  // Formatar data BR
+  const formatDateBR = (dateStr) => {
+    if (!dateStr) return "Sem data";
+    const date = new Date(dateStr + "T00:00:00");
+    return date.toLocaleDateString("pt-BR");
+  };
+
+  // --------------------------
+  // ESTADOS
+  // --------------------------
   const [students, setStudents] = useState([]);
   const [name, setName] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
 
-  // Estado para ofertas
   const [ofertas, setOfertas] = useState([]);
   const [descricaoOferta, setDescricaoOferta] = useState("");
   const [valorOferta, setValorOferta] = useState("");
 
-  // Função para formatar data em DD/MM/YYYY
-  const formatDateBR = (dateString) => {
-    if (!dateString) return "Sem data";
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("pt-BR").format(date);
-  };
+  // --------------------------
+  // FUNÇÕES
+  // --------------------------
 
-  // Adicionar aluno
+  // Adicionar casal
   const addStudent = () => {
     const trimmedName = name.trim();
     if (!trimmedName) return;
+
     if (students.some((s) => s.nome.toLowerCase() === trimmedName.toLowerCase())) {
-      alert("Casais já estão na lista!");
+      alert("Casais já cadastrados!");
       return;
     }
+
     setStudents([...students, { nome: trimmedName, presenca: false }]);
     setName("");
   };
@@ -46,7 +72,7 @@ export default function ListaChamadas() {
     setStudents(students.filter((_, i) => i !== index));
   };
 
-  // Limpar lista de Casais
+  // Limpar lista
   const clearList = () => {
     if (window.confirm("Deseja realmente limpar toda a lista de Casais?")) {
       setStudents([]);
@@ -57,7 +83,9 @@ export default function ListaChamadas() {
   const addOferta = () => {
     const desc = descricaoOferta.trim();
     const val = parseFloat(valorOferta);
+
     if (!desc || isNaN(val) || val <= 0) return;
+
     setOfertas([...ofertas, { descricao: desc, valor: val }]);
     setDescricaoOferta("");
     setValorOferta("");
@@ -75,7 +103,9 @@ export default function ListaChamadas() {
     }
   };
 
-  // Exportar PDF
+  // --------------------------
+  // EXPORTAR PDF
+  // --------------------------
   const exportPDF = () => {
     if (students.length === 0 && ofertas.length === 0) {
       alert("Não há dados para exportar!");
@@ -83,8 +113,10 @@ export default function ListaChamadas() {
     }
 
     const doc = new jsPDF();
+    const dataFormatada = formatDateBR(selectedDate);
+
     doc.setFontSize(16);
-    doc.text(`Lista de Casais - ${formatDateBR(selectedDate)}`, 14, 20);
+    doc.text(`Lista de Casais - ${dataFormatada}`, 14, 20);
 
     // Tabela de presença
     if (students.length > 0) {
@@ -114,7 +146,10 @@ export default function ListaChamadas() {
         body: ofertas.map((o, i) => [
           i + 1,
           o.descricao,
-          new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor),
+          new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }).format(o.valor),
         ]),
         startY: startY + 5,
       });
@@ -123,24 +158,27 @@ export default function ListaChamadas() {
     doc.save("lista-chamada-ofertas.pdf");
   };
 
+  // --------------------------
+  // JSX
+  // --------------------------
   return (
     <div className="lista-chamadas-container">
       <h2>Lista-Chamada-De-Casais</h2>
 
+      {/* Input de data corrigido */}
       <input
         type="date"
-        value={selectedDate}
-        onChange={(e) => setSelectedDate(e.target.value)}
+        value={ajustarDataInput(selectedDate)}
+        onChange={(e) => setSelectedDate(ajustarDataSalvar(e.target.value))}
       />
 
-      {/* Mostrar data formatada na tela */}
       {selectedDate && (
         <p style={{ textAlign: "center", marginBottom: "1rem" }}>
           Data: {formatDateBR(selectedDate)}
         </p>
       )}
 
-      {/* Adicionar aluno */}
+      {/* Adicionar casal */}
       <div className="input-group">
         <input
           type="text"
@@ -153,7 +191,7 @@ export default function ListaChamadas() {
         </button>
       </div>
 
-      {/* Lista de alunos */}
+      {/* Lista de casais */}
       {students.length > 0 && (
         <>
           <div className="presenca-contagem">
@@ -172,10 +210,7 @@ export default function ListaChamadas() {
                   >
                     {aluno.presenca ? "Presente" : "Ausente"}
                   </button>
-                  <button
-                    onClick={() => removeStudent(index)}
-                    className="btn-remover"
-                  >
+                  <button onClick={() => removeStudent(index)} className="btn-remover">
                     Remover
                   </button>
                 </div>
@@ -193,6 +228,7 @@ export default function ListaChamadas() {
 
       {/* Ofertas */}
       <h2>Contribuições/Ofertas</h2>
+
       <div className="input-group">
         <input
           type="text"
@@ -200,6 +236,7 @@ export default function ListaChamadas() {
           onChange={(e) => setDescricaoOferta(e.target.value)}
           placeholder="Descrição da oferta"
         />
+
         <input
           type="number"
           value={valorOferta}
@@ -208,40 +245,39 @@ export default function ListaChamadas() {
           min="0.01"
           step="0.01"
         />
+
         <button onClick={addOferta} className="btn-adicionar">
           Adicionar
         </button>
       </div>
 
+      {/* Lista ofertas */}
       {ofertas.length > 0 && (
         <>
           <ul className="lista-alunos">
             {ofertas.map((o, index) => (
               <li key={index}>
                 <span>
-                  {o.descricao} -{" "}
+                  {o.descricao} –{" "}
                   {new Intl.NumberFormat("pt-BR", {
                     style: "currency",
                     currency: "BRL",
                   }).format(o.valor)}
                 </span>
-                <div className="aluno-buttons">
-                  <button
-                    onClick={() => removeOferta(index)}
-                    className="btn-remover"
-                  >
-                    Remover
-                  </button>
-                </div>
+
+                <button onClick={() => removeOferta(index)} className="btn-remover">
+                  Remover
+                </button>
               </li>
             ))}
           </ul>
 
           <div className="presenca-contagem">
             Total arrecadado:{" "}
-            {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
-              ofertas.reduce((acc, o) => acc + o.valor, 0)
-            )}
+            {new Intl.NumberFormat("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            }).format(ofertas.reduce((acc, o) => acc + o.valor, 0))}
           </div>
 
           <div className="bottom-buttons">
