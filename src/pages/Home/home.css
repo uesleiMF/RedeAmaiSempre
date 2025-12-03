@@ -1,0 +1,151 @@
+/* ============================
+   WRAPPER GERAL
+============================ */
+.home-wrapper {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+/* ============================
+   TÍTULOS
+============================ */
+.title1 {
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.title2 {
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+
+/* ============================
+   CARROSSEL (IMAGENS IGUAIS)
+============================ */
+.carousel-img,
+.carousel-item img {
+  width: 50% !important;
+  height: 450px !important;  /* ajuste se quiser maior/menor */
+  object-fit: cover !important;
+  object-position: center;
+  border-radius: 8px;
+}
+
+/* Corrige distorção no mobile */
+@media (max-width: 468px) {
+  .carousel-img,
+  .carousel-item img {
+    height: 240px !important;
+  }
+}
+
+/* ============================
+   IMAGEM IEQ
+============================ */
+.ieq-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.ieq-container img {
+  width: 250px;
+  height: 250px;
+  border-radius: 20px;
+  transition: 0.3s;
+  cursor: pointer;
+  object-fit: cover;
+}
+
+.ieq-container img:hover {
+  transform: scale(1.05);
+}
+
+/* Ajuste mobile */
+@media (max-width: 468px) {
+  .ieq-container img {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+/* ============================
+   FLIP CARDS
+============================ */
+.flip-card {
+  background: transparent;
+  width: 100%;
+  height: 230px;
+  perspective: 1000px;
+  margin-top: 20px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 10px;
+}
+
+/* Frente */
+.flip-card-front img {
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Verso */
+.flip-card-back {
+  background-color: #024c24;
+  color: white;
+  transform: rotateY(180deg);
+  padding: 10px;
+  text-align: center;
+}
+
+.icon-map {
+  font-size: 30px;
+  color: white;
+  margin-top: 10px;
+}
+
+/* Ajuste mobile */
+@media (max-width: 468px) {
+  .flip-card {
+    height: 200px;
+  }
+}
+
+/* ============================
+   REDES SOCIAIS
+============================ */
+.social-area {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin: 20px 0;
+}
+
+.social-area a {
+  font-size: 40px;
+  transition: 0.3s;
+}
+
+.social-area a:hover {
+  transform: scale(1.2);
+}

@@ -1,0 +1,16 @@
+.loginHome{
+    padding: 20px;
+    padding-left: 70px;
+    padding-right: 70px;
+    border-radius: 12px;
+    background-color: #cd933e;
+    color: white;
+    font-size: 20px;
+    letter-spacing: 4px;
+    font-weight: bold;
+}
+
+.loginHome:hover{
+    background-color: white;
+    color: #cd933e;
+}

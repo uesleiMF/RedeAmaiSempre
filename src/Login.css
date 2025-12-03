@@ -1,0 +1,82 @@
+/* Container principal */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: #f2f2f2;
+}
+
+/* Card central */
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background: #fff;
+  padding: 30px 22px;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.4s ease;
+}
+
+.login-card h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Área dos botões */
+.login-actions {
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.login-btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+.login-loading {
+  margin-left: 5px;
+}
+
+/* Link de registro */
+.login-register-link {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+/* ---------- RESPONSIVIDADE ---------- */
+
+/* Telas pequenas */
+@media (max-width: 480px) {
+
+  .login-card {
+    padding: 26px 18px;
+  }
+
+  .login-actions {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .login-register-link {
+    margin-left: 0;
+    text-align: center;
+    width: 100%;
+  }
+
+  .login-btn {
+      width: 100%;
+  }
+}
+
+/* Animação suave ao aparecer */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
