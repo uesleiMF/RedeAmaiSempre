@@ -231,7 +231,7 @@ export default class Dashboard extends Component {
 
       if (this._isMounted) {
         this.handleCasaltEditClose();
-        this.setState({ name: '', desc: '', tel: '', niverH: '', niverM: '', fileName: '' }, () => this.getCasal());
+        this.setState({ name: '', desc: '', tel: '', niverH: '', niverM: '', fileName: '', filePreview:'' }, () => this.getCasal());
       }
       if (fileInput) fileInput.value = null;
     } catch (err) {
@@ -248,7 +248,7 @@ export default class Dashboard extends Component {
       fileName: '', filePreview: ''
     });
     if (this.fileInputAddRef.current) this.fileInputAddRef.current.value = null;
-    this.getHistory(); // busca histórico do backend
+    this.getHistory();
   };
 
   handleCasalClose = () => this.setState({ openCasalModal: false });
@@ -266,7 +266,7 @@ export default class Dashboard extends Component {
       filePreview: data.image
     });
     if (this.fileInputEditRef.current) this.fileInputEditRef.current.value = null;
-    this.getHistory(); // busca histórico do backend
+    this.getHistory();
   };
 
   handleCasaltEditClose = () => this.setState({ openCasalEditModal: false });
@@ -390,7 +390,7 @@ export default class Dashboard extends Component {
   };
 
   render() {
-    const { activeTab, casais, loading, page, pages, search, filePreview, nameHistory, searchHistorico } = this.state;
+    const { activeTab, casais, loading, page, pages, search, nameHistory, searchHistorico } = this.state;
 
     const historicoFiltrado = (nameHistory || []).filter(n => n.toLowerCase().includes((searchHistorico || '').toLowerCase()));
 
@@ -452,7 +452,7 @@ export default class Dashboard extends Component {
                 <TableBody>
                   {casais.map(c => (
                     <TableRow key={c._id}>
-                      <TableCell>{c.image ? <img src={c.image} alt={c.name} width={50} /> : '—'}</TableCell>
+                      <TableCell><img src={c.image} alt={c.name} width={50} /></TableCell>
                       <TableCell>{c.name}</TableCell>
                       <TableCell>{c.desc}</TableCell>
                       <TableCell>{c.tel}</TableCell>
@@ -468,90 +468,97 @@ export default class Dashboard extends Component {
               </Table>
             </TableContainer>
 
-            {/* Paginação */}
-            <div className="pagination">
-              <Pagination count={pages} page={page} onChange={this.pageChange} color="primary" />
-            </div>
+            <Pagination count={pages} page={page} onChange={this.pageChange} color="primary" style={{ marginTop:10, display:'flex', justifyContent:'center' }} />
+
+            {/* MODAL ADICIONAR */}
+            <Dialog open={this.state.openCasalModal} onClose={this.handleCasalClose} maxWidth="sm" fullWidth>
+              <DialogTitle>Adicionar Casal</DialogTitle>
+              <DialogContent>
+
+                {/* HISTÓRICO */}
+                {nameHistory.length > 0 && (
+                  <div className="history-container" style={{ marginBottom:15 }}>
+                    <h4>Histórico de Nomes</h4>
+                    <button onClick={this.clearHistory}>Limpar Histórico</button>
+                    <TextField placeholder="Filtrar..." name="searchHistorico" value={searchHistorico} onChange={this.onChange} fullWidth margin="normal" />
+                    <ul>
+                      {historicoFiltrado.map(n => (
+                        <li key={n} style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                          <span onClick={()=>this.setState({name:n})} style={{ cursor:'pointer' }}>{n}</span>
+                          <button onClick={(e)=>this.deleteNameFromHistory(n,e)}>X</button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* CAMPOS FORM */}
+                <div className="form-fields">
+                  <TextField label="Nome" fullWidth margin="normal" name="name" value={this.state.name} onChange={this.onChange} />
+                  <TextField label="Descrição" fullWidth margin="normal" name="desc" value={this.state.desc} onChange={this.onChange} />
+                  <TextField label="Telefone" fullWidth margin="normal" name="tel" value={this.state.tel} onChange={this.onChange} />
+                  <TextField label="Aniversário Homem" type="date" fullWidth margin="normal" name="niverH" value={this.state.niverH} onChange={this.onChange} InputLabelProps={{ shrink:true }} />
+                  <TextField label="Aniversário Mulher" type="date" fullWidth margin="normal" name="niverM" value={this.state.niverM} onChange={this.onChange} InputLabelProps={{ shrink:true }} />
+                  <input type="file" ref={this.fileInputAddRef} onChange={this.onChange} />
+                  {this.state.filePreview && <img src={this.state.filePreview} alt="preview" width={100} style={{ marginTop:10 }} />}
+                </div>
+
+              </DialogContent>
+              <DialogActions>
+                <button onClick={this.handleCasalClose}>Cancelar</button>
+                <button onClick={this.addCasal}>Adicionar</button>
+              </DialogActions>
+            </Dialog>
+
+            {/* MODAL EDITAR */}
+            <Dialog open={this.state.openCasalEditModal} onClose={this.handleCasaltEditClose} maxWidth="sm" fullWidth>
+              <DialogTitle>Editar Casal</DialogTitle>
+              <DialogContent>
+
+                {/* HISTÓRICO */}
+                {nameHistory.length > 0 && (
+                  <div className="history-container" style={{ marginBottom:15 }}>
+                    <h4>Histórico de Nomes</h4>
+                    <button onClick={this.clearHistory}>Limpar Histórico</button>
+                    <TextField placeholder="Filtrar..." name="searchHistorico" value={searchHistorico} onChange={this.onChange} fullWidth margin="normal" />
+                    <ul>
+                      {historicoFiltrado.map(n => (
+                        <li key={n} style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                          <span onClick={()=>this.setState({name:n})} style={{ cursor:'pointer' }}>{n}</span>
+                          <button onClick={(e)=>this.deleteNameFromHistory(n,e)}>X</button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* CAMPOS FORM */}
+                <div className="form-fields">
+                  <TextField label="Nome" fullWidth margin="normal" name="name" value={this.state.name} onChange={this.onChange} />
+                  <TextField label="Descrição" fullWidth margin="normal" name="desc" value={this.state.desc} onChange={this.onChange} />
+                  <TextField label="Telefone" fullWidth margin="normal" name="tel" value={this.state.tel} onChange={this.onChange} />
+                  <TextField label="Aniversário Homem" type="date" fullWidth margin="normal" name="niverH" value={this.state.niverH} onChange={this.onChange} InputLabelProps={{ shrink:true }} />
+                  <TextField label="Aniversário Mulher" type="date" fullWidth margin="normal" name="niverM" value={this.state.niverM} onChange={this.onChange} InputLabelProps={{ shrink:true }} />
+                  <input type="file" ref={this.fileInputEditRef} onChange={this.onChange} />
+                  {this.state.filePreview && <img src={this.state.filePreview} alt="preview" width={100} style={{ marginTop:10 }} />}
+                </div>
+
+              </DialogContent>
+              <DialogActions>
+                <button onClick={this.handleCasaltEditClose}>Cancelar</button>
+                <button onClick={this.updateCasal}>Atualizar</button>
+              </DialogActions>
+            </Dialog>
+
           </div>
         )}
 
         {/* ABA LISTA DE CHAMADA */}
-        {activeTab === 1 && <ListaChamadas token={this.state.token} />}
-        
-        {/* MODAL ADICIONAR */}
-        <Dialog open={this.state.openCasalModal} onClose={this.handleCasalClose} fullWidth maxWidth="sm">
-          <DialogTitle>Adicionar Casal</DialogTitle>
-
-          {/* Histórico */}
-            {nameHistory.length > 0 && (
-              <div className="history-container">
-                <h4>Histórico de Nomes</h4>
-                <button onClick={this.clearHistory}>Limpar Histórico</button>
-                <TextField placeholder="Filtrar..." name="searchHistorico" value={searchHistorico} onChange={this.onChange} fullWidth margin="normal" />
-                <ul>
-                  {historicoFiltrado.map(n => (
-                    <li key={n} style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                      <span onClick={()=>this.setState({name:n})} style={{ cursor:'pointer' }}>{n}</span>
-                      <button onClick={(e)=>this.deleteNameFromHistory(n,e)}>X</button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          <DialogContent>
-            <TextField label="Nome" fullWidth margin="normal" name="name" value={this.state.name} onChange={this.onChange} />
-            <TextField label="Descrição" fullWidth margin="normal" name="desc" value={this.state.desc} onChange={this.onChange} />
-            <TextField label="Telefone" fullWidth margin="normal" name="tel" value={this.state.tel} onChange={this.onChange} />
-            <TextField label="Aniversário Homem" type="date" fullWidth margin="normal" name="niverH" value={this.state.niverH} onChange={this.onChange} InputLabelProps={{ shrink:true }} />
-            <TextField label="Aniversário Mulher" type="date" fullWidth margin="normal" name="niverM" value={this.state.niverM} onChange={this.onChange} InputLabelProps={{ shrink:true }} />
-            <input type="file" ref={this.fileInputAddRef} onChange={this.onChange} />
-            {filePreview && <img src={filePreview} alt="preview" width={100} style={{ marginTop:10 }} />}
-            
-           
-          </DialogContent>
-          <DialogActions>
-            <button onClick={this.handleCasalClose}>Cancelar</button>
-            <button onClick={this.addCasal}>Adicionar</button>
-          </DialogActions>
-        </Dialog>
-
-        {/* MODAL EDITAR */}
-        <Dialog open={this.state.openCasalEditModal} onClose={this.handleCasaltEditClose} fullWidth maxWidth="sm">
-          <DialogTitle>Editar Casal</DialogTitle>
-
-
-           {/* Histórico */}
-            {nameHistory.length > 0 && (
-              <div className="history-container">
-                <h4>Histórico de Nomes</h4>
-                <button onClick={this.clearHistory}>Limpar Histórico</button>
-                <TextField placeholder="Filtrar..." name="searchHistorico" value={searchHistorico} onChange={this.onChange} fullWidth margin="normal" />
-                <ul>
-                  {historicoFiltrado.map(n => (
-                    <li key={n} style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                      <span onClick={()=>this.setState({name:n})} style={{ cursor:'pointer' }}>{n}</span>
-                      <button onClick={(e)=>this.deleteNameFromHistory(n,e)}>X</button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          <DialogContent>
-            <TextField label="Nome" fullWidth margin="normal" name="name" value={this.state.name} onChange={this.onChange} />
-            <TextField label="Descrição" fullWidth margin="normal" name="desc" value={this.state.desc} onChange={this.onChange} />
-            <TextField label="Telefone" fullWidth margin="normal" name="tel" value={this.state.tel} onChange={this.onChange} />
-            <TextField label="Aniversário Homem" type="date" fullWidth margin="normal" name="niverH" value={this.state.niverH} onChange={this.onChange} InputLabelProps={{ shrink:true }} />
-            <TextField label="Aniversário Mulher" type="date" fullWidth margin="normal" name="niverM" value={this.state.niverM} onChange={this.onChange} InputLabelProps={{ shrink:true }} />
-            <input type="file" ref={this.fileInputEditRef} onChange={this.onChange} />
-            {filePreview && <img src={filePreview} alt="preview" width={100} style={{ marginTop:10 }} />}
-            
-            
-          </DialogContent>
-          <DialogActions>
-            <button onClick={this.handleCasaltEditClose}>Cancelar</button>
-            <button onClick={this.updateCasal}>Atualizar</button>
-          </DialogActions>
-        </Dialog>
+        {activeTab === 1 && (
+          <div className="tab-content">
+            <ListaChamadas token={this.state.token} />
+          </div>
+        )}
 
       </div>
     );
