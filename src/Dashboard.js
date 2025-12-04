@@ -20,7 +20,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Tooltip from '@material-ui/core/Tooltip';
 
-import ListaChamadas from './ListaChamadas'; // Importando componente de lista de chamadas
+import ListaChamadas from './ListaChamadas';
 import "./Dashboard.css";
 
 pdfMake.vfs = pdfFonts.vfs;
@@ -47,39 +47,31 @@ export default class Dashboard extends Component {
       search: '',
       casais: [],
       pages: 0,
-      loading: false
+      loading: false,
+      nameHistory: [], // agora vem do backend
+      searchHistorico: '',
+      nomesVisiveis: {}
     };
 
     this.fileInputAddRef = React.createRef();
     this.fileInputEditRef = React.createRef();
   }
 
-  // ---------------------------------------------------
-  // UTILITÁRIAS DE DATA (evitam -1 dia e formatam BR)
-  // ---------------------------------------------------
-
-  // Converte data da API (qualquer formato ISO) para value de <input type="date"> (YYYY-MM-DD)
+  // ---------------- Formatação de datas ----------------
   formatDateToInput = (dateString) => {
     if (!dateString) return "";
-    // Garante que o construtor interprete como UTC start-of-day
     const d = new Date(dateString);
-    // Ajusta pelo offset para normalizar a data local -> evita o -1 dia
     d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
     return d.toISOString().substring(0, 10);
   }
 
-  // Converte valor do input (YYYY-MM-DD) para uma string segura para salvar (YYYY-MM-DD)
-  // e evita problemas de timezone ao enviar ao backend
   formatDateForSave = (inputValue) => {
     if (!inputValue) return "";
-    // inputValue já costuma vir no formato YYYY-MM-DD (por type="date")
-    // Criamos um Date em meia-noite local e subtraímos o offset para preservar a data correta no backend
     const d = new Date(inputValue + "T00:00:00");
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
     return d.toISOString().split("T")[0];
   }
 
-  // Formata qualquer data (ISO ou YYYY-MM-DD) para DD/MM/YYYY para exibição (Tabela/CSV/PDF)
   formatBR = (dateString) => {
     if (!dateString) return "";
     const d = new Date(dateString);
@@ -87,8 +79,7 @@ export default class Dashboard extends Component {
     return d.toLocaleDateString('pt-BR');
   }
 
-  // ---------------------------------------------------
-
+  // ---------------- Ciclo de vida ----------------
   componentDidMount = () => {
     this._isMounted = true;
     const token = localStorage.getItem('token');
@@ -109,6 +100,7 @@ export default class Dashboard extends Component {
     return { Authorization: `Bearer ${t}`, token: t };
   }
 
+  // ---------------- API Casais ----------------
   getCasal = async () => {
     if (this._isMounted) this.setState({ loading: true });
     try {
@@ -157,7 +149,6 @@ export default class Dashboard extends Component {
   }
 
   onChange = (e) => {
-    // upload file
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (this._isMounted) this.setState({
@@ -177,6 +168,7 @@ export default class Dashboard extends Component {
     }
   };
 
+  // ---------------- Adicionar / Atualizar ----------------
   addCasal = async () => {
     const fileInput = this.fileInputAddRef.current;
     if (!fileInput || !fileInput.files[0]) return swal({ text: 'Selecione uma imagem', icon: 'error' });
@@ -187,8 +179,6 @@ export default class Dashboard extends Component {
     fd.append('name', this.state.name);
     fd.append('desc', this.state.desc);
     fd.append('tel', this.state.tel);
-
-    // converte data do input (YYYY-MM-DD) para formato seguro ao salvar
     fd.append('niverH', this.formatDateForSave(this.state.niverH));
     fd.append('niverM', this.formatDateForSave(this.state.niverM));
 
@@ -198,6 +188,9 @@ export default class Dashboard extends Component {
       });
 
       swal({ text: res.data?.message || 'Casal adicionado!', icon: "success" });
+
+      this.saveNameToHistory(this.state.name); // histórico via backend
+
       if (this._isMounted) {
         this.handleCasalClose();
         this.setState({
@@ -223,8 +216,6 @@ export default class Dashboard extends Component {
     fd.append('name', this.state.name);
     fd.append('desc', this.state.desc);
     fd.append('tel', this.state.tel);
-
-    // converte data do input de edição para formato seguro ao salvar
     fd.append('niverH', this.formatDateForSave(this.state.niverH));
     fd.append('niverM', this.formatDateForSave(this.state.niverM));
 
@@ -235,6 +226,9 @@ export default class Dashboard extends Component {
         headers: { 'content-type': 'multipart/form-data', ...this.getAuthHeaders() }
       });
       swal({ text: res.data?.message || 'Atualizado!', icon: 'success' });
+
+      this.saveNameToHistory(this.state.name); // histórico via backend
+
       if (this._isMounted) {
         this.handleCasaltEditClose();
         this.setState({ name: '', desc: '', tel: '', niverH: '', niverM: '', fileName: '' }, () => this.getCasal());
@@ -254,12 +248,12 @@ export default class Dashboard extends Component {
       fileName: '', filePreview: ''
     });
     if (this.fileInputAddRef.current) this.fileInputAddRef.current.value = null;
+    this.getHistory(); // busca histórico do backend
   };
 
   handleCasalClose = () => this.setState({ openCasalModal: false });
 
   handleCasalEditOpen = (data) => {
-    // Ao abrir modal de edição, convertemos as datas vindas da API para o formato do input (YYYY-MM-DD)
     this.setState({
       openCasalEditModal: true,
       id: data._id,
@@ -272,10 +266,60 @@ export default class Dashboard extends Component {
       filePreview: data.image
     });
     if (this.fileInputEditRef.current) this.fileInputEditRef.current.value = null;
+    this.getHistory(); // busca histórico do backend
   };
 
   handleCasaltEditClose = () => this.setState({ openCasalEditModal: false });
 
+  // ---------------- Histórico via backend ----------------
+  getHistory = async () => {
+    try {
+      const res = await axios.get('https://backtestmar.onrender.com/history', {
+        headers: this.getAuthHeaders()
+      });
+      if (this._isMounted) this.setState({ nameHistory: res.data.history || [] });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  saveNameToHistory = async (name) => {
+    if (!name) return;
+    try {
+      const res = await axios.post('https://backtestmar.onrender.com/history/add', { name }, {
+        headers: this.getAuthHeaders()
+      });
+      if (this._isMounted) this.setState({ nameHistory: res.data.history || [] });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  deleteNameFromHistory = async (nome, e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    try {
+      const res = await axios.delete(`https://backtestmar.onrender.com/history/delete/${encodeURIComponent(nome)}`, {
+        headers: this.getAuthHeaders()
+      });
+      if (this._isMounted) this.setState({ nameHistory: res.data.history || [] });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  clearHistory = async () => {
+    if (!window.confirm('Limpar todo o histórico de nomes?')) return;
+    try {
+      await axios.delete('https://backtestmar.onrender.com/history/clear', {
+        headers: this.getAuthHeaders()
+      });
+      if (this._isMounted) this.setState({ nameHistory: [] });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  // ---------------- PDF ----------------
   generatePDF = async () => {
     const { casais } = this.state;
     const toBase64 = (url) => {
@@ -302,7 +346,6 @@ export default class Dashboard extends Component {
       return { ...c, imgBase64 };
     }));
 
-    // Monta o body da tabela usando formatBR para as datas
     const body = [['Imagem','Nome Casal','Descrição','Contato','Aniversário Homem','Aniversário Mulher']];
     casaisComImg.forEach(c => {
       body.push([
@@ -347,7 +390,9 @@ export default class Dashboard extends Component {
   };
 
   render() {
-    const { activeTab, casais, loading, page, pages, filePreview } = this.state;
+    const { activeTab, casais, loading, page, pages, search, filePreview, nameHistory, searchHistorico } = this.state;
+
+    const historicoFiltrado = (nameHistory || []).filter(n => n.toLowerCase().includes((searchHistorico || '').toLowerCase()));
 
     return (
       <div className="dashboard-container">
@@ -357,20 +402,17 @@ export default class Dashboard extends Component {
           <Tab label="Lista de Chamada" />
         </Tabs>
 
-        {/* ABA 0 → Casais */}
+        {/* ABA CASAIS */}
         {activeTab === 0 && (
           <div className="tab-content">
             {loading && <div className="loading-container"><CircularProgress color="inherit" /></div>}
 
+            {/* Top Bar */}
             <div className="top-bar">
               <h2>CELULAS DE CASAIS</h2>
               <div className="top-bar-icons">
-                <Tooltip title="Adicionar Casal">
-                  <IconButton color="primary" onClick={this.handleCasalOpen}><AddCircleIcon /></IconButton>
-                </Tooltip>
-                <Tooltip title="Exportar PDF">
-                  <IconButton color="default" onClick={this.generatePDF}><PictureAsPdfIcon /></IconButton>
-                </Tooltip>
+                <Tooltip title="Adicionar Casal"><IconButton color="primary" onClick={this.handleCasalOpen}><AddCircleIcon /></IconButton></Tooltip>
+                <Tooltip title="Exportar PDF"><IconButton color="default" onClick={this.generatePDF}><PictureAsPdfIcon /></IconButton></Tooltip>
                 <Tooltip title="Exportar CSV">
                   <CSVLink
                     data={casais.map(c => ({
@@ -386,112 +428,131 @@ export default class Dashboard extends Component {
                     <IconButton color="default"><GetAppIcon /></IconButton>
                   </CSVLink>
                 </Tooltip>
-                <Tooltip title="Sair">
-                  <IconButton color="secondary" onClick={this.logOut}><ExitToAppIcon /></IconButton>
-                </Tooltip>
+                <Tooltip title="Sair"><IconButton color="secondary" onClick={this.logOut}><ExitToAppIcon /></IconButton></Tooltip>
               </div>
             </div>
 
-            {/* MODAIS */}
-            <Dialog open={this.state.openCasalModal} onClose={this.handleCasalClose}>
-              <DialogTitle>Adicionar Casal</DialogTitle>
-              <DialogContent>
-                <TextField type="text" name="name" value={this.state.name} onChange={this.onChange} placeholder="Nome Casal" fullWidth margin="dense" />
-                <TextField type="text" name="desc" value={this.state.desc} onChange={this.onChange} placeholder="Descrição" fullWidth margin="dense" />
-                <TextField type="text" name="tel" value={this.state.tel} onChange={this.onChange} placeholder="Contato" fullWidth margin="dense" />
-                {/* No modal de adicionar mantemos type="date" — o valor salvo é tratado ao enviar */}
-                <TextField type="date" name="niverH" value={this.state.niverH} onChange={this.onChange} fullWidth margin="dense" />
-                <TextField type="date" name="niverM" value={this.state.niverM} onChange={this.onChange} fullWidth margin="dense" />
-                <div className="file-input-row">
-                  <input ref={this.fileInputAddRef} type="file" accept="image/*" onChange={this.onChange} />
-                  <span>{this.state.fileName}</span>
-                </div>
-                {filePreview && <div className="preview-img-container"><img src={filePreview} alt="Preview" className="preview-img" /></div>}
-              </DialogContent>
-              <DialogActions>
-                <IconButton onClick={this.handleCasalClose} color="primary"><DeleteIcon /></IconButton>
-                <IconButton onClick={this.addCasal} color="primary"><AddCircleIcon /></IconButton>
-              </DialogActions>
-            </Dialog>
+            {/* Busca */}
+            <TextField placeholder="Buscar..." name="search" value={search} onChange={this.onChange} fullWidth margin="normal" />
 
-            <Dialog open={this.state.openCasalEditModal} onClose={this.handleCasaltEditClose}>
-              <DialogTitle>Editar Casal</DialogTitle>
-              <DialogContent>
-                <TextField type="text" name="name" value={this.state.name} onChange={this.onChange} placeholder="Nome Casal" fullWidth margin="dense" />
-                <TextField type="text" name="desc" value={this.state.desc} onChange={this.onChange} placeholder="Descrição" fullWidth margin="dense" />
-                <TextField type="text" name="tel" value={this.state.tel} onChange={this.onChange} placeholder="Contato" fullWidth margin="dense" />
-                {/* Aqui mostramos o value já convertido para YYYY-MM-DD com formatDateToInput */}
-                <TextField type="date" name="niverH" value={this.state.niverH} onChange={this.onChange} fullWidth margin="dense" />
-                <TextField type="date" name="niverM" value={this.state.niverM} onChange={this.onChange} fullWidth margin="dense" />
-                <div className="file-input-row">
-                  <input ref={this.fileInputEditRef} type="file" accept="image/*" onChange={this.onChange} />
-                  <span>{this.state.fileName}</span>
-                </div>
-                {filePreview && <div className="preview-img-container"><img src={filePreview} alt="Preview" className="preview-img" /></div>}
-              </DialogContent>
-              <DialogActions>
-                <IconButton onClick={this.handleCasaltEditClose} color="primary"><DeleteIcon /></IconButton>
-                <IconButton onClick={this.updateCasal} color="primary"><EditIcon /></IconButton>
-              </DialogActions>
-            </Dialog>
-
-            {/* TABELA */}
-            <TableContainer>
-              <div className="search-box">
-                <TextField type="search" name="search" value={this.state.search} onChange={this.onChange} placeholder="Procurar Casais" variant="outlined" size="small" />
-              </div>
+            {/* Tabela */}
+            <TableContainer className="table-container">
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell align="center">Imagem</TableCell>
-                    <TableCell align="center">Nome Casal</TableCell>
-                    <TableCell align="center">Descrição</TableCell>
-                    <TableCell align="center">Contato</TableCell>
-                    <TableCell align="center">Aniversário Homem</TableCell>
-                    <TableCell align="center">Aniversário Mulher</TableCell>
-                    <TableCell align="center">Ação</TableCell>
+                    <TableCell>Imagem</TableCell>
+                    <TableCell>Nome</TableCell>
+                    <TableCell>Descrição</TableCell>
+                    <TableCell>Contato</TableCell>
+                    <TableCell>Niver H</TableCell>
+                    <TableCell>Niver M</TableCell>
+                    <TableCell>Ações</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {casais.length === 0 && !loading && (
-                    <TableRow>
-                      <TableCell colSpan={7} align="center">Nenhum casal encontrado</TableCell>
-                    </TableRow>
-                  )}
-
-                  {casais.map(row => (
-                    <TableRow key={row._id || row.name}>
-                      <TableCell align="center">{row.image ? <img src={row.image} alt={row.name} className="table-img" /> : '—'}</TableCell>
-                      <TableCell align="center">{row.name}</TableCell>
-                      <TableCell align="center">{row.desc}</TableCell>
-                      <TableCell align="center">{row.tel}</TableCell>
-                      <TableCell align="center">{this.formatBR(row.niverH)}</TableCell>
-                      <TableCell align="center">{this.formatBR(row.niverM)}</TableCell>
-                      <TableCell align="center">
-                        <Tooltip title="Editar">
-                          <IconButton onClick={() => this.handleCasalEditOpen(row)} color="primary"><EditIcon /></IconButton>
-                        </Tooltip>
-                        <Tooltip title="Excluir">
-                          <IconButton onClick={() => this.deleteCasal(row._id)} color="secondary"><DeleteIcon /></IconButton>
-                        </Tooltip>
+                  {casais.map(c => (
+                    <TableRow key={c._id}>
+                      <TableCell>{c.image ? <img src={c.image} alt={c.name} width={50} /> : '—'}</TableCell>
+                      <TableCell>{c.name}</TableCell>
+                      <TableCell>{c.desc}</TableCell>
+                      <TableCell>{c.tel}</TableCell>
+                      <TableCell>{this.formatBR(c.niverH)}</TableCell>
+                      <TableCell>{this.formatBR(c.niverM)}</TableCell>
+                      <TableCell>
+                        <Tooltip title="Editar"><IconButton onClick={()=>this.handleCasalEditOpen(c)}><EditIcon /></IconButton></Tooltip>
+                        <Tooltip title="Excluir"><IconButton onClick={()=>this.deleteCasal(c._id)}><DeleteIcon /></IconButton></Tooltip>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              <div className="pagination-area">
-                <Pagination count={pages} page={page} onChange={this.pageChange} color="primary" />
-              </div>
             </TableContainer>
+
+            {/* Paginação */}
+            <div className="pagination">
+              <Pagination count={pages} page={page} onChange={this.pageChange} color="primary" />
+            </div>
           </div>
         )}
 
-        {/* ABA 1 → Lista de Chamada */}
-        {activeTab === 1 && (
-          <div className="tab-content">
-            <ListaChamadas token={this.state.token} />
-          </div>
-        )}
+        {/* ABA LISTA DE CHAMADA */}
+        {activeTab === 1 && <ListaChamadas token={this.state.token} />}
+        
+        {/* MODAL ADICIONAR */}
+        <Dialog open={this.state.openCasalModal} onClose={this.handleCasalClose} fullWidth maxWidth="sm">
+          <DialogTitle>Adicionar Casal</DialogTitle>
+
+          {/* Histórico */}
+            {nameHistory.length > 0 && (
+              <div className="history-container">
+                <h4>Histórico de Nomes</h4>
+                <button onClick={this.clearHistory}>Limpar Histórico</button>
+                <TextField placeholder="Filtrar..." name="searchHistorico" value={searchHistorico} onChange={this.onChange} fullWidth margin="normal" />
+                <ul>
+                  {historicoFiltrado.map(n => (
+                    <li key={n} style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                      <span onClick={()=>this.setState({name:n})} style={{ cursor:'pointer' }}>{n}</span>
+                      <button onClick={(e)=>this.deleteNameFromHistory(n,e)}>X</button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          <DialogContent>
+            <TextField label="Nome" fullWidth margin="normal" name="name" value={this.state.name} onChange={this.onChange} />
+            <TextField label="Descrição" fullWidth margin="normal" name="desc" value={this.state.desc} onChange={this.onChange} />
+            <TextField label="Telefone" fullWidth margin="normal" name="tel" value={this.state.tel} onChange={this.onChange} />
+            <TextField label="Aniversário Homem" type="date" fullWidth margin="normal" name="niverH" value={this.state.niverH} onChange={this.onChange} InputLabelProps={{ shrink:true }} />
+            <TextField label="Aniversário Mulher" type="date" fullWidth margin="normal" name="niverM" value={this.state.niverM} onChange={this.onChange} InputLabelProps={{ shrink:true }} />
+            <input type="file" ref={this.fileInputAddRef} onChange={this.onChange} />
+            {filePreview && <img src={filePreview} alt="preview" width={100} style={{ marginTop:10 }} />}
+            
+           
+          </DialogContent>
+          <DialogActions>
+            <button onClick={this.handleCasalClose}>Cancelar</button>
+            <button onClick={this.addCasal}>Adicionar</button>
+          </DialogActions>
+        </Dialog>
+
+        {/* MODAL EDITAR */}
+        <Dialog open={this.state.openCasalEditModal} onClose={this.handleCasaltEditClose} fullWidth maxWidth="sm">
+          <DialogTitle>Editar Casal</DialogTitle>
+
+
+           {/* Histórico */}
+            {nameHistory.length > 0 && (
+              <div className="history-container">
+                <h4>Histórico de Nomes</h4>
+                <button onClick={this.clearHistory}>Limpar Histórico</button>
+                <TextField placeholder="Filtrar..." name="searchHistorico" value={searchHistorico} onChange={this.onChange} fullWidth margin="normal" />
+                <ul>
+                  {historicoFiltrado.map(n => (
+                    <li key={n} style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                      <span onClick={()=>this.setState({name:n})} style={{ cursor:'pointer' }}>{n}</span>
+                      <button onClick={(e)=>this.deleteNameFromHistory(n,e)}>X</button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          <DialogContent>
+            <TextField label="Nome" fullWidth margin="normal" name="name" value={this.state.name} onChange={this.onChange} />
+            <TextField label="Descrição" fullWidth margin="normal" name="desc" value={this.state.desc} onChange={this.onChange} />
+            <TextField label="Telefone" fullWidth margin="normal" name="tel" value={this.state.tel} onChange={this.onChange} />
+            <TextField label="Aniversário Homem" type="date" fullWidth margin="normal" name="niverH" value={this.state.niverH} onChange={this.onChange} InputLabelProps={{ shrink:true }} />
+            <TextField label="Aniversário Mulher" type="date" fullWidth margin="normal" name="niverM" value={this.state.niverM} onChange={this.onChange} InputLabelProps={{ shrink:true }} />
+            <input type="file" ref={this.fileInputEditRef} onChange={this.onChange} />
+            {filePreview && <img src={filePreview} alt="preview" width={100} style={{ marginTop:10 }} />}
+            
+            
+          </DialogContent>
+          <DialogActions>
+            <button onClick={this.handleCasaltEditClose}>Cancelar</button>
+            <button onClick={this.updateCasal}>Atualizar</button>
+          </DialogActions>
+        </Dialog>
+
       </div>
     );
   }

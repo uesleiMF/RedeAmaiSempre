@@ -59,6 +59,20 @@
   box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
+.MuiTableCell-root {
+  text-align: center;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.MuiTableBody-root tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.MuiTableBody-root tr:hover {
+  background-color: #e3f2fd;
+}
+
 .table-img {
   width: 90px;
   height: 90px;
@@ -66,6 +80,12 @@
   border-radius: 4px;
   display: block;
   margin: 0 auto;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.table-img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 /* ---------------- Preview Imagem ---------------- */
@@ -80,6 +100,12 @@
   object-fit: contain;
   border-radius: 4px;
   border: 1px solid #ccc;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.preview-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 /* ---------------- File Input ---------------- */
@@ -98,20 +124,117 @@
 .file-input-row span {
   font-size: 14px;
   color: #555;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 /* ---------------- Modal ---------------- */
 .MuiDialog-paper {
-  width: 400px;
-  max-width: 90%;
-  padding: 10px;
+  width: 500px;
+  max-width: 95%;
+  padding: 20px;
+  border-radius: 12px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.MuiDialogTitle-root {
+  font-weight: bold;
+  font-size: 18px;
+  color: #0f40e4;
 }
 
 .MuiDialogContent-root {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+/* ---------------- Modal Buttons ---------------- */
+.MuiDialogActions-root button,
+button.btn-save {
+  padding: 6px 15px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+}
+
+button.btn-save {
+  background-color: #0f40e4;
+  color: #fff;
+}
+
+button.btn-save:hover {
+  background-color: #0928a4;
+}
+
+.MuiDialogActions-root button:hover {
+  opacity: 0.85;
+}
+
+/* ---------------- Histórico de Nomes Adaptável ---------------- */
+.historico-container {
+  max-height: calc(80vh - 150px); /* ocupa até 80% da tela menos espaço para header e padding */
+  min-height: 150px;             /* garante que não fique muito pequeno */
+  overflow-y: auto;              /* scroll aparece se passar do max-height */
+  border: 1px solid #ccc;
+  padding: 15px;                 /* mais espaço interno para os nomes */
+  border-radius: 6px;
+  background-color: #fff;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;                     /* espaço maior entre os itens */
+}
+
+.historico-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f5f5f5;
+  padding: 12px 15px;           /* mais espaço interno */
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: normal;           /* permite quebra de linha */
+  word-break: break-word;        /* nomes longos quebram corretamente */
+  overflow-wrap: break-word;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.historico-item:hover {
+  background-color: #e3f2fd;
+  transform: scale(1.02);
+}
+
+.historico-item .MuiIconButton-root {
+  visibility: hidden;
+  transition: visibility 0.2s, opacity 0.2s;
+}
+
+.historico-item:hover .MuiIconButton-root {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+
+.clear-history-btn {
+  margin-top: 10px;
+  padding: 6px 12px;
+  background-color: #f44336;
+  color: #fff;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.clear-history-btn:hover {
+  opacity: 0.85;
 }
 
 /* ---------------- Pagination ---------------- */
@@ -121,25 +244,13 @@
   margin-top: 15px;
 }
 
-/* ---------------- Buttons ---------------- */
+/* ---------------- Buttons Hover ---------------- */
 .MuiIconButton-root {
   transition: transform 0.2s;
 }
 
 .MuiIconButton-root:hover {
   transform: scale(1.1);
-}
-
-/* ---------------- Table Text Alignment ---------------- */
-.MuiTableCell-root {
-  text-align: center;
-  vertical-align: middle;
-  font-size: 14px;
-}
-
-/* ---------------- Alternating Row Colors ---------------- */
-.MuiTableBody-root tr:nth-child(even) {
-  background-color: #f9f9f9;
 }
 
 /* ---------------- Responsividade ---------------- */
@@ -156,10 +267,10 @@
   .MuiTable-root {
     font-size: 12px;
   }
- 
+
   .table-img {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
   }
 }
 
@@ -187,8 +298,8 @@
   }
 
   .table-img {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
   }
 
   .preview-img {
