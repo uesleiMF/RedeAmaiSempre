@@ -32,7 +32,9 @@
 /* Inputs */
 .lista-chamadas-container input[type="text"],
 .lista-chamadas-container input[type="date"],
-.lista-chamadas-container input[type="number"] {
+.lista-chamadas-container input[type="number"],
+.lista-chamadas-container input[type="time"],
+.lista-chamadas-container textarea {
   padding: 0.5rem 0.75rem;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -43,8 +45,16 @@
   transition: border 0.2s;
 }
 
-.lista-chamadas-container input:focus {
+.lista-chamadas-container input:focus,
+.lista-chamadas-container textarea:focus {
   border-color: #4f46e5; /* roxo */
+}
+
+/* Textarea de observação */
+.lista-chamadas-container textarea {
+  min-height: 80px;
+  resize: vertical;
+  overflow-wrap: break-word;
 }
 
 /* Botões */
@@ -162,7 +172,8 @@
   }
 
   .lista-chamadas-container input,
-  .lista-chamadas-container button {
+  .lista-chamadas-container button,
+  .lista-chamadas-container textarea {
     font-size: 0.9rem;
   }
 

@@ -7,12 +7,16 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import "./ListaChamadas.css";
 
 export default function ListaChamadas({ token }) {
-  // --------------------------
-  // ESTADOS
-  // --------------------------
   const [students, setStudents] = useState([]);
   const [name, setName] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+
+  const [nomeCelula, setNomeCelula] = useState("");
+  const [horario, setHorario] = useState("");
+  const [tema, setTema] = useState("");
+  const [dinamica, setDinamica] = useState("");
+  const [louvor, setLouvor] = useState("");
+  const [observacao, setObservacao] = useState("");
 
   const [ofertas, setOfertas] = useState([]);
   const [descricaoOferta, setDescricaoOferta] = useState("");
@@ -21,9 +25,7 @@ export default function ListaChamadas({ token }) {
   const [nameHistory, setNameHistory] = useState([]);
   const [searchHistorico, setSearchHistorico] = useState("");
 
-  // --------------------------
-  // EFEITO INICIAL – Buscar histórico do backend
-  // --------------------------
+  // Buscar histórico
   useEffect(() => {
     if (!token) return;
     axios
@@ -36,12 +38,8 @@ export default function ListaChamadas({ token }) {
       .catch((err) => console.log(err));
   }, [token]);
 
-  // --------------------------
-  // HISTÓRICO DE NOMES
-  // --------------------------
   const saveNameToHistory = (nome) => {
     if (!nome) return;
-
     axios
       .post(
         "https://backtestmar.onrender.com/history/add",
@@ -56,37 +54,31 @@ export default function ListaChamadas({ token }) {
 
   const deleteNameFromHistory = (nome, e) => {
     if (e && e.stopPropagation) e.stopPropagation();
-
     axios
-      .delete(`https://backtestmar.onrender.com/history/delete/${encodeURIComponent(nome)}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .delete(
+        `https://backtestmar.onrender.com/history/delete/${encodeURIComponent(
+          nome
+        )}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
       .then((res) => {
         if (res.data.status) setNameHistory(res.data.history);
-      })
-      .catch((err) => console.log(err));
+      });
   };
 
   const clearHistory = () => {
     if (!window.confirm("Limpar todo o histórico de nomes?")) return;
-
     axios
       .delete("https://backtestmar.onrender.com/history/clear", {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => {
-        if (res.data.status) setNameHistory([]);
-      })
-      .catch((err) => console.log(err));
+      .then(() => setNameHistory([]));
   };
 
   const historicoFiltrado = nameHistory.filter((n) =>
     n.toLowerCase().includes(searchHistorico.toLowerCase())
   );
 
-  // --------------------------
-  // FUNÇÕES DE DATA
-  // --------------------------
   const ajustarDataInput = (dateStr) => {
     if (!dateStr) return "";
     const date = new Date(dateStr + "T00:00:00");
@@ -107,16 +99,19 @@ export default function ListaChamadas({ token }) {
     return date.toLocaleDateString("pt-BR");
   };
 
-  // --------------------------
-  // FUNÇÕES DE CASAIS
-  // --------------------------
   const addStudent = () => {
     const trimmedName = name.trim();
     if (!trimmedName) return;
-    if (students.some((s) => s.nome.toLowerCase() === trimmedName.toLowerCase())) {
+
+    if (
+      students.some(
+        (s) => s.nome.toLowerCase() === trimmedName.toLowerCase()
+      )
+    ) {
       alert("Casal já cadastrado!");
       return;
     }
+
     setStudents([...students, { nome: trimmedName, presenca: false }]);
     saveNameToHistory(trimmedName);
     setName("");
@@ -133,18 +128,16 @@ export default function ListaChamadas({ token }) {
   };
 
   const clearList = () => {
-    if (window.confirm("Deseja realmente limpar toda a lista de Casais?")) {
+    if (window.confirm("Deseja realmente limpar toda a lista?")) {
       setStudents([]);
     }
   };
 
-  // --------------------------
-  // FUNÇÕES DE OFERTAS
-  // --------------------------
   const addOferta = () => {
     const desc = descricaoOferta.trim();
     const val = parseFloat(valorOferta);
     if (!desc || isNaN(val) || val <= 0) return;
+
     setOfertas([...ofertas, { descricao: desc, valor: val }]);
     setDescricaoOferta("");
     setValorOferta("");
@@ -160,9 +153,7 @@ export default function ListaChamadas({ token }) {
     }
   };
 
-  // --------------------------
-  // EXPORTAR PDF
-  // --------------------------
+  // ----------------------- PDF -----------------------
   const exportPDF = () => {
     if (students.length === 0 && ofertas.length === 0) {
       alert("Não há dados para exportar!");
@@ -170,64 +161,133 @@ export default function ListaChamadas({ token }) {
     }
 
     const doc = new jsPDF();
+    const width = doc.internal.pageSize.getWidth();
+    const margin = 15;
+    let y = 20;
+
     const dataFormatada = formatDateBR(selectedDate);
 
+    // Título
     doc.setFontSize(16);
-    doc.text(`Lista de Casais - ${dataFormatada}`, 14, 20);
+    doc.text(`Lista de Casais - ${dataFormatada}`, width / 2, y, { align: "center" });
+
+    doc.setFontSize(12);
+    y += 10;
+    doc.text(`Nome da Célula: ${nomeCelula || "Não informado"}`, margin, y);
+    y += 7;
+    doc.text(`Horário: ${horario || "Não informado"}`, margin, y);
+    y += 7;
+    doc.text(`Tema: ${tema || "Não informado"}`, margin, y);
+    y += 7;
+    doc.text(`Dinâmica: ${dinamica || "Não informada"}`, margin, y);
+    y += 7;
+    doc.text(`Louvor: ${louvor || "Não informado"}`, margin, y);
+    y += 10;
 
     if (students.length > 0) {
       autoTable(doc, {
         head: [["#", "Nome de Casais", "Presença"]],
-        body: students.map((s, i) => [i + 1, s.nome, s.presenca ? "Presente" : "Ausente"]),
-        startY: 30,
+        body: students.map((s, i) => [
+          i + 1,
+          s.nome,
+          s.presenca ? "Presente" : "Ausente",
+        ]),
+        startY: y,
+        margin: { left: margin, right: margin },
         didParseCell: (data) => {
           if (data.column.index === 2) {
-            if (data.cell.raw === "Presente") data.cell.styles.fillColor = [144, 238, 144];
-            else if (data.cell.raw === "Ausente") data.cell.styles.fillColor = [255, 182, 193];
+            if (data.cell.raw === "Presente")
+              data.cell.styles.fillColor = [144, 238, 144];
+            else data.cell.styles.fillColor = [255, 182, 193];
           }
         },
       });
+      y = doc.lastAutoTable.finalY + 10;
     }
 
     if (ofertas.length > 0) {
-      const startY = doc.lastAutoTable?.finalY + 10 || 50;
-      doc.text("Contribuições/Ofertas", 14, startY);
+      doc.text("Contribuições/Ofertas", width / 2, y, { align: "center" });
+      y += 5;
       autoTable(doc, {
         head: [["#", "Descrição", "Valor"]],
         body: ofertas.map((o, i) => [
           i + 1,
           o.descricao,
-          new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor),
+          new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }).format(o.valor),
         ]),
-        startY: startY + 5,
+        startY: y,
+        margin: { left: margin, right: margin },
       });
+      y = doc.lastAutoTable.finalY + 10;
+    }
+
+    if (observacao) {
+      doc.text("Observação:", margin, y);
+      const splitObs = doc.splitTextToSize(observacao, width - 2 * margin);
+      y += 7;
+      doc.text(splitObs, margin, y);
     }
 
     doc.save("lista-chamada-ofertas.pdf");
   };
 
-  // --------------------------
-  // JSX
-  // --------------------------
   return (
     <div className="lista-chamadas-container">
-      <h2>Lista-Chamada-De-Casais</h2>
+      <h2 style={{ textAlign: "center" }}>Lista-Chamada-De-Casais</h2>
 
-      {/* Histórico de nomes */}
-      <h4>Histórico de nomes</h4>
+      <input
+        type="text"
+        placeholder="Nome da Célula"
+        value={nomeCelula}
+        onChange={(e) => setNomeCelula(e.target.value)}
+      />
+
+      <input
+        type="text"
+        placeholder="Horário de Início e Fim"
+        value={horario}
+        onChange={(e) => setHorario(e.target.value)}
+      />
+
+      <input
+        type="text"
+        placeholder="Tema da célula"
+        value={tema}
+        onChange={(e) => setTema(e.target.value)}
+      />
+
+      <input
+        type="text"
+        placeholder="Dinâmica da célula"
+        value={dinamica}
+        onChange={(e) => setDinamica(e.target.value)}
+      />
+
+      <input
+        type="text"
+        placeholder="Louvor"
+        value={louvor}
+        onChange={(e) => setLouvor(e.target.value)}
+      />
+
+      <h2 style={{ textAlign: "center" }}>Histórico de Nomes</h2>
       <input
         type="text"
         placeholder="Pesquisar histórico..."
         value={searchHistorico}
         onChange={(e) => setSearchHistorico(e.target.value)}
       />
+
       <div style={{ maxHeight: 150, overflow: "auto", border: "1px solid #ccc", padding: 10, borderRadius: 6 }}>
         {historicoFiltrado.length === 0 && <p>Nenhum nome encontrado.</p>}
         {historicoFiltrado.map((nome) => (
           <div
             key={nome}
-            style={{ display: "flex", justifyContent: "space-between", background: "#f5f5f5", padding: 6, marginBottom: 6, borderRadius: 4, cursor: "pointer" }}
             onClick={() => setName(nome)}
+            style={{ display: "flex", justifyContent: "space-between", background: "#f5f5f5", padding: 6, marginBottom: 6, borderRadius: 4, cursor: "pointer" }}
           >
             <span>{nome}</span>
             <IconButton size="small" onClick={(e) => deleteNameFromHistory(nome, e)}>
@@ -235,15 +295,17 @@ export default function ListaChamadas({ token }) {
             </IconButton>
           </div>
         ))}
+
         {nameHistory.length > 0 && (
-          <button style={{ marginTop: 10, padding: 5, cursor: "pointer", borderRadius: 4 }} onClick={clearHistory}>
+          <button onClick={clearHistory} style={{ marginTop: 10 }}>
             Limpar histórico
           </button>
         )}
       </div>
 
-      {/* Input de adicionar casal */}
       <div className="input-group">
+        <h2 style={{ textAlign: "center" }}>Casais Participantes</h2>
+
         <input
           type="text"
           value={name}
@@ -255,7 +317,6 @@ export default function ListaChamadas({ token }) {
         </button>
       </div>
 
-      {/* Lista de casais */}
       {students.length > 0 && (
         <>
           <div className="presenca-contagem">
@@ -268,10 +329,7 @@ export default function ListaChamadas({ token }) {
               <li key={index}>
                 <span>{aluno.nome}</span>
                 <div className="aluno-buttons">
-                  <button
-                    onClick={() => togglePresenca(index)}
-                    className={aluno.presenca ? "btn-presente" : "btn-ausente"}
-                  >
+                  <button onClick={() => togglePresenca(index)} className={aluno.presenca ? "btn-presente" : "btn-ausente"}>
                     {aluno.presenca ? "Presente" : "Ausente"}
                   </button>
                   <button onClick={() => removeStudent(index)} className="btn-remover">
@@ -283,14 +341,12 @@ export default function ListaChamadas({ token }) {
           </ul>
 
           <div className="bottom-buttons">
-            <button onClick={clearList} className="btn-limpar">
-              Limpar Lista
-            </button>
+            <button onClick={clearList} className="btn-limpar">Limpar Lista</button>
           </div>
         </>
       )}
 
-      {/* Input de data */}
+      <h2 style={{ textAlign: "center" }}>Data</h2>
       <input
         type="date"
         value={ajustarDataInput(selectedDate)}
@@ -298,26 +354,11 @@ export default function ListaChamadas({ token }) {
       />
       {selectedDate && <p style={{ textAlign: "center" }}>Data: {formatDateBR(selectedDate)}</p>}
 
-      {/* Ofertas */}
-      <h2>Contribuições/Ofertas</h2>
+      <h2 style={{ textAlign: "center" }}>Contribuições/Ofertas</h2>
       <div className="input-group">
-        <input
-          type="text"
-          value={descricaoOferta}
-          onChange={(e) => setDescricaoOferta(e.target.value)}
-          placeholder="Descrição da oferta"
-        />
-        <input
-          type="number"
-          value={valorOferta}
-          onChange={(e) => setValorOferta(e.target.value)}
-          placeholder="Valor (R$)"
-          min="0.01"
-          step="0.01"
-        />
-        <button onClick={addOferta} className="btn-adicionar">
-          Adicionar
-        </button>
+        <input type="text" value={descricaoOferta} onChange={(e) => setDescricaoOferta(e.target.value)} placeholder="Descrição da oferta" />
+        <input type="number" value={valorOferta} onChange={(e) => setValorOferta(e.target.value)} placeholder="Valor (R$)" min="0.01" step="0.01" />
+        <button onClick={addOferta} className="btn-adicionar">Adicionar</button>
       </div>
 
       {ofertas.length > 0 && (
@@ -325,34 +366,37 @@ export default function ListaChamadas({ token }) {
           <ul className="lista-alunos">
             {ofertas.map((o, index) => (
               <li key={index}>
-                <span>
-                  {o.descricao} –{" "}
-                  {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor)}
-                </span>
-                <button onClick={() => removeOferta(index)} className="btn-remover">
-                  Remover
-                </button>
+                <span>{o.descricao} – {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor)}</span>
+                <button onClick={() => removeOferta(index)} className="btn-remover">Remover</button>
               </li>
             ))}
           </ul>
 
           <div className="presenca-contagem">
-            Total arrecadado:{" "}
-            {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
-              ofertas.reduce((acc, o) => acc + o.valor, 0)
-            )}
+            Total arrecadado: {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(ofertas.reduce((acc, o) => acc + o.valor, 0))}
           </div>
 
           <div className="bottom-buttons">
-            <button onClick={limparOfertas} className="btn-limpar">
-              Limpar Ofertas
-            </button>
+            <button onClick={limparOfertas} className="btn-limpar">Limpar Ofertas</button>
           </div>
         </>
       )}
 
-      {/* Exportar PDF */}
-      <button onClick={exportPDF} className="btn-exportar">
+     <textarea
+  placeholder="Observação"
+  value={observacao}
+  onChange={(e) => setObservacao(e.target.value)}
+  style={{
+    width: "100%",
+    marginTop: 10,
+    padding: 6,
+    minHeight: 60,   // altura inicial
+    resize: "vertical", // permite ajustar a altura manualmente
+  }}
+/>
+
+
+      <button onClick={exportPDF} className="btn-exportar" style={{ marginTop: 10 }}>
         Exportar PDF
       </button>
     </div>

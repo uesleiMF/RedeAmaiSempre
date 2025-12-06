@@ -469,7 +469,10 @@ export default class Dashboard extends Component {
               </Table>
             </TableContainer>
 
+
             <Pagination count={pages} page={page} onChange={this.pageChange} color="primary" style={{ marginTop:10, display:'flex', justifyContent:'center' }} />
+
+
 {/* MODAL ADICIONAR */}
 <Dialog open={this.state.openCasalModal} onClose={this.handleCasalClose} maxWidth="sm" fullWidth>
   <DialogTitle>Adicionar Casal</DialogTitle>
