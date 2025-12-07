@@ -2,59 +2,60 @@
 
 /* Container principal */
 .lista-chamadas-container {
-  max-width: 600px;
+  max-width: 700px;
   margin: 2rem auto;
-  padding: 3.5rem;
+  padding: 2rem 3rem;
   background-color: #f9f9f9;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(51, 174, 10, 0.1);
+  box-shadow: 0 4px 12px rgba(51, 174, 10, 0.15);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Título */
 .lista-chamadas-container h2 {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: bold;
   text-align: center;
   margin-bottom: 1rem;
-  color: #333;
+  color: #111827;
 }
 
-/* Agrupamento dos inputs — (IMPORTANTE PARA NÃO SUMIR) */
+/* Agrupamento dos inputs */
 .input-group {
   display: flex;
   gap: 0.5rem;
-  flex-wrap: wrap; /* evita sumir */
+  flex-wrap: wrap;
   align-items: center;
   width: 100%;
+  margin-bottom: 1rem;
 }
 
-/* Inputs */
+/* Inputs e textarea */
 .lista-chamadas-container input[type="text"],
 .lista-chamadas-container input[type="date"],
-.lista-chamadas-container input[type="number"],
 .lista-chamadas-container input[type="time"],
+.lista-chamadas-container input[type="number"],
 .lista-chamadas-container textarea {
-  padding: 0.5rem 0.75rem;
+  padding: 0.55rem 0.75rem;
   border: 1px solid #ccc;
   border-radius: 8px;
   flex: 1 1 auto;
-  min-width: 0; /* EVITA DESAPARECER EM TELAS PEQUENAS */
+  min-width: 0;
   font-size: 1rem;
   outline: none;
   transition: border 0.2s;
+  box-sizing: border-box;
 }
 
 .lista-chamadas-container input:focus,
 .lista-chamadas-container textarea:focus {
-  border-color: #4f46e5; /* roxo */
+  border-color: #4f46e5;
 }
 
-/* Textarea de observação */
+/* Textarea observações */
 .lista-chamadas-container textarea {
-  min-height: 80px;
   resize: vertical;
-  overflow-wrap: break-word;
+  min-height: 80px;
 }
 
 /* Botões */
@@ -62,7 +63,7 @@
   cursor: pointer;
   font-weight: bold;
   transition: all 0.2s;
-  flex: 0 0 auto; /* impede botão de encolher até sumir */
+  flex: 0 0 auto;
 }
 
 .lista-chamadas-container button:hover {
@@ -73,7 +74,7 @@
 .btn-adicionar {
   background-color: #2563eb;
   color: white;
-  padding: 0.5rem 1rem;
+  padding: 0.55rem 1.2rem;
   border-radius: 8px;
   border: none;
 }
@@ -81,7 +82,7 @@
 .btn-limpar {
   background-color: #4b5563;
   color: white;
-  padding: 0.5rem 1rem;
+  padding: 0.55rem 1.2rem;
   border-radius: 8px;
   border: none;
 }
@@ -89,12 +90,16 @@
 .btn-exportar {
   background-color: #7c3aed;
   color: white;
-  padding: 0.5rem 1rem;
+  padding: 0.55rem 1.2rem;
   border-radius: 8px;
   border: none;
+  display: block;
+  margin: 1.5rem auto 0;
+  width: 200px;
+  text-align: center;
 }
 
-/* Lista de alunos */
+/* Lista de alunos e ofertas */
 .lista-alunos {
   margin-top: 1rem;
   list-style: none;
@@ -110,19 +115,19 @@
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.55rem 0.75rem;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #fff;
   transition: all 0.2s;
-  min-width: 0; /* evita quebra invisível */
+  min-width: 0;
 }
 
 .lista-alunos li:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Texto dentro do item — evita sumir */
+/* Texto dentro do item */
 .lista-alunos li span {
   flex: 1;
   min-width: 0;
@@ -135,7 +140,7 @@
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 0.25rem 0.5rem;
+  padding: 0.35rem 0.6rem;
 }
 
 .btn-ausente {
@@ -143,7 +148,7 @@
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 0.25rem 0.5rem;
+  padding: 0.35rem 0.6rem;
 }
 
 /* Botão remover */
@@ -152,12 +157,12 @@
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 0.25rem 0.5rem;
+  padding: 0.35rem 0.6rem;
 }
 
 /* Contagem de presença */
 .presenca-contagem {
-  margin-top: 0.5rem;
+  margin-top: 0.7rem;
   font-weight: bold;
   color: #111827;
   display: flex;
@@ -165,16 +170,40 @@
   width: 100%;
 }
 
+/* Histórico de nomes */
+.lista-chamadas-container div[style*="overflow"] {
+  max-height: 150px;
+  overflow: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.lista-chamadas-container div[style*="overflow"] > div {
+  display: flex;
+  justify-content: space-between;
+  background: #f5f5f5;
+  padding: 6px;
+  margin-bottom: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.lista-chamadas-container div[style*="overflow"] > div:hover {
+  background: #e0e0e0;
+}
+
 /* Responsividade */
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .lista-chamadas-container {
-    padding: 1rem;
+    padding: 1rem 1.5rem;
   }
 
   .lista-chamadas-container input,
-  .lista-chamadas-container button,
-  .lista-chamadas-container textarea {
-    font-size: 0.9rem;
+  .lista-chamadas-container textarea,
+  .lista-chamadas-container button {
+    font-size: 0.95rem;
   }
 
   .lista-alunos li {
@@ -186,5 +215,10 @@
     display: flex;
     gap: 0.5rem;
     margin-top: 0.4rem;
+  }
+
+  .input-group {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }

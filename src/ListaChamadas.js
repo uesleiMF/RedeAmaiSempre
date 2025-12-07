@@ -12,15 +12,18 @@ export default function ListaChamadas({ token }) {
   const [selectedDate, setSelectedDate] = useState("");
 
   const [nomeCelula, setNomeCelula] = useState("");
-  const [horario, setHorario] = useState("");
+  const [horaInicio, setHoraInicio] = useState("");
+  const [horaFim, setHoraFim] = useState("");
+
   const [tema, setTema] = useState("");
   const [dinamica, setDinamica] = useState("");
   const [louvor, setLouvor] = useState("");
-  const [observacao, setObservacao] = useState("");
 
   const [ofertas, setOfertas] = useState([]);
   const [descricaoOferta, setDescricaoOferta] = useState("");
   const [valorOferta, setValorOferta] = useState("");
+
+  const [observacoes, setObservacoes] = useState("");
 
   const [nameHistory, setNameHistory] = useState([]);
   const [searchHistorico, setSearchHistorico] = useState("");
@@ -162,27 +165,67 @@ export default function ListaChamadas({ token }) {
 
     const doc = new jsPDF();
     const width = doc.internal.pageSize.getWidth();
-    const margin = 15;
-    let y = 20;
-
-    const dataFormatada = formatDateBR(selectedDate);
+    let startY = 20;
 
     // Título
+    
     doc.setFontSize(16);
-    doc.text(`Lista de Casais - ${dataFormatada}`, width / 2, y, { align: "center" });
+    doc.setFont("helvetica", "bold");
+    doc.text(
+      `LISTA DE CASAIS - ${formatDateBR(selectedDate)}`,
+      
+      width / 2,
+      startY,
+      
+      { align: "center" }
+      
+    );
+doc.setFontSize(12);
+startY += 18;
+doc.setFont("helvetica", "normal");
 
-    doc.setFontSize(12);
-    y += 10;
-    doc.text(`Nome da Célula: ${nomeCelula || "Não informado"}`, margin, y);
-    y += 7;
-    doc.text(`Horário: ${horario || "Não informado"}`, margin, y);
-    y += 7;
-    doc.text(`Tema: ${tema || "Não informado"}`, margin, y);
-    y += 7;
-    doc.text(`Dinâmica: ${dinamica || "Não informada"}`, margin, y);
-    y += 7;
-    doc.text(`Louvor: ${louvor || "Não informado"}`, margin, y);
-    y += 10;
+
+const marginLeft = 14; // distância da borda esquerda
+const labelWidth = 40; // espaço entre o rótulo e o valor, aumente conforme precisar
+
+// NOME CELULA
+doc.setFont("helvetica", "bold");
+doc.text("NOME CELULA:", marginLeft, startY);
+doc.setFont("helvetica", "normal");
+doc.text(nomeCelula || "Não informado", marginLeft + labelWidth, startY);
+startY += 7;
+
+// HORARIO
+const horarioTexto = `${horaInicio || ""}${horaInicio && horaFim ? " - " : ""}${horaFim || ""}`;
+doc.setFont("helvetica", "bold");
+doc.text("HORARIO:", marginLeft, startY);
+doc.setFont("helvetica", "normal");
+doc.text(horarioTexto || "Não informado", marginLeft + labelWidth, startY);
+startY += 7;
+
+// TEMA
+doc.setFont("helvetica", "bold");
+doc.text("TEMA:", marginLeft, startY);
+doc.setFont("helvetica", "normal");
+doc.text(tema || "Não informado", marginLeft + labelWidth, startY);
+startY += 7;
+
+// DINÂMICA
+doc.setFont("helvetica", "bold");
+doc.text("DINÂMICA:", marginLeft, startY);
+doc.setFont("helvetica", "normal");
+doc.text(dinamica || "Não informada", marginLeft + labelWidth, startY);
+startY += 7;
+
+// LOUVOR
+doc.setFont("helvetica", "bold");
+doc.text("LOUVOR:", marginLeft, startY);
+doc.setFont("helvetica", "normal");
+doc.text(louvor || "Não informado", marginLeft + labelWidth, startY);
+startY += 10;
+
+
+
 
     if (students.length > 0) {
       autoTable(doc, {
@@ -192,8 +235,7 @@ export default function ListaChamadas({ token }) {
           s.nome,
           s.presenca ? "Presente" : "Ausente",
         ]),
-        startY: y,
-        margin: { left: margin, right: margin },
+        startY,
         didParseCell: (data) => {
           if (data.column.index === 2) {
             if (data.cell.raw === "Presente")
@@ -202,33 +244,33 @@ export default function ListaChamadas({ token }) {
           }
         },
       });
-      y = doc.lastAutoTable.finalY + 10;
+      startY = doc.lastAutoTable.finalY + 10;
     }
 
     if (ofertas.length > 0) {
-      doc.text("Contribuições/Ofertas", width / 2, y, { align: "center" });
-      y += 5;
+      doc.setFont("helvetica", "bold"); // negrito
+      doc.text("OFERTAS-CONTRIBUIÇÕES", width / 2, startY, { align: "center" } );
+      
       autoTable(doc, {
         head: [["#", "Descrição", "Valor"]],
         body: ofertas.map((o, i) => [
           i + 1,
           o.descricao,
-          new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          }).format(o.valor),
+          new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor),
         ]),
-        startY: y,
-        margin: { left: margin, right: margin },
+        startY: startY + 5,
       });
-      y = doc.lastAutoTable.finalY + 10;
+      startY = doc.lastAutoTable.finalY + 10;
     }
 
-    if (observacao) {
-      doc.text("Observação:", margin, y);
-      const splitObs = doc.splitTextToSize(observacao, width - 2 * margin);
-      y += 7;
-      doc.text(splitObs, margin, y);
+    // Observações
+    if (observacoes.trim() !== "") {
+      doc.setFont("helvetica", "bold");
+      doc.text("OBSERVAÇÕES:", 14, startY);
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+      const splitObs = doc.splitTextToSize(observacoes, width - 28); // margem de 14
+      doc.text(splitObs, 14, startY + 6);
     }
 
     doc.save("lista-chamada-ofertas.pdf");
@@ -236,7 +278,7 @@ export default function ListaChamadas({ token }) {
 
   return (
     <div className="lista-chamadas-container">
-      <h2 style={{ textAlign: "center" }}>Lista-Chamada-De-Casais</h2>
+      <h2>LISTA-DE-CASAIS</h2>
 
       <input
         type="text"
@@ -245,12 +287,18 @@ export default function ListaChamadas({ token }) {
         onChange={(e) => setNomeCelula(e.target.value)}
       />
 
-      <input
-        type="text"
-        placeholder="Horário de Início e Fim"
-        value={horario}
-        onChange={(e) => setHorario(e.target.value)}
-      />
+      <div className="input-group">
+        <input
+          type="time"
+          value={horaInicio}
+          onChange={(e) => setHoraInicio(e.target.value)}
+        />
+        <input
+          type="time"
+          value={horaFim}
+          onChange={(e) => setHoraFim(e.target.value)}
+        />
+      </div>
 
       <input
         type="text"
@@ -258,14 +306,12 @@ export default function ListaChamadas({ token }) {
         value={tema}
         onChange={(e) => setTema(e.target.value)}
       />
-
       <input
         type="text"
         placeholder="Dinâmica da célula"
         value={dinamica}
         onChange={(e) => setDinamica(e.target.value)}
       />
-
       <input
         type="text"
         placeholder="Louvor"
@@ -273,14 +319,13 @@ export default function ListaChamadas({ token }) {
         onChange={(e) => setLouvor(e.target.value)}
       />
 
-      <h2 style={{ textAlign: "center" }}>Histórico de Nomes</h2>
+      <h2>HISTORICO</h2>
       <input
         type="text"
         placeholder="Pesquisar histórico..."
         value={searchHistorico}
         onChange={(e) => setSearchHistorico(e.target.value)}
       />
-
       <div style={{ maxHeight: 150, overflow: "auto", border: "1px solid #ccc", padding: 10, borderRadius: 6 }}>
         {historicoFiltrado.length === 0 && <p>Nenhum nome encontrado.</p>}
         {historicoFiltrado.map((nome) => (
@@ -295,26 +340,17 @@ export default function ListaChamadas({ token }) {
             </IconButton>
           </div>
         ))}
-
-        {nameHistory.length > 0 && (
-          <button onClick={clearHistory} style={{ marginTop: 10 }}>
-            Limpar histórico
-          </button>
-        )}
+        {nameHistory.length > 0 && <button onClick={clearHistory} style={{ marginTop: 10 }}>Limpar histórico</button>}
       </div>
 
       <div className="input-group">
-        <h2 style={{ textAlign: "center" }}>Casais Participantes</h2>
-
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Nome dos Casais"
         />
-        <button onClick={addStudent} className="btn-adicionar">
-          Adicionar
-        </button>
+        <button onClick={addStudent} className="btn-adicionar">Adicionar</button>
       </div>
 
       {students.length > 0 && (
@@ -332,9 +368,7 @@ export default function ListaChamadas({ token }) {
                   <button onClick={() => togglePresenca(index)} className={aluno.presenca ? "btn-presente" : "btn-ausente"}>
                     {aluno.presenca ? "Presente" : "Ausente"}
                   </button>
-                  <button onClick={() => removeStudent(index)} className="btn-remover">
-                    Remover
-                  </button>
+                  <button onClick={() => removeStudent(index)} className="btn-remover">Remover</button>
                 </div>
               </li>
             ))}
@@ -346,18 +380,26 @@ export default function ListaChamadas({ token }) {
         </>
       )}
 
-      <h2 style={{ textAlign: "center" }}>Data</h2>
-      <input
-        type="date"
-        value={ajustarDataInput(selectedDate)}
-        onChange={(e) => setSelectedDate(ajustarDataSalvar(e.target.value))}
-      />
-      {selectedDate && <p style={{ textAlign: "center" }}>Data: {formatDateBR(selectedDate)}</p>}
+      <h2>Data</h2>
+      <input type="date" value={ajustarDataInput(selectedDate)} onChange={(e) => setSelectedDate(ajustarDataSalvar(e.target.value))} />
+      {selectedDate && <p>Data: {formatDateBR(selectedDate)}</p>}
 
-      <h2 style={{ textAlign: "center" }}>Contribuições/Ofertas</h2>
+      <h2>OFERTAS-CONTRIBUIÇÕES</h2>
       <div className="input-group">
-        <input type="text" value={descricaoOferta} onChange={(e) => setDescricaoOferta(e.target.value)} placeholder="Descrição da oferta" />
-        <input type="number" value={valorOferta} onChange={(e) => setValorOferta(e.target.value)} placeholder="Valor (R$)" min="0.01" step="0.01" />
+        <input
+          type="text"
+          value={descricaoOferta}
+          onChange={(e) => setDescricaoOferta(e.target.value)}
+          placeholder="Descrição da oferta"
+        />
+        <input
+          type="number"
+          value={valorOferta}
+          onChange={(e) => setValorOferta(e.target.value)}
+          placeholder="Valor (R$)"
+          min="0.01"
+          step="0.01"
+        />
         <button onClick={addOferta} className="btn-adicionar">Adicionar</button>
       </div>
 
@@ -377,28 +419,21 @@ export default function ListaChamadas({ token }) {
           </div>
 
           <div className="bottom-buttons">
-            <button onClick={limparOfertas} className="btn-limpar">Limpar Ofertas</button>
+            <button onClick={limparOfertas} className="btn-limpar">LIMPAR OFERTAS</button>
           </div>
         </>
       )}
 
-     <textarea
-  placeholder="Observação"
-  value={observacao}
-  onChange={(e) => setObservacao(e.target.value)}
-  style={{
-    width: "100%",
-    marginTop: 10,
-    padding: 6,
-    minHeight: 60,   // altura inicial
-    resize: "vertical", // permite ajustar a altura manualmente
-  }}
-/>
+      <h2>OBSERVAÇÕES</h2>
+      <textarea
+        value={observacoes}
+        onChange={(e) => setObservacoes(e.target.value)}
+        placeholder="Digite observações..."
+        rows={4}
+        style={{ width: "100%", padding: "0.5rem", borderRadius: 8, border: "1px solid #ccc", resize: "vertical" }}
+      />
 
-
-      <button onClick={exportPDF} className="btn-exportar" style={{ marginTop: 10 }}>
-        Exportar PDF
-      </button>
+      <button onClick={exportPDF} className="btn-exportar">Exportar PDF</button>
     </div>
   );
 }
