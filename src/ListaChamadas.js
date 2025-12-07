@@ -190,7 +190,7 @@ const labelWidth = 40; // espaço entre o rótulo e o valor, aumente conforme pr
 
 // NOME CELULA
 doc.setFont("helvetica", "bold");
-doc.text("NOME CELULA:", marginLeft, startY);
+doc.text("NOME CÉLULA:", marginLeft, startY);
 doc.setFont("helvetica", "normal");
 doc.text(nomeCelula || "Não informado", marginLeft + labelWidth, startY);
 startY += 7;
@@ -198,7 +198,7 @@ startY += 7;
 // HORARIO
 const horarioTexto = `${horaInicio || ""}${horaInicio && horaFim ? " - " : ""}${horaFim || ""}`;
 doc.setFont("helvetica", "bold");
-doc.text("HORARIO:", marginLeft, startY);
+doc.text("HORÁRIO:", marginLeft, startY);
 doc.setFont("helvetica", "normal");
 doc.text(horarioTexto || "Não informado", marginLeft + labelWidth, startY);
 startY += 7;
