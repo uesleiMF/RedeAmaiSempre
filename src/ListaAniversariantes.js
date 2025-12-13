@@ -42,22 +42,28 @@ export default function ListaAniversariantes({ token: propToken }) {
     Authorization: `Bearer ${token}`,
   };
 
-  // Corrige timezone para input date
+  // Corrige timezone para o input type="date"
   const formatDateToInput = (dateStr) => {
     if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 10);
+    // Pega só a parte da data (yyyy-mm-dd) ignorando hora/timezone
+    const datePart = typeof dateStr === "string" ? dateStr.split("T")[0] : "";
+    return datePart;
   };
 
-  // Formata para pt-BR
-  const formatDateBR = (dateStr) => {
-    if (!dateStr) return "-";
-    return new Date(dateStr).toLocaleDateString("pt-BR");
+  // NOVA FUNÇÃO CORRIGIDA: formata data de forma segura (nunca mais Invalid Date)
+  const formatDateBR = (birthDate) => {
+    if (!birthDate) return "-";
+
+    // Extrai apenas a parte da data da string ISO (ex: "2025-12-13T00:00:00.000Z" → "2025-12-13")
+    const dateStr = typeof birthDate === "string" ? birthDate.split("T")[0] : "";
+    
+    if (!dateStr || dateStr.length !== 10) return "Data inválida";
+
+    const [year, month, day] = dateStr.split("-");
+    return `${day}/${month}/${year}`;
   };
 
-  // BUSCA CORRIGIDA: usa /get-casal-simple (o que realmente lista os cadastrados)
+  // Busca os aniversariantes
   const fetchAniversariantes = useCallback(async () => {
     if (!token) {
       setAniversariantes([]);
@@ -93,7 +99,7 @@ export default function ListaAniversariantes({ token: propToken }) {
     fetchAniversariantes();
   }, [fetchAniversariantes]);
 
-  // Modal abrir
+  // Modal
   const handleOpenModal = (aniversariante = null) => {
     setIsEdit(!!aniversariante);
     setCurrent(
@@ -118,7 +124,7 @@ export default function ListaAniversariantes({ token: propToken }) {
     setCurrent((prev) => ({ ...prev, [name]: value }));
   };
 
-  // SALVAR (adicionar ou editar)
+  // Salvar
   const handleSave = async () => {
     if (!current.name.trim() || !current.birthDate) {
       return swal({ text: "Preencha nome e data de nascimento", icon: "warning" });
@@ -148,7 +154,7 @@ export default function ListaAniversariantes({ token: propToken }) {
       }
 
       handleCloseModal();
-      fetchAniversariantes(); // Atualiza a lista imediatamente
+      fetchAniversariantes();
     } catch (err) {
       swal({
         text: err?.response?.data?.errorMessage || "Erro ao salvar",
@@ -157,7 +163,7 @@ export default function ListaAniversariantes({ token: propToken }) {
     }
   };
 
-  // DELETAR
+  // Deletar
   const handleDelete = async (id) => {
     if (!window.confirm("Deseja realmente excluir este aniversariante?")) return;
 

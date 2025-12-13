@@ -9,7 +9,6 @@ import AniversariantesDiaMes from "./AniversariantesDiaMes";
 
 export default function ListaChamadas({ token }) {
   const BASE_URL = "https://backtestmar.onrender.com";
-
   const [students, setStudents] = useState([]);
   const [name, setName] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
@@ -26,8 +25,8 @@ export default function ListaChamadas({ token }) {
   const [nameHistory, setNameHistory] = useState([]);
   const [searchHistorico, setSearchHistorico] = useState("");
 
-  // Aniversariantes simplificados: só nome e data
-  const [aniverDia, setAniverDia] = useState([]);   // [{ nome, birthDate }]
+  // Aniversariantes
+  const [aniverDia, setAniverDia] = useState([]);
   const [aniverMes, setAniverMes] = useState([]);
   const [aniverCarregado, setAniverCarregado] = useState(false);
 
@@ -36,15 +35,20 @@ export default function ListaChamadas({ token }) {
 
   const ajustarDataInput = (dateStr) => {
     if (!dateStr) return "";
-    const date = new Date(dateStr + "T00:00:00");
-    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-    return date.toISOString().split("T")[0];
+    const datePart = typeof dateStr === "string" ? dateStr.split("T")[0] : "";
+    return datePart;
   };
 
-  const formatDateBR = (dateStr) => {
-    if (!dateStr) return "Sem data";
-    const date = new Date(dateStr + "T00:00:00");
-    return date.toLocaleDateString("pt-BR");
+  // FUNÇÃO CORRIGIDA: formatação segura para datas do backend (ISO string)
+  const formatDateBR = (birthDate) => {
+    if (!birthDate) return "Sem data";
+
+    // Extrai apenas yyyy-mm-dd da string ISO completa
+    const dateStr = typeof birthDate === "string" ? birthDate.split("T")[0] : "";
+    if (!dateStr || dateStr.length !== 10) return "Data inválida";
+
+    const [year, month, day] = dateStr.split("-");
+    return `${day}/${month}/${year}`;
   };
 
   // ================= HISTÓRICO ====================
@@ -152,20 +156,19 @@ export default function ListaChamadas({ token }) {
       setOfertas([]);
   };
 
-  // ================= RECEBER ANIVERSÁRIOS (SIMPLIFICADO) ====================
+  // ================= RECEBER ANIVERSÁRIOS ====================
   function receberAniversarios({ dia = [], mes = [] }) {
     const mapear = (lista) =>
       lista.map((item) => ({
         nome: item.name || item.nome || "Sem nome",
-        birthDate: item.birthDate || "", // formato YYYY-MM-DD
+        birthDate: item.birthDate || "",
       }));
-
     setAniverDia(mapear(dia));
     setAniverMes(mapear(mes));
     setAniverCarregado(true);
   }
 
-  // ================= EXPORTAR PDF (SIMPLIFICADO) =====================
+  // ================= EXPORTAR PDF ====================
   const exportPDF = () => {
     const doc = new jsPDF();
     const width = doc.internal.pageSize.getWidth();
@@ -173,7 +176,6 @@ export default function ListaChamadas({ token }) {
     const marginLeft = 14;
     const labelWidth = 40;
 
-    // Cabeçalho
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.text(`LISTA DE CASAIS - ${formatDateBR(selectedDate)}`, width / 2, startY, { align: "center" });
@@ -194,15 +196,12 @@ export default function ListaChamadas({ token }) {
     addLabel("LOUVOR:", louvor);
     startY += 8;
 
-    // Tabela de aniversariantes (simples e com destaque para o dia)
     const adicionarTabelaAniversariantes = (lista, titulo) => {
       if (!lista || lista.length === 0) return startY;
-
       if (startY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
         startY = 20;
       }
-
       doc.setFont("helvetica", "bold");
       doc.setFontSize(14);
       doc.text(`Aniversariantes ${titulo}`, width / 2, startY, { align: "center" });
@@ -223,7 +222,6 @@ export default function ListaChamadas({ token }) {
           startY = data.cursor.y + 8;
         },
       });
-
       startY = doc.lastAutoTable.finalY + 8;
       return startY;
     };
@@ -231,7 +229,7 @@ export default function ListaChamadas({ token }) {
     startY = adicionarTabelaAniversariantes(aniverDia, "do Dia");
     startY = adicionarTabelaAniversariantes(aniverMes, "do Mês");
 
-    // Lista de casais
+    // Lista de casais, ofertas, observações (mantido igual)
     if (students.length > 0) {
       if (startY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
@@ -251,7 +249,6 @@ export default function ListaChamadas({ token }) {
       startY = doc.lastAutoTable.finalY + 10;
     }
 
-    // Ofertas
     if (ofertas.length > 0) {
       if (startY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
@@ -272,7 +269,6 @@ export default function ListaChamadas({ token }) {
       startY = doc.lastAutoTable.finalY + 10;
     }
 
-    // Observações
     if (observacoes.trim() !== "") {
       if (startY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();

@@ -601,7 +601,7 @@ export default class Dashboard extends Component {
         )}
         
 
-        {/* ABA LISTA DE CHAMADA */}
+        {/* ABA LISTA-CHAMADA */}
         {activeTab === 1 && (
           <div className="tab-content">
             <ListaChamadas token={this.state.token} />
