@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function AniversariantesDiaMes({ token, onListaAtualizada }) {
+export default function AniversariantesDiaMes({ token, onLoad }) {
   const BASE_URL = "https://backtestmar.onrender.com";
 
   const [aniversariantesDia, setAniversariantesDia] = useState([]);
   const [aniversariantesMes, setAniversariantesMes] = useState([]);
 
-  // Notificação ao carregar
   const notifyBirthday = (nome) => {
     if (Notification.permission === "granted") {
       new Notification("Aniversariante do Dia 🎉", { body: nome });
@@ -20,91 +19,94 @@ export default function AniversariantesDiaMes({ token, onListaAtualizada }) {
     }
   };
 
-  const isBirthdayToday = (data) => {
+  const isBirthdayToday = (birthDate) => {
+    if (!birthDate) return false;
+    const nascimento = new Date(birthDate + "T00:00:00");
+    if (isNaN(nascimento.getTime())) return false;
+
     const hoje = new Date();
-    const nascimento = new Date(data);
-    return (
-      nascimento.getDate() === hoje.getDate() &&
-      nascimento.getMonth() === hoje.getMonth()
-    );
+    return nascimento.getDate() === hoje.getDate() && nascimento.getMonth() === hoje.getMonth();
   };
 
   useEffect(() => {
     async function fetchData() {
+      if (!token) return;
+
       try {
         const res = await axios.get(`${BASE_URL}/aniversariantes`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const todos = res.data.aniversariantes;
+        const todos = res.data.aniversariantes || [];
+        const hoje = new Date();
+        const mesAtual = hoje.getMonth();
 
-        const dia = todos.filter((item) => isBirthdayToday(item.niverH || item.niverM));
+        // Filtra aniversariantes do dia
+        const dia = todos.filter((item) => isBirthdayToday(item.birthDate));
+
+        // Filtra aniversariantes do mês, excluindo os de hoje
         const mes = todos.filter((item) => {
-          const dH = item.niverH ? new Date(item.niverH) : null;
-          const dM = item.niverM ? new Date(item.niverM) : null;
-          const hoje = new Date();
-          return (
-            (dH && dH.getMonth() === hoje.getMonth()) ||
-            (dM && dM.getMonth() === hoje.getMonth())
-          );
+          if (!item.birthDate) return false;
+          const data = new Date(item.birthDate + "T00:00:00");
+          return data.getMonth() === mesAtual && !isBirthdayToday(item.birthDate);
         });
 
         setAniversariantesDia(dia);
         setAniversariantesMes(mes);
 
-        // Dispara notificação para cada aniversariante do dia
+        // Notificação para aniversariantes do dia
         dia.forEach((a) => notifyBirthday(a.name || a.nome));
 
-        // Envia para componente de chamadas
-        onListaAtualizada(todos);
-
+        if (onLoad) onLoad({ dia, mes });
       } catch (err) {
         console.error("Erro ao buscar aniversariantes:", err);
       }
     }
 
     fetchData();
-  }, [token, onListaAtualizada]);
+  }, [token, onLoad]);
+
+  const formatDateBR = (dateStr) => {
+    if (!dateStr) return "-";
+    const date = new Date(dateStr + "T00:00:00");
+    return date.toLocaleDateString("pt-BR");
+  };
 
   return (
     <div style={{ marginBottom: 20 }}>
       <h3>Aniversariantes</h3>
 
-      {/* 🎉 LISTA DO DIA */}
       <h4>Aniversariantes do Dia</h4>
       {aniversariantesDia.length === 0 && <p>Nenhum aniversariante hoje.</p>}
-
       {aniversariantesDia.map((item) => (
         <div
-          key={item._id}
+          key={item._id || item.nome}
           style={{
             padding: 12,
             marginBottom: 10,
             borderRadius: 8,
-            backgroundColor: "#FFF8A6", // fundo amarelo
+            backgroundColor: "#FFF8A6",
             fontWeight: "bold",
             border: "2px solid #E8D98A",
             boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
             animation: "pulse 2s infinite",
             display: "flex",
             alignItems: "center",
-            gap: 8
+            gap: 8,
           }}
         >
           🎉 {item.name || item.nome}
           <span style={{ fontWeight: "normal", marginLeft: 10 }}>
-            {new Date(item.niverH || item.niverM).toLocaleDateString("pt-BR")}
+            {formatDateBR(item.birthDate)}
           </span>
         </div>
       ))}
 
-      {/* 🎂 LISTA DO MÊS */}
       <h4>Aniversariantes do Mês</h4>
       {aniversariantesMes.length === 0 && <p>Nenhum aniversariante este mês.</p>}
-
       {aniversariantesMes.map((item) => (
         <div
-          key={item._id}
+          key={item._id || item.nome}
           style={{
             padding: 10,
             marginBottom: 8,
@@ -115,7 +117,7 @@ export default function AniversariantesDiaMes({ token, onListaAtualizada }) {
         >
           {item.name || item.nome}
           <br />
-          <span>{new Date(item.niverH || item.niverM).toLocaleDateString("pt-BR")}</span>
+          <span>{formatDateBR(item.birthDate)}</span>
         </div>
       ))}
 

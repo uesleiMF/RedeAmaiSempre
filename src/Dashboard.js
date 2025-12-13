@@ -21,6 +21,8 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Tooltip from '@material-ui/core/Tooltip';
 import CloseIcon from '@material-ui/icons/Close';
 
+
+import ListaAniversariantes from './ListaAniversariantes';
 import ListaChamadas from './ListaChamadas';
 import "./Dashboard.css";
 
@@ -401,6 +403,7 @@ export default class Dashboard extends Component {
         <Tabs value={activeTab} onChange={(e, val)=>this.setState({activeTab:val})} centered>
           <Tab label="Casais" />
           <Tab label="Lista de Chamada" />
+          <Tab label="Aniversariantes" />
         </Tabs>
 
         {/* ABA CASAIS */}
@@ -596,13 +599,21 @@ export default class Dashboard extends Component {
 
           </div>
         )}
+        
 
         {/* ABA LISTA DE CHAMADA */}
         {activeTab === 1 && (
           <div className="tab-content">
             <ListaChamadas token={this.state.token} />
+      
           </div>
         )}
+        {/* ABA ANIVERSARIANTES */}
+{activeTab === 2 && (
+  <div className="tab-content">
+    <ListaAniversariantes token={this.state.token} />
+  </div>
+)}
 
       </div>
     );
