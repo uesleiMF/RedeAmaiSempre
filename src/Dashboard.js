@@ -402,8 +402,8 @@ export default class Dashboard extends Component {
         {/* TABS */}
         <Tabs value={activeTab} onChange={(e, val)=>this.setState({activeTab:val})} centered>
           <Tab label="Casais" />
-          <Tab label="Lista de Chamada" />
-          <Tab label="Aniversariantes" />
+          <Tab label="Lista" />
+          <Tab label="Niver" />
         </Tabs>
 
         {/* ABA CASAIS */}
