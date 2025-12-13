@@ -1,0 +1,65 @@
+.aniv-container {
+  margin-bottom: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.aniv-title {
+  margin-bottom: 10px;
+}
+
+.aniv-subtitle {
+  margin-top: 15px;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.aniv-empty {
+  color: #777;
+  font-style: italic;
+}
+
+/* Card aniversariante do dia */
+.aniv-card-dia {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background-color: #fff8a6;
+  font-weight: bold;
+  border: 2px solid #e8d98a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  animation: pulse 2s infinite;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Card aniversariante do mês */
+.aniv-card-mes {
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  background-color: #f3f3f3;
+  border: 1px solid #d2d2d2;
+  display: flex;
+  flex-direction: column;
+}
+
+.aniv-date {
+  font-weight: normal;
+  font-size: 0.9rem;
+  color: #555;
+  margin-left: 6px;
+}
+
+/* Animação destaque */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 200, 0, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 200, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 200, 0, 0);
+  }
+}

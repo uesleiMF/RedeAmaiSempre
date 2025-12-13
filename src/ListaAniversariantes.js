@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogActions,
@@ -13,188 +13,261 @@ import {
   TextField,
   IconButton,
   CircularProgress,
-  Tooltip
+  Tooltip,
+  Button,
+  Typography,
+  Box,
+  Paper,
 } from "@material-ui/core";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
+import CakeIcon from "@material-ui/icons/Cake";
 import swal from "sweetalert";
 import axios from "axios";
 
-export default class ListaAniversariantes extends Component {
-  _isMounted = false;
+const BASE_URL = "https://backtestmar.onrender.com";
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      token: props.token || null,
-      loading: false,
-      search: "",
-      aniversariantes: [],
-      openModal: false,
-      isEdit: false,
-      current: { id: "", name: "", birthDate: "" }
-    };
-  }
+export default function ListaAniversariantes({ token: propToken }) {
+  const [loading, setLoading] = useState(false);
+  const [aniversariantes, setAniversariantes] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [current, setCurrent] = useState({ id: "", name: "", birthDate: "" });
 
-  componentDidMount() {
-    this._isMounted = true;
-    this.getAniversariantes();
-  }
+  // Token: prop ou localStorage
+  const token = propToken || localStorage.getItem("token");
 
-  componentWillUnmount() {
-    this._isMounted = false;
-  }
-
-  getHeaders = () => {
-    const t = this.state.token || localStorage.getItem("token");
-    return t ? { Authorization: `Bearer ${t}`, token: t } : {};
+  const headers = {
+    Authorization: `Bearer ${token}`,
   };
 
-  formatDateToInput = (date) => {
-    if (!date) return "";
-    const d = new Date(date);
-    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-    return d.toISOString().slice(0, 10);
+  // Corrige timezone para input date
+  const formatDateToInput = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 10);
   };
 
-  formatBR = (date) => {
-    if (!date) return "";
-    const d = new Date(date);
-    d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
-    return d.toLocaleDateString("pt-BR");
+  // Formata para pt-BR
+  const formatDateBR = (dateStr) => {
+    if (!dateStr) return "-";
+    return new Date(dateStr).toLocaleDateString("pt-BR");
   };
 
-  getAniversariantes = async () => {
-    this._isMounted && this.setState({ loading: true });
-    try {
-      const res = await axios.get("https://backtestmar.onrender.com/get-casal-simple", { headers: this.getHeaders() });
-      const aniversariantes = res.data?.casal || [];
-      this._isMounted && this.setState({ aniversariantes, loading: false });
-    } catch (err) {
-      swal({ text: err?.response?.data?.errorMessage || err.message, icon: "error" });
-      this._isMounted && this.setState({ aniversariantes: [], loading: false });
+  // BUSCA CORRIGIDA: usa /get-casal-simple (o que realmente lista os cadastrados)
+  const fetchAniversariantes = useCallback(async () => {
+    if (!token) {
+      setAniversariantes([]);
+      return;
     }
-  };
 
-  handleInputChange = (e) => {
-    const { name, value } = e.target;
-    this.setState({ current: { ...this.state.current, [name]: value } });
-  };
+    setLoading(true);
+    const controller = new AbortController();
 
-  openModal = (aniversariante = null) => {
-    this.setState({
-      openModal: true,
-      isEdit: !!aniversariante,
-      current: aniversariante
+    try {
+      const res = await axios.get(`${BASE_URL}/get-casal-simple`, {
+        headers,
+        signal: controller.signal,
+      });
+
+      const todos = res.data?.casal || [];
+      setAniversariantes(todos);
+    } catch (err) {
+      if (axios.isCancel(err)) return;
+      swal({
+        text: err?.response?.data?.errorMessage || "Erro ao carregar a lista",
+        icon: "error",
+      });
+      setAniversariantes([]);
+    } finally {
+      setLoading(false);
+    }
+
+    return () => controller.abort();
+  }, [token]);
+
+  useEffect(() => {
+    fetchAniversariantes();
+  }, [fetchAniversariantes]);
+
+  // Modal abrir
+  const handleOpenModal = (aniversariante = null) => {
+    setIsEdit(!!aniversariante);
+    setCurrent(
+      aniversariante
         ? {
             id: aniversariante._id,
-            name: aniversariante.name,
-            birthDate: this.formatDateToInput(aniversariante.birthDate)
+            name: aniversariante.name || "",
+            birthDate: formatDateToInput(aniversariante.birthDate),
           }
         : { id: "", name: "", birthDate: "" }
-    });
-  };
-
-  closeModal = () => this.setState({ openModal: false });
-
-  saveAniversariante = async () => {
-    const { current, isEdit } = this.state;
-    if (!current.name || !current.birthDate)
-      return swal({ text: "Preencha todos os campos", icon: "error" });
-
-    try {
-      const url = isEdit
-        ? `https://backtestmar.onrender.com/update-casal-simple/${current.id}`
-        : `https://backtestmar.onrender.com/add-casal-simple`;
-      const method = isEdit ? axios.put : axios.post;
-
-      await method(url, { name: current.name, birthDate: current.birthDate }, { headers: this.getHeaders() });
-      swal({ text: isEdit ? "Atualizado!" : "Aniversariante adicionado!", icon: "success" });
-      this.closeModal();
-      this.getAniversariantes();
-    } catch (err) {
-      swal({ text: err?.response?.data?.errorMessage || err.message, icon: "error" });
-    }
-  };
-
-  deleteAniversariante = async (id) => {
-    if (!window.confirm("Deseja realmente excluir?")) return;
-    try {
-      await axios.delete(`https://backtestmar.onrender.com/delete-casal-simple/${id}`, { headers: this.getHeaders() });
-      swal({ text: "Deletado!", icon: "success" });
-      this.getAniversariantes();
-    } catch (err) {
-      swal({ text: err?.response?.data?.errorMessage || err.message, icon: "error" });
-    }
-  };
-
-  render() {
-    const { aniversariantes, loading, openModal, current } = this.state;
-
-    return (
-      <div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h2>Aniversariantes</h2>
-          <Tooltip title="Adicionar Aniversariante">
-            <IconButton color="primary" onClick={() => this.openModal()}><AddCircleIcon /></IconButton>
-          </Tooltip>
-        </div>
-
-        {loading ? (
-          <div style={{ display:'flex', justifyContent:'center', marginTop:20 }}><CircularProgress /></div>
-        ) : (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Nome</TableCell>
-                  <TableCell>Data de Nascimento</TableCell>
-                  <TableCell>Ações</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {aniversariantes.map(a => (
-                  <TableRow key={a._id}>
-                    <TableCell>{a.name}</TableCell>
-                    <TableCell>{this.formatBR(a.birthDate)}</TableCell>
-                    <TableCell>
-                      <Tooltip title="Editar">
-                        <IconButton onClick={() => this.openModal(a)}><EditIcon /></IconButton>
-                      </Tooltip>
-                      <Tooltip title="Excluir">
-                        <IconButton onClick={() => this.deleteAniversariante(a._id)}><DeleteIcon /></IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-
-        {/* MODAL */}
-        <Dialog open={openModal} onClose={this.closeModal} maxWidth="sm" fullWidth>
-          <DialogTitle>{this.state.isEdit ? "Editar Aniversariante" : "Adicionar Aniversariante"}</DialogTitle>
-          <DialogContent>
-            <TextField label="Nome" fullWidth margin="normal" name="name" value={current.name} onChange={this.handleInputChange} />
-            <TextField
-              label="Data de Nascimento"
-              type="date"
-              fullWidth
-              margin="normal"
-              name="birthDate"
-              value={current.birthDate}
-              onChange={this.handleInputChange}
-              InputLabelProps={{ shrink: true }}
-            />
-          </DialogContent>
-          <DialogActions>
-            <button onClick={this.closeModal}>Cancelar</button>
-            <button onClick={this.saveAniversariante}>{this.state.isEdit ? "Atualizar" : "Adicionar"}</button>
-          </DialogActions>
-        </Dialog>
-      </div>
     );
-  }
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setCurrent({ id: "", name: "", birthDate: "" });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCurrent((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // SALVAR (adicionar ou editar)
+  const handleSave = async () => {
+    if (!current.name.trim() || !current.birthDate) {
+      return swal({ text: "Preencha nome e data de nascimento", icon: "warning" });
+    }
+
+    try {
+      if (isEdit) {
+        await axios.put(
+          `${BASE_URL}/update-casal-simple/${current.id}`,
+          {
+            name: current.name.trim(),
+            birthDate: current.birthDate,
+          },
+          { headers }
+        );
+        swal({ text: "Aniversariante atualizado!", icon: "success" });
+      } else {
+        await axios.post(
+          `${BASE_URL}/add-casal-simple`,
+          {
+            name: current.name.trim(),
+            birthDate: current.birthDate,
+          },
+          { headers }
+        );
+        swal({ text: "Aniversariante adicionado!", icon: "success" });
+      }
+
+      handleCloseModal();
+      fetchAniversariantes(); // Atualiza a lista imediatamente
+    } catch (err) {
+      swal({
+        text: err?.response?.data?.errorMessage || "Erro ao salvar",
+        icon: "error",
+      });
+    }
+  };
+
+  // DELETAR
+  const handleDelete = async (id) => {
+    if (!window.confirm("Deseja realmente excluir este aniversariante?")) return;
+
+    try {
+      await axios.delete(`${BASE_URL}/delete-casal-simple/${id}`, { headers });
+      swal({ text: "Excluído com sucesso!", icon: "success" });
+      fetchAniversariantes();
+    } catch (err) {
+      swal({
+        text: err?.response?.data?.errorMessage || "Erro ao excluir",
+        icon: "error",
+      });
+    }
+  };
+
+  return (
+    <Box p={3}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        <Typography variant="h5" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <CakeIcon fontSize="large" color="primary" />
+          Aniversariantes
+        </Typography>
+        <Tooltip title="Adicionar novo">
+          <IconButton color="primary" onClick={() => handleOpenModal()}>
+            <AddCircleIcon fontSize="large" />
+          </IconButton>
+        </Tooltip>
+      </Box>
+
+      {loading ? (
+        <Box display="flex" justifyContent="center" my={6}>
+          <CircularProgress />
+        </Box>
+      ) : aniversariantes.length === 0 ? (
+        <Paper elevation={3} style={{ padding: 40, textAlign: "center" }}>
+          <CakeIcon style={{ fontSize: 80, color: "#ddd", marginBottom: 20 }} />
+          <Typography variant="h6" color="textSecondary" gutterBottom>
+            Nenhum aniversariante cadastrado ainda
+          </Typography>
+          <Typography variant="body1" color="textSecondary">
+            Clique no botão + para adicionar o primeiro! 🎉
+          </Typography>
+        </Paper>
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell><strong>Nome</strong></TableCell>
+                <TableCell><strong>Data de Nascimento</strong></TableCell>
+                <TableCell align="center"><strong>Ações</strong></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {aniversariantes.map((a) => (
+                <TableRow key={a._id} hover>
+                  <TableCell>{a.name}</TableCell>
+                  <TableCell>{formatDateBR(a.birthDate)}</TableCell>
+                  <TableCell align="center">
+                    <Tooltip title="Editar">
+                      <IconButton size="small" onClick={() => handleOpenModal(a)}>
+                        <EditIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Excluir">
+                      <IconButton size="small" color="secondary" onClick={() => handleDelete(a._id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+
+      {/* Modal */}
+      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {isEdit ? "Editar Aniversariante" : "Adicionar Novo Aniversariante"}
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            name="name"
+            label="Nome"
+            fullWidth
+            value={current.name}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            name="birthDate"
+            label="Data de Nascimento"
+            type="date"
+            fullWidth
+            value={current.birthDate}
+            onChange={handleInputChange}
+            InputLabelProps={{ shrink: true }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseModal}>Cancelar</Button>
+          <Button onClick={handleSave} color="primary" variant="contained">
+            {isEdit ? "Atualizar" : "Adicionar"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
 }

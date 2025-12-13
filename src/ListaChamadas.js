@@ -13,28 +13,22 @@ export default function ListaChamadas({ token }) {
   const [students, setStudents] = useState([]);
   const [name, setName] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
-
   const [nomeCelula, setNomeCelula] = useState("");
   const [horaInicio, setHoraInicio] = useState("");
   const [horaFim, setHoraFim] = useState("");
-
   const [tema, setTema] = useState("");
   const [dinamica, setDinamica] = useState("");
   const [louvor, setLouvor] = useState("");
-
   const [ofertas, setOfertas] = useState([]);
   const [descricaoOferta, setDescricaoOferta] = useState("");
   const [valorOferta, setValorOferta] = useState("");
-
   const [observacoes, setObservacoes] = useState("");
-
   const [nameHistory, setNameHistory] = useState([]);
   const [searchHistorico, setSearchHistorico] = useState("");
 
-  // aniversariantes
-  const [aniverDia, setAniverDia] = useState([]);
+  // Aniversariantes simplificados: só nome e data
+  const [aniverDia, setAniverDia] = useState([]);   // [{ nome, birthDate }]
   const [aniverMes, setAniverMes] = useState([]);
-  // Mantemos o estado de carregamento, mas o removemos do bloqueio do PDF.
   const [aniverCarregado, setAniverCarregado] = useState(false);
 
   // ================= HELPERS ======================
@@ -51,27 +45,6 @@ export default function ListaChamadas({ token }) {
     if (!dateStr) return "Sem data";
     const date = new Date(dateStr + "T00:00:00");
     return date.toLocaleDateString("pt-BR");
-  };
-
-  const formatarDataDMA = (raw) => {
-    if (!raw) return "";
-    if (raw.includes("/")) return raw;
-    const parts = raw.split("-");
-    if (parts.length === 3) {
-      if (parts[0].length === 4) {
-        return `${parts[2].padStart(2, "0")}/${parts[1].padStart(2, "0")}/${parts[0]}`;
-      } else {
-        return `${parts[0].padStart(2, "0")}/${parts[1].padStart(2, "0")}/${parts[2]}`;
-      }
-    }
-    if (parts.length === 2) {
-      return `${parts[0].padStart(2, "0")}/${parts[1].padStart(2, "0")}`;
-    }
-    const d = new Date(raw);
-    if (!isNaN(d.getTime())) {
-      return d.toLocaleDateString("pt-BR");
-    }
-    return raw;
   };
 
   // ================= HISTÓRICO ====================
@@ -123,20 +96,18 @@ export default function ListaChamadas({ token }) {
   const addStudent = () => {
     const trimmedName = name.trim();
     if (!trimmedName) return;
-
     if (students.some((s) => s.nome.toLowerCase() === trimmedName.toLowerCase())) {
       alert("Casal já cadastrado!");
       return;
     }
-
     setStudents((prev) => [...prev, { nome: trimmedName, presenca: false }]);
     saveNameToHistory(trimmedName);
     setName("");
   };
 
   const addCasalToList = (casal) => {
-    if (!casal || !casal.name) return;
-    const trimmedName = casal.name.trim();
+    if (!casal || !casal.nome) return;
+    const trimmedName = casal.nome.trim();
     if (students.some((s) => s.nome.toLowerCase() === trimmedName.toLowerCase())) {
       alert("Casal já cadastrado!");
       return;
@@ -167,7 +138,6 @@ export default function ListaChamadas({ token }) {
     const desc = descricaoOferta.trim();
     const val = parseFloat(valorOferta);
     if (!desc || isNaN(val) || val <= 0) return;
-
     setOfertas((prev) => [...prev, { descricao: desc, valor: val }]);
     setDescricaoOferta("");
     setValorOferta("");
@@ -182,31 +152,21 @@ export default function ListaChamadas({ token }) {
       setOfertas([]);
   };
 
-  // ================= RECEBER ANIVERSÁRIOS ====================
+  // ================= RECEBER ANIVERSÁRIOS (SIMPLIFICADO) ====================
   function receberAniversarios({ dia = [], mes = [] }) {
-    const mapAniversariantes = (lista) =>
-      lista.map((c) => ({
-        nome: c.nome || c.name || "",
-        niverH: formatarDataDMA(c.niverH || c.niverH),
-        niverM: formatarDataDMA(c.niverM || c.niverM),
-        _id: c._id || c.id || undefined,
-        tel: c.tel || "",
-        sexo: c.sexo || c.gender || "M",
+    const mapear = (lista) =>
+      lista.map((item) => ({
+        nome: item.name || item.nome || "Sem nome",
+        birthDate: item.birthDate || "", // formato YYYY-MM-DD
       }));
 
-    setAniverDia(mapAniversariantes(dia));
-    setAniverMes(mapAniversariantes(mes));
-    setAniverCarregado(true); // marca que já carregou
+    setAniverDia(mapear(dia));
+    setAniverMes(mapear(mes));
+    setAniverCarregado(true);
   }
 
-  // ================= EXPORTAR PDF =====================
- // Dentro do seu ListaChamadas.js
-
-// ... (todas as outras funções e states)
-
-// ================= EXPORTAR PDF (ATUALIZADO) =====================
-// ================= EXPORTAR PDF (COMPLETO) =====================
-const exportPDF = () => {
+  // ================= EXPORTAR PDF (SIMPLIFICADO) =====================
+  const exportPDF = () => {
     const doc = new jsPDF();
     const width = doc.internal.pageSize.getWidth();
     let startY = 20;
@@ -220,11 +180,11 @@ const exportPDF = () => {
     startY += 12;
 
     const addLabel = (label, value) => {
-        doc.setFont("helvetica", "bold");
-        doc.text(label, marginLeft, startY);
-        doc.setFont("helvetica", "normal");
-        doc.text(value || "Não informado", marginLeft + labelWidth, startY);
-        startY += 7;
+      doc.setFont("helvetica", "bold");
+      doc.text(label, marginLeft, startY);
+      doc.setFont("helvetica", "normal");
+      doc.text(value || "Não informado", marginLeft + labelWidth, startY);
+      startY += 7;
     };
 
     addLabel("NOME CÉLULA:", nomeCelula);
@@ -234,136 +194,111 @@ const exportPDF = () => {
     addLabel("LOUVOR:", louvor);
     startY += 8;
 
-    // FUNÇÃO DE ADICIONAR TABELA DE ANIVERSARIANTES (COM DESTAQUE)
+    // Tabela de aniversariantes (simples e com destaque para o dia)
     const adicionarTabelaAniversariantes = (lista, titulo) => {
-        const isListaDia = titulo === "do Dia"; // Identifica se é a lista do dia
+      if (!lista || lista.length === 0) return startY;
 
-        if (!lista || lista.length === 0) return startY;
+      if (startY > doc.internal.pageSize.getHeight() - 50) {
+        doc.addPage();
+        startY = 20;
+      }
 
-        // Adicionando uma nova página se não houver espaço suficiente
-        if (startY > doc.internal.pageSize.getHeight() - 50) {
-            doc.addPage();
-            startY = 20;
-        }
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text(`Aniversariantes ${titulo}`, width / 2, startY, { align: "center" });
+      startY += 6;
 
-        const homens = lista.filter((a) => a.sexo === "M");
-        const mulheres = lista.filter((a) => a.sexo === "F");
+      autoTable(doc, {
+        head: [["#", "Nome", "Data de Aniversário"]],
+        body: lista.map((a, i) => [i + 1, a.nome, formatDateBR(a.birthDate)]),
+        startY,
+        margin: { left: marginLeft, right: marginLeft },
+        didParseCell: (data) => {
+          if (titulo.includes("Dia") && data.section === "body") {
+            data.cell.styles.fillColor = [255, 255, 150];
+            data.cell.styles.fontStyle = "bold";
+          }
+        },
+        didDrawPage: (data) => {
+          startY = data.cursor.y + 8;
+        },
+      });
 
-        const categorias = [
-            { title: `Homens ${titulo}`, lista: homens },
-            { title: `Mulheres ${titulo}`, lista: mulheres },
-        ];
-
-        categorias.forEach((cat) => {
-            if (cat.lista.length === 0) return;
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.text(cat.title, width / 2, startY, { align: "center" });
-            startY += 6;
-
-            autoTable(doc, {
-                head: [["#", "Nome", "Aniversário (H)", "Aniversário (M)", "Telefone"]],
-                body: cat.lista.map((a, i) => [i + 1, a.nome, a.niverH || "", a.niverM || "", a.tel || ""]),
-                startY,
-                margin: { left: marginLeft, right: marginLeft },
-                didParseCell: (data) => {
-                    // Aplica destaque se for a lista do dia
-                    if (isListaDia && data.section === 'body') {
-                        data.cell.styles.fillColor = [255, 255, 150]; // Amarelo claro
-                        data.cell.styles.fontStyle = 'bold';
-                    }
-                },
-                didDrawPage: (data) => {
-                    // Mudar startY para o topo da nova página
-                    startY = data.cursor.y + 8;
-                }
-            });
-
-            // Atualiza startY para a posição final da tabela
-            startY = doc.lastAutoTable.finalY + 8;
-        });
-
-        return startY;
+      startY = doc.lastAutoTable.finalY + 8;
+      return startY;
     };
 
-    // 1. Aniversariantes
     startY = adicionarTabelaAniversariantes(aniverDia, "do Dia");
     startY = adicionarTabelaAniversariantes(aniverMes, "do Mês");
 
-    // 2. Lista de casais (REINCORPORADO)
+    // Lista de casais
     if (students.length > 0) {
-        if (startY > doc.internal.pageSize.getHeight() - 50) {
-            doc.addPage();
-            startY = 20;
-        }
-        autoTable(doc, {
-            head: [["#", "Casal", "Presença"]],
-            body: students.map((s, i) => [i + 1, s.nome, s.presenca ? "Presente" : "Ausente"]),
-            startY,
-            didParseCell: (data) => {
-                if (data.column.index === 2) {
-                    data.cell.styles.fillColor = data.cell.raw === "Presente" ? [144, 238, 144] : [255, 182, 193];
-                }
-            },
-            margin: { left: marginLeft, right: marginLeft },
-        });
-        startY = doc.lastAutoTable.finalY + 10;
+      if (startY > doc.internal.pageSize.getHeight() - 50) {
+        doc.addPage();
+        startY = 20;
+      }
+      autoTable(doc, {
+        head: [["#", "Casal", "Presença"]],
+        body: students.map((s, i) => [i + 1, s.nome, s.presenca ? "Presente" : "Ausente"]),
+        startY,
+        didParseCell: (data) => {
+          if (data.column.index === 2) {
+            data.cell.styles.fillColor = data.cell.raw === "Presente" ? [144, 238, 144] : [255, 182, 193];
+          }
+        },
+        margin: { left: marginLeft, right: marginLeft },
+      });
+      startY = doc.lastAutoTable.finalY + 10;
     }
 
-    // 3. Ofertas (REINCORPORADO)
+    // Ofertas
     if (ofertas.length > 0) {
-        if (startY > doc.internal.pageSize.getHeight() - 50) {
-            doc.addPage();
-            startY = 20;
-        }
-        doc.setFont("helvetica", "bold");
-        doc.text("OFERTAS / CONTRIBUIÇÕES", width / 2, startY, { align: "center" });
-
-        autoTable(doc, {
-            head: [["#", "Descrição", "Valor"]],
-            body: ofertas.map((o, i) => [
-                i + 1,
-                o.descricao,
-                new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor),
-            ]),
-            startY: startY + 6,
-            margin: { left: marginLeft, right: marginLeft },
-        });
-
-        startY = doc.lastAutoTable.finalY + 10;
+      if (startY > doc.internal.pageSize.getHeight() - 50) {
+        doc.addPage();
+        startY = 20;
+      }
+      doc.setFont("helvetica", "bold");
+      doc.text("OFERTAS / CONTRIBUIÇÕES", width / 2, startY, { align: "center" });
+      autoTable(doc, {
+        head: [["#", "Descrição", "Valor"]],
+        body: ofertas.map((o, i) => [
+          i + 1,
+          o.descricao,
+          new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor),
+        ]),
+        startY: startY + 6,
+        margin: { left: marginLeft, right: marginLeft },
+      });
+      startY = doc.lastAutoTable.finalY + 10;
     }
 
-    // 4. Observações (REINCORPORADO)
+    // Observações
     if (observacoes.trim() !== "") {
-        if (startY > doc.internal.pageSize.getHeight() - 50) {
-            doc.addPage();
-            startY = 20;
-        }
-        doc.setFont("helvetica", "bold");
-        doc.text("OBSERVAÇÕES:", marginLeft, startY);
-        doc.setFont("helvetica", "normal");
-        const obs = doc.splitTextToSize(observacoes, width - 28);
-        doc.text(obs, marginLeft, startY + 6);
+      if (startY > doc.internal.pageSize.getHeight() - 50) {
+        doc.addPage();
+        startY = 20;
+      }
+      doc.setFont("helvetica", "bold");
+      doc.text("OBSERVAÇÕES:", marginLeft, startY);
+      doc.setFont("helvetica", "normal");
+      const obs = doc.splitTextToSize(observacoes, width - 28);
+      doc.text(obs, marginLeft, startY + 6);
     }
 
     doc.save("lista-casais.pdf");
-};
+  };
+
   // ================= RENDER =====================
   return (
     <div className="lista-chamadas-container">
-      {/* O componente AniversariantesDiaMes se encarrega de chamar receberAniversarios */}
       <AniversariantesDiaMes token={token} onLoad={receberAniversarios} />
 
-      <h2>LISTA-DE-CASAIS</h2>
-
+      <h2>LISTA DE CASAIS</h2>
       <input type="text" placeholder="Nome da Célula" value={nomeCelula} onChange={(e) => setNomeCelula(e.target.value)} />
-
       <div className="input-group">
         <input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} />
         <input type="time" value={horaFim} onChange={(e) => setHoraFim(e.target.value)} />
       </div>
-
       <input type="text" placeholder="Tema" value={tema} onChange={(e) => setTema(e.target.value)} />
       <input type="text" placeholder="Dinâmica" value={dinamica} onChange={(e) => setDinamica(e.target.value)} />
       <input type="text" placeholder="Louvor" value={louvor} onChange={(e) => setLouvor(e.target.value)} />
@@ -383,31 +318,37 @@ const exportPDF = () => {
       </div>
 
       <div className="box-aniversarios" style={{ marginTop: 16 }}>
-        <h3>Aniversariantes do Dia</h3>
-        {aniverDia.length === 0 ? <p>Nenhum aniversariante hoje.</p> :
+        <h3>Aniversariantes do Dia 🎉</h3>
+        {aniverDia.length === 0 ? (
+          <p>Nenhum aniversariante hoje.</p>
+        ) : (
           aniverDia.map((a, i) => (
-            <div key={a._id || i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 6 }}>
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 8, backgroundColor: "#FFF8A6", borderRadius: 6, marginBottom: 6 }}>
               <div>
-                <strong>{a.nome}</strong> — H: {a.niverH || "-"} / M: {a.niverM || "-"}
-                {a.tel && <div><small>{a.tel}</small></div>}
+                <strong>{a.nome}</strong> — {formatDateBR(a.birthDate)}
               </div>
-              <button className="btn-adicionar" onClick={() => addCasalToList({ name: a.nome })}>Adicionar à lista</button>
+              <button className="btn-adicionar" onClick={() => addCasalToList({ nome: a.nome })}>
+                Adicionar à lista
+              </button>
             </div>
           ))
-        }
+        )}
 
-        <h3 style={{ marginTop: 12 }}>Aniversariantes do Mês</h3>
-        {aniverMes.length === 0 ? <p>Nenhum aniversariante este mês.</p> :
+        <h3 style={{ marginTop: 16 }}>Aniversariantes do Mês</h3>
+        {aniverMes.length === 0 ? (
+          <p>Nenhum outro aniversariante este mês.</p>
+        ) : (
           aniverMes.map((a, i) => (
-            <div key={a._id || i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 6 }}>
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 6, marginBottom: 4 }}>
               <div>
-                <strong>{a.nome}</strong> — H: {a.niverH || "-"} / M: {a.niverM || "-"}
-                {a.tel && <div><small>{a.tel}</small></div>}
+                <strong>{a.nome}</strong> — {formatDateBR(a.birthDate)}
               </div>
-              <button className="btn-adicionar" onClick={() => addCasalToList({ name: a.nome })}>Adicionar à lista</button>
+              <button className="btn-adicionar" onClick={() => addCasalToList({ nome: a.nome })}>
+                Adicionar à lista
+              </button>
             </div>
           ))
-        }
+        )}
       </div>
 
       <div className="input-group" style={{ marginTop: 12 }}>
@@ -421,7 +362,6 @@ const exportPDF = () => {
             <span>Presentes: {students.filter((s) => s.presenca).length}</span>
             <span>Ausentes: {students.filter((s) => !s.presenca).length}</span>
           </div>
-
           <ul className="lista-alunos">
             {students.map((s, index) => (
               <li key={index}>
@@ -435,7 +375,6 @@ const exportPDF = () => {
               </li>
             ))}
           </ul>
-
           <button onClick={clearList} className="btn-limpar">Limpar Lista</button>
         </>
       )}
