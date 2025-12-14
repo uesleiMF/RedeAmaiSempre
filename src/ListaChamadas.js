@@ -8,15 +8,13 @@ import {
   Box,
   Typography,
 } from "@material-ui/core";
-
 import DeleteIcon from "@material-ui/icons/Delete";
 import AddIcon from "@material-ui/icons/Add";
 import ClearIcon from "@material-ui/icons/Clear";
 import PersonAddIcon from "@material-ui/icons/PersonAdd";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import CancelIcon from "@material-ui/icons/Cancel";
-import GetAppIcon from "@material-ui/icons/GetApp"; // Ícone para Exportar PDF
-
+import GetAppIcon from "@material-ui/icons/GetApp";
 import "./ListaChamadas.css";
 import AniversariantesDiaMes from "./AniversariantesDiaMes";
 
@@ -176,7 +174,7 @@ export default function ListaChamadas({ token }) {
     setAniverCarregado(true);
   }
 
-  // ================= EXPORTAR PDF ====================
+  // ================= EXPORTAR PDF (COM TÍTULO PARA LISTA DE CASAIS) ====================
   const exportPDF = () => {
     const doc = new jsPDF();
     const width = doc.internal.pageSize.getWidth();
@@ -184,11 +182,13 @@ export default function ListaChamadas({ token }) {
     const marginLeft = 14;
     const labelWidth = 48;
 
+    // Título principal
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.text(`LISTA DE CASAIS - ${formatDateBR(selectedDate)}`, width / 2, startY, { align: "center" });
     startY += 12;
 
+    // Informações da célula
     const addLabel = (label, value) => {
       doc.setFont("helvetica", "bold");
       doc.text(label, marginLeft, startY);
@@ -202,46 +202,19 @@ export default function ListaChamadas({ token }) {
     addLabel("TEMA:", tema);
     addLabel("DINÂMICA:", dinamica);
     addLabel("LOUVOR:", louvor);
-    startY += 8;
+    startY += 10;
 
-    const adicionarTabelaAniversariantes = (lista, titulo) => {
-      if (!lista || lista.length === 0) return startY;
+    // ===== TÍTULO DA LISTA DE CASAIS NO PDF =====
+    if (students.length > 0) {
       if (startY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
         startY = 20;
       }
       doc.setFont("helvetica", "bold");
       doc.setFontSize(14);
-      doc.text(`Aniversariantes ${titulo}`, width / 2, startY, { align: "center" });
-      startY += 6;
+      doc.text("CASAIS PRESENTES", width / 2, startY, { align: "center" });
+      startY += 8;
 
-      autoTable(doc, {
-        head: [["#", "Nome", "Data de Aniversário"]],
-        body: lista.map((a, i) => [i + 1, a.nome, formatDateBR(a.birthDate)]),
-        startY,
-        margin: { left: marginLeft, right: marginLeft },
-        didParseCell: (data) => {
-          if (titulo.includes("Dia") && data.section === "body") {
-            data.cell.styles.fillColor = [255, 255, 150];
-            data.cell.styles.fontStyle = "bold";
-          }
-        },
-        didDrawPage: (data) => {
-          startY = data.cursor.y + 8;
-        },
-      });
-      startY = doc.lastAutoTable.finalY + 8;
-      return startY;
-    };
-
-    startY = adicionarTabelaAniversariantes(aniverDia, "do Dia");
-    startY = adicionarTabelaAniversariantes(aniverMes, "do Mês");
-
-    if (students.length > 0) {
-      if (startY > doc.internal.pageSize.getHeight() - 50) {
-        doc.addPage();
-        startY = 20;
-      }
       autoTable(doc, {
         head: [["#", "Casal", "Presença"]],
         body: students.map((s, i) => [i + 1, s.nome, s.presenca ? "Presente" : "Ausente"]),
@@ -256,13 +229,60 @@ export default function ListaChamadas({ token }) {
       startY = doc.lastAutoTable.finalY + 10;
     }
 
+    // ===== ANIVERSARIANTES DO DIA =====
+    if (aniverDia.length > 0) {
+      if (startY > doc.internal.pageSize.getHeight() - 50) {
+        doc.addPage();
+        startY = 20;
+      }
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("ANIVERSARIANTES DO DIA", width / 2, startY, { align: "center" });
+      startY += 6;
+      autoTable(doc, {
+        head: [["#", "Nome", "Data de Aniversário"]],
+        body: aniverDia.map((a, i) => [i + 1, a.nome, formatDateBR(a.birthDate)]),
+        startY,
+        margin: { left: marginLeft, right: marginLeft },
+        didParseCell: (data) => {
+          if (data.section === "body") {
+            data.cell.styles.fillColor = [255, 255, 150];
+            data.cell.styles.fontStyle = "bold";
+          }
+        },
+      });
+      startY = doc.lastAutoTable.finalY + 10;
+    }
+
+    // ===== ANIVERSARIANTES DO MÊS =====
+    if (aniverMes.length > 0) {
+      if (startY > doc.internal.pageSize.getHeight() - 50) {
+        doc.addPage();
+        startY = 20;
+      }
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
+      doc.text("ANIVERSARIANTES DO MÊS", width / 2, startY, { align: "center" });
+      startY += 6;
+      autoTable(doc, {
+        head: [["#", "Nome", "Data de Aniversário"]],
+        body: aniverMes.map((a, i) => [i + 1, a.nome, formatDateBR(a.birthDate)]),
+        startY,
+        margin: { left: marginLeft, right: marginLeft },
+      });
+      startY = doc.lastAutoTable.finalY + 10;
+    }
+
+    // ===== OFERTAS =====
     if (ofertas.length > 0) {
       if (startY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
         startY = 20;
       }
       doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
       doc.text("OFERTAS-CONTRIBUIÇÕES", width / 2, startY, { align: "center" });
+      startY += 8;
       autoTable(doc, {
         head: [["#", "Descrição", "Valor"]],
         body: ofertas.map((o, i) => [
@@ -270,44 +290,59 @@ export default function ListaChamadas({ token }) {
           o.descricao,
           new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor),
         ]),
-        startY: startY + 6,
+        startY,
         margin: { left: marginLeft, right: marginLeft },
       });
       startY = doc.lastAutoTable.finalY + 10;
     }
 
+    // ===== OBSERVAÇÕES =====
     if (observacoes.trim() !== "") {
       if (startY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
         startY = 20;
       }
       doc.setFont("helvetica", "bold");
+      doc.setFontSize(14);
       doc.text("OBSERVAÇÕES:", width / 2, startY, { align: "center" });
       doc.setFont("helvetica", "normal");
       const obs = doc.splitTextToSize(observacoes, width - 28);
-      doc.text(obs, marginLeft, startY + 6);
+      doc.text(obs, marginLeft, startY + 8);
     }
 
     doc.save("lista-casais.pdf");
   };
 
-  // ================= RENDER =====================
+  // ================= RENDER (mantido igual) =====================
   return (
     <div className="lista-chamadas-container">
       <AniversariantesDiaMes token={token} onLoad={receberAniversarios} />
 
       <h2>LISTA DE CASAIS</h2>
-      <input type="text" placeholder="Nome da Célula" value={nomeCelula} onChange={(e) => setNomeCelula(e.target.value)} />
+      <input
+        type="text"
+        placeholder="Nome da Célula"
+        value={nomeCelula}
+        onChange={(e) => setNomeCelula(e.target.value)}
+      />
+
       <div className="input-group">
         <input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} />
         <input type="time" value={horaFim} onChange={(e) => setHoraFim(e.target.value)} />
       </div>
+
       <input type="text" placeholder="Tema" value={tema} onChange={(e) => setTema(e.target.value)} />
       <input type="text" placeholder="Dinâmica" value={dinamica} onChange={(e) => setDinamica(e.target.value)} />
       <input type="text" placeholder="Louvor" value={louvor} onChange={(e) => setLouvor(e.target.value)} />
 
-      <h2>HISTÓRICO</h2>
-      <input type="text" placeholder="Pesquisar histórico..." value={searchHistorico} onChange={(e) => setSearchHistorico(e.target.value)} />
+      <h2 style={{ marginTop: 24 }}>HISTÓRICO</h2>
+      <input
+        type="text"
+        placeholder="Pesquisar histórico..."
+        value={searchHistorico}
+        onChange={(e) => setSearchHistorico(e.target.value)}
+      />
+
       <div className="historico-box">
         {historicoFiltrado.map((nome) => (
           <div key={nome} className="historico-item" onClick={() => setName(nome)}>
@@ -328,8 +363,65 @@ export default function ListaChamadas({ token }) {
         )}
       </div>
 
-      <div className="box-aniversarios" style={{ marginTop: 16 }}>
-        <h3>ANIVERSARIANTES DO DIA🎉</h3>
+      <h2 style={{ marginTop: 24 }}>CASAIS PRESENTES</h2>
+      <div className="input-group" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <input
+          type="text"
+          value={name}
+          placeholder="Nome dos casais"
+          onChange={(e) => setName(e.target.value)}
+          style={{ flex: 1 }}
+        />
+        <Tooltip title="Adicionar casal">
+          <IconButton onClick={addStudent} color="primary">
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
+      </div>
+
+      {students.length > 0 && (
+        <>
+          <div className="presenca-contagem" style={{ marginTop: 12 }}>
+            <span>Presentes: {students.filter((s) => s.presenca).length}</span>
+            <span style={{ marginLeft: 16 }}>Ausentes: {students.filter((s) => !s.presenca).length}</span>
+          </div>
+
+          <ul className="lista-alunos" style={{ marginTop: 8 }}>
+            {students.map((s, index) => (
+              <li key={index}>
+                <span>{s.nome}</span>
+                <div className="aluno-buttons">
+                  <Tooltip title={s.presenca ? "Marcar como Ausente" : "Marcar como Presente"}>
+                    <IconButton
+                      size="small"
+                      color={s.presenca ? "primary" : "default"}
+                      onClick={() => togglePresenca(index)}
+                    >
+                      {s.presenca ? <CheckCircleIcon /> : <CancelIcon />}
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="Remover da lista">
+                    <IconButton size="small" color="secondary" onClick={() => removeStudent(index)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <Box textAlign="center" my={2}>
+            <Tooltip title="Limpar toda a lista">
+              <IconButton onClick={clearList} color="secondary" size="medium">
+                <ClearIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </>
+      )}
+
+      <div className="box-aniversarios" style={{ marginTop: 24 }}>
+        <h3>ANIVERSARIANTES DO DIA 🎉</h3>
         {aniverDia.length === 0 ? (
           <p>Nenhum aniversariante hoje.</p>
         ) : (
@@ -358,7 +450,7 @@ export default function ListaChamadas({ token }) {
           ))
         )}
 
-        <h3 style={{ marginTop: 16 }}>ANIVERSARIANTE DO MÊS</h3>
+        <h3 style={{ marginTop: 16 }}>ANIVERSARIANTES DO MÊS</h3>
         {aniverMes.length === 0 ? (
           <p>Nenhum outro aniversariante este mês.</p>
         ) : (
@@ -386,67 +478,10 @@ export default function ListaChamadas({ token }) {
         )}
       </div>
 
-      <div className="input-group" style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8 }}>
-        <input
-          type="text"
-          value={name}
-          placeholder="Nome dos casais"
-          onChange={(e) => setName(e.target.value)}
-          style={{ flex: 1 }}
-        />
-        <Tooltip title="Adicionar casal">
-          <IconButton onClick={addStudent} color="primary">
-            <AddIcon />
-          </IconButton>
-        </Tooltip>
-      </div>
-
-      {students.length > 0 && (
-        <>
-          <div className="presenca-contagem">
-            <span>Presentes: {students.filter((s) => s.presenca).length}</span>
-            <span>Ausentes: {students.filter((s) => !s.presenca).length}</span>
-          </div>
-
-          <ul className="lista-alunos">
-            {students.map((s, index) => (
-              <li key={index}>
-                <span>{s.nome}</span>
-                <div className="aluno-buttons">
-                  <Tooltip title={s.presenca ? "Marcar como Ausente" : "Marcar como Presente"}>
-                    <IconButton
-                      size="small"
-                      color={s.presenca ? "primary" : "default"}
-                      onClick={() => togglePresenca(index)}
-                    >
-                      {s.presenca ? <CheckCircleIcon /> : <CancelIcon />}
-                    </IconButton>
-                  </Tooltip>
-
-                  <Tooltip title="Remover da lista">
-                    <IconButton size="small" color="secondary" onClick={() => removeStudent(index)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          <Box textAlign="center" my={2}>
-            <Tooltip title="Limpar toda a lista">
-              <IconButton onClick={clearList} color="secondary" size="medium">
-                <ClearIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </>
-      )}
-
-      <h2 style={{ marginTop: 16 }}>DATA</h2>
+      <h2 style={{ marginTop: 24 }}>DATA</h2>
       <input type="date" value={ajustarDataInput(selectedDate)} onChange={(e) => setSelectedDate(e.target.value)} />
 
-      <h2 style={{ marginTop: 16 }}>OFERTAS-CONTRIBUIÇÕES</h2>
+      <h2 style={{ marginTop: 24 }}>OFERTAS-CONTRIBUIÇÕES</h2>
       <div className="input-group" style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <input
           type="text"
@@ -471,7 +506,7 @@ export default function ListaChamadas({ token }) {
 
       {ofertas.length > 0 && (
         <>
-          <ul className="lista-ofertas">
+          <ul className="lista-ofertas" style={{ marginTop: 12 }}>
             {ofertas.map((o, i) => (
               <li key={i}>
                 {o.descricao} — {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor)}
@@ -483,7 +518,6 @@ export default function ListaChamadas({ token }) {
               </li>
             ))}
           </ul>
-
           <Box textAlign="center" my={2}>
             <Tooltip title="Limpar todas as ofertas">
               <IconButton onClick={limparOfertas} color="secondary" size="medium">
@@ -494,10 +528,14 @@ export default function ListaChamadas({ token }) {
         </>
       )}
 
-      <h2 style={{ marginTop: 16 }}>OBSERVAÇÕES</h2>
-      <textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} rows={4} style={{ width: "100%" }} />
+      <h2 style={{ marginTop: 24 }}>OBSERVAÇÕES</h2>
+      <textarea
+        value={observacoes}
+        onChange={(e) => setObservacoes(e.target.value)}
+        rows={4}
+        style={{ width: "100%" }}
+      />
 
-      {/* Botão Exportar PDF como ícone grande e destacado */}
       <Box mt={4} textAlign="center">
         <Tooltip title="Exportar como PDF">
           <IconButton
@@ -507,7 +545,7 @@ export default function ListaChamadas({ token }) {
             style={{
               backgroundColor: "#1976d2",
               color: "white",
-              padding: 20,
+              padding: 15,
               boxShadow: "0 6px 20px rgba(25, 118, 210, 0.4)",
             }}
           >
