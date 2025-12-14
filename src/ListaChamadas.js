@@ -262,7 +262,7 @@ export default function ListaChamadas({ token }) {
         startY = 20;
       }
       doc.setFont("helvetica", "bold");
-      doc.text("OFERTAS / CONTRIBUIÇÕES", width / 2, startY, { align: "center" });
+      doc.text("OFERTAS-CONTRIBUIÇÕES", width / 2, startY, { align: "center" });
       autoTable(doc, {
         head: [["#", "Descrição", "Valor"]],
         body: ofertas.map((o, i) => [
@@ -282,7 +282,7 @@ export default function ListaChamadas({ token }) {
         startY = 20;
       }
       doc.setFont("helvetica", "bold");
-      doc.text("OBSERVAÇÕES:", marginLeft, startY);
+      doc.text("OBSERVAÇÕES:", width / 2, startY, { align: "center" });
       doc.setFont("helvetica", "normal");
       const obs = doc.splitTextToSize(observacoes, width - 28);
       doc.text(obs, marginLeft, startY + 6);
@@ -329,7 +329,7 @@ export default function ListaChamadas({ token }) {
       </div>
 
       <div className="box-aniversarios" style={{ marginTop: 16 }}>
-        <h3>Aniversariantes do Dia 🎉</h3>
+        <h3>ANIVERSARIANTES DO DIA🎉</h3>
         {aniverDia.length === 0 ? (
           <p>Nenhum aniversariante hoje.</p>
         ) : (
@@ -358,7 +358,7 @@ export default function ListaChamadas({ token }) {
           ))
         )}
 
-        <h3 style={{ marginTop: 16 }}>Aniversariantes do Mês</h3>
+        <h3 style={{ marginTop: 16 }}>ANIVERSARIANTE DO MÊS</h3>
         {aniverMes.length === 0 ? (
           <p>Nenhum outro aniversariante este mês.</p>
         ) : (
@@ -446,7 +446,7 @@ export default function ListaChamadas({ token }) {
       <h2 style={{ marginTop: 16 }}>DATA</h2>
       <input type="date" value={ajustarDataInput(selectedDate)} onChange={(e) => setSelectedDate(e.target.value)} />
 
-      <h2 style={{ marginTop: 16 }}>OFRTAS-CONTRIBUIÇÕES</h2>
+      <h2 style={{ marginTop: 16 }}>OFERTAS-CONTRIBUIÇÕES</h2>
       <div className="input-group" style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <input
           type="text"
