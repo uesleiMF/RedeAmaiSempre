@@ -1,0 +1,170 @@
+/* ListaAniversariantes.css */
+
+/* Container principal */
+.aniversariantes-container {
+  padding: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Cabeçalho com título e botão adicionar */
+.aniversariantes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.aniversariantes-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #333;
+  font-weight: 500;
+}
+
+.aniversariantes-title svg {
+  color: #e91e63; /* Rosa vibrante pro ícone de bolo */
+}
+
+/* Botão adicionar */
+.add-button {
+  background-color: #e91e63 !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+  transition: all 0.3s ease;
+}
+
+.add-button:hover {
+  background-color: #c2185b !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(233, 30, 99, 0.4);
+}
+
+/* Estado vazio */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.empty-state svg {
+  font-size: 100px;
+  color: #e0e0e0;
+  margin-bottom: 24px;
+  opacity: 0.8;
+}
+
+.empty-state h6 {
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  color: #888;
+  font-size: 1.1rem;
+}
+
+/* Tabela */
+.aniversariantes-table {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.aniversariantes-table th {
+  background-color: #e91e63 !important;
+  color: white !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+.aniversariantes-table tr:hover {
+  background-color: #fff0f5 !important;
+  transition: background-color 0.2s ease;
+}
+
+/* Destaque para quem faz aniversário HOJE */
+.today-birthday {
+  background-color: #fff8e1 !important;
+  border-left: 5px solid #ffc107;
+  animation: pulse 2s infinite;
+}
+
+.today-birthday td:first-child {
+  font-weight: 600;
+  color: #d97706;
+}
+
+/* Animação sutil de destaque */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+}
+
+/* Botões de ação (editar/excluir) */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.edit-button {
+  color: #4caf50 !important;
+}
+
+.edit-button:hover {
+  background-color: rgba(76, 175, 80, 0.1) !important;
+}
+
+.delete-button {
+  color: #f44336 !important;
+}
+
+.delete-button:hover {
+  background-color: rgba(244, 67, 54, 0.1) !important;
+}
+
+/* Modal */
+.aniversariantes-modal .MuiDialog-paper {
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.aniversariantes-modal .MuiDialogTitle-root {
+  background-color: #e91e63;
+  color: white;
+  padding: 20px 24px;
+}
+
+.aniversariantes-modal .MuiDialogContent-root {
+  padding: 24px;
+}
+
+.aniversariantes-modal .MuiTextField-root {
+  margin-bottom: 20px;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+  .aniversariantes-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .aniversariantes-table {
+    font-size: 0.9rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+}

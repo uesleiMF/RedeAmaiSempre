@@ -25,7 +25,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import CakeIcon from "@material-ui/icons/Cake";
 import swal from "sweetalert";
 import axios from "axios";
-
+import "./ListaAniversariantes.css";
 const BASE_URL = "https://backtestmar.onrender.com";
 
 export default function ListaAniversariantes({ token: propToken }) {

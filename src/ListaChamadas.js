@@ -2,8 +2,21 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { IconButton } from "@material-ui/core";
+import {
+  IconButton,
+  Tooltip,
+  Box,
+  Typography,
+} from "@material-ui/core";
+
 import DeleteIcon from "@material-ui/icons/Delete";
+import AddIcon from "@material-ui/icons/Add";
+import ClearIcon from "@material-ui/icons/Clear";
+import PersonAddIcon from "@material-ui/icons/PersonAdd";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import CancelIcon from "@material-ui/icons/Cancel";
+import GetAppIcon from "@material-ui/icons/GetApp"; // Ícone para Exportar PDF
+
 import "./ListaChamadas.css";
 import AniversariantesDiaMes from "./AniversariantesDiaMes";
 
@@ -24,7 +37,6 @@ export default function ListaChamadas({ token }) {
   const [observacoes, setObservacoes] = useState("");
   const [nameHistory, setNameHistory] = useState([]);
   const [searchHistorico, setSearchHistorico] = useState("");
-
   // Aniversariantes
   const [aniverDia, setAniverDia] = useState([]);
   const [aniverMes, setAniverMes] = useState([]);
@@ -39,14 +51,10 @@ export default function ListaChamadas({ token }) {
     return datePart;
   };
 
-  // FUNÇÃO CORRIGIDA: formatação segura para datas do backend (ISO string)
   const formatDateBR = (birthDate) => {
     if (!birthDate) return "Sem data";
-
-    // Extrai apenas yyyy-mm-dd da string ISO completa
     const dateStr = typeof birthDate === "string" ? birthDate.split("T")[0] : "";
     if (!dateStr || dateStr.length !== 10) return "Data inválida";
-
     const [year, month, day] = dateStr.split("-");
     return `${day}/${month}/${year}`;
   };
@@ -174,7 +182,7 @@ export default function ListaChamadas({ token }) {
     const width = doc.internal.pageSize.getWidth();
     let startY = 20;
     const marginLeft = 14;
-    const labelWidth = 40;
+    const labelWidth = 48;
 
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
@@ -189,7 +197,7 @@ export default function ListaChamadas({ token }) {
       startY += 7;
     };
 
-    addLabel("NOME CÉLULA:", nomeCelula);
+    addLabel("CÉLULA:", nomeCelula);
     addLabel("HORÁRIO:", `${horaInicio || ""}${horaInicio && horaFim ? " - " : ""}${horaFim || ""}`);
     addLabel("TEMA:", tema);
     addLabel("DINÂMICA:", dinamica);
@@ -229,7 +237,6 @@ export default function ListaChamadas({ token }) {
     startY = adicionarTabelaAniversariantes(aniverDia, "do Dia");
     startY = adicionarTabelaAniversariantes(aniverMes, "do Mês");
 
-    // Lista de casais, ofertas, observações (mantido igual)
     if (students.length > 0) {
       if (startY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
@@ -305,12 +312,20 @@ export default function ListaChamadas({ token }) {
         {historicoFiltrado.map((nome) => (
           <div key={nome} className="historico-item" onClick={() => setName(nome)}>
             <span>{nome}</span>
-            <IconButton size="small" onClick={(e) => deleteNameFromHistory(nome, e)}>
-              <DeleteIcon fontSize="small" />
-            </IconButton>
+            <Tooltip title="Excluir do histórico">
+              <IconButton size="small" onClick={(e) => deleteNameFromHistory(nome, e)}>
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </div>
         ))}
-        {nameHistory.length > 0 && <button onClick={clearHistory}>Limpar Histórico</button>}
+        {nameHistory.length > 0 && (
+          <Tooltip title="Limpar todo o histórico">
+            <IconButton onClick={clearHistory} color="secondary">
+              <ClearIcon />
+            </IconButton>
+          </Tooltip>
+        )}
       </div>
 
       <div className="box-aniversarios" style={{ marginTop: 16 }}>
@@ -319,13 +334,26 @@ export default function ListaChamadas({ token }) {
           <p>Nenhum aniversariante hoje.</p>
         ) : (
           aniverDia.map((a, i) => (
-            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 8, backgroundColor: "#FFF8A6", borderRadius: 6, marginBottom: 6 }}>
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: 8,
+                backgroundColor: "#ffff8a",
+                borderRadius: 6,
+                marginBottom: 6,
+              }}
+            >
               <div>
                 <strong>{a.nome}</strong> — {formatDateBR(a.birthDate)}
               </div>
-              <button className="btn-adicionar" onClick={() => addCasalToList({ nome: a.nome })}>
-                Adicionar à lista
-              </button>
+              <Tooltip title="Adicionar à lista">
+                <IconButton size="small" color="primary" onClick={() => addCasalToList({ nome: a.nome })}>
+                  <PersonAddIcon />
+                </IconButton>
+              </Tooltip>
             </div>
           ))
         )}
@@ -335,21 +363,42 @@ export default function ListaChamadas({ token }) {
           <p>Nenhum outro aniversariante este mês.</p>
         ) : (
           aniverMes.map((a, i) => (
-            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 6, marginBottom: 4 }}>
+            <div
+              key={i}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: 6,
+                marginBottom: 4,
+              }}
+            >
               <div>
                 <strong>{a.nome}</strong> — {formatDateBR(a.birthDate)}
               </div>
-              <button className="btn-adicionar" onClick={() => addCasalToList({ nome: a.nome })}>
-                Adicionar à lista
-              </button>
+              <Tooltip title="Adicionar à lista">
+                <IconButton size="small" color="primary" onClick={() => addCasalToList({ nome: a.nome })}>
+                  <PersonAddIcon />
+                </IconButton>
+              </Tooltip>
             </div>
           ))
         )}
       </div>
 
-      <div className="input-group" style={{ marginTop: 12 }}>
-        <input type="text" value={name} placeholder="Nome dos casais" onChange={(e) => setName(e.target.value)} />
-        <button onClick={addStudent} className="btn-adicionar">Adicionar</button>
+      <div className="input-group" style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8 }}>
+        <input
+          type="text"
+          value={name}
+          placeholder="Nome dos casais"
+          onChange={(e) => setName(e.target.value)}
+          style={{ flex: 1 }}
+        />
+        <Tooltip title="Adicionar casal">
+          <IconButton onClick={addStudent} color="primary">
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
       </div>
 
       {students.length > 0 && (
@@ -358,49 +407,117 @@ export default function ListaChamadas({ token }) {
             <span>Presentes: {students.filter((s) => s.presenca).length}</span>
             <span>Ausentes: {students.filter((s) => !s.presenca).length}</span>
           </div>
+
           <ul className="lista-alunos">
             {students.map((s, index) => (
               <li key={index}>
                 <span>{s.nome}</span>
                 <div className="aluno-buttons">
-                  <button onClick={() => togglePresenca(index)} className={s.presenca ? "btn-presente" : "btn-ausente"}>
-                    {s.presenca ? "Presente" : "Ausente"}
-                  </button>
-                  <button onClick={() => removeStudent(index)} className="btn-remover">Remover</button>
+                  <Tooltip title={s.presenca ? "Marcar como Ausente" : "Marcar como Presente"}>
+                    <IconButton
+                      size="small"
+                      color={s.presenca ? "primary" : "default"}
+                      onClick={() => togglePresenca(index)}
+                    >
+                      {s.presenca ? <CheckCircleIcon /> : <CancelIcon />}
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title="Remover da lista">
+                    <IconButton size="small" color="secondary" onClick={() => removeStudent(index)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
                 </div>
               </li>
             ))}
           </ul>
-          <button onClick={clearList} className="btn-limpar">Limpar Lista</button>
+
+          <Box textAlign="center" my={2}>
+            <Tooltip title="Limpar toda a lista">
+              <IconButton onClick={clearList} color="secondary" size="medium">
+                <ClearIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </>
       )}
 
-      <h2 style={{ marginTop: 16 }}>Data</h2>
+      <h2 style={{ marginTop: 16 }}>DATA</h2>
       <input type="date" value={ajustarDataInput(selectedDate)} onChange={(e) => setSelectedDate(e.target.value)} />
 
-      <h2 style={{ marginTop: 16 }}>Ofertas / Contribuições</h2>
-      <div className="input-group">
-        <input type="text" placeholder="Descrição" value={descricaoOferta} onChange={(e) => setDescricaoOferta(e.target.value)} />
-        <input type="number" placeholder="Valor" value={valorOferta} onChange={(e) => setValorOferta(e.target.value)} />
-        <button onClick={addOferta} className="btn-adicionar">Adicionar</button>
+      <h2 style={{ marginTop: 16 }}>OFRTAS-CONTRIBUIÇÕES</h2>
+      <div className="input-group" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <input
+          type="text"
+          placeholder="Descrição"
+          value={descricaoOferta}
+          onChange={(e) => setDescricaoOferta(e.target.value)}
+          style={{ flex: 1 }}
+        />
+        <input
+          type="number"
+          placeholder="Valor"
+          value={valorOferta}
+          onChange={(e) => setValorOferta(e.target.value)}
+          style={{ width: 120 }}
+        />
+        <Tooltip title="Adicionar oferta">
+          <IconButton onClick={addOferta} color="primary">
+            <AddIcon />
+          </IconButton>
+        </Tooltip>
       </div>
 
       {ofertas.length > 0 && (
-        <ul className="lista-ofertas">
-          {ofertas.map((o, i) => (
-            <li key={i}>
-              {o.descricao} — {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor)}
-              <button onClick={() => removeOferta(i)} className="btn-remover">Remover</button>
-            </li>
-          ))}
-          <button onClick={limparOfertas} className="btn-limpar">Limpar Ofertas</button>
-        </ul>
+        <>
+          <ul className="lista-ofertas">
+            {ofertas.map((o, i) => (
+              <li key={i}>
+                {o.descricao} — {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor)}
+                <Tooltip title="Remover oferta">
+                  <IconButton size="small" color="secondary" onClick={() => removeOferta(i)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
+              </li>
+            ))}
+          </ul>
+
+          <Box textAlign="center" my={2}>
+            <Tooltip title="Limpar todas as ofertas">
+              <IconButton onClick={limparOfertas} color="secondary" size="medium">
+                <ClearIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </>
       )}
 
-      <h2 style={{ marginTop: 16 }}>Observações</h2>
-      <textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} rows={4} />
+      <h2 style={{ marginTop: 16 }}>OBSERVAÇÕES</h2>
+      <textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} rows={4} style={{ width: "100%" }} />
 
-      <button onClick={exportPDF} className="btn-exportar">Exportar PDF</button>
+      {/* Botão Exportar PDF como ícone grande e destacado */}
+      <Box mt={4} textAlign="center">
+        <Tooltip title="Exportar como PDF">
+          <IconButton
+            onClick={exportPDF}
+            color="primary"
+            size="large"
+            style={{
+              backgroundColor: "#1976d2",
+              color: "white",
+              padding: 20,
+              boxShadow: "0 6px 20px rgba(25, 118, 210, 0.4)",
+            }}
+          >
+            <GetAppIcon fontSize="large" />
+          </IconButton>
+        </Tooltip>
+        <Typography variant="body2" color="textSecondary" style={{ marginTop: 8 }}>
+          PDF
+        </Typography>
+      </Box>
     </div>
   );
 }
