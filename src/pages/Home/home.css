@@ -1,89 +1,69 @@
-/* ============================
-   WRAPPER GERAL
-============================ */
 .home-wrapper {
-  padding-top: 40px;
-  padding-bottom: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-/* ============================
-   TÍTULOS
-============================ */
+.home-card {
+  border-radius: 20px !important;
+  overflow: hidden;
+}
+
+.bg-gradient-title {
+  background: linear-gradient(135deg, #17a2b8, #0d6efd);
+  color: white;
+}
+
 .title1 {
-  font-weight: bold;
-  margin-top: 20px;
+  font-size: 2.5rem;
+  font-weight: 900;
 }
 
 .title2 {
-  margin-bottom: 20px;
-  margin-top: 10px;
+  font-size: 2rem;
+  font-weight: 700;
 }
 
-/* ============================
-   CARROSSEL (IMAGENS IGUAIS)
-============================ */
-.carousel-img,
-.carousel-item img {
-  width: 50% !important;
-  height: 450px !important;  /* ajuste se quiser maior/menor */
-  object-fit: cover !important;
-  object-position: center;
-  border-radius: 8px;
-}
-
-/* Corrige distorção no mobile */
-@media (max-width: 468px) {
-  .carousel-img,
-  .carousel-item img {
-    height: 240px !important;
-  }
-}
-
-/* ============================
-   IMAGEM IEQ
-============================ */
-.ieq-container {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0;
-}
-
-.ieq-container img {
-  width: 250px;
-  height: 250px;
-  border-radius: 20px;
-  transition: 0.3s;
-  cursor: pointer;
+/* ===== CARROSSEL - IMAGENS MESMO TAMANHO ===== */
+.carousel-custom .carousel-img {
+  height: 500px !important; /* Altura fixa - mude se quiser */
   object-fit: cover;
-}
-
-.ieq-container img:hover {
-  transform: scale(1.05);
-}
-
-/* Ajuste mobile */
-@media (max-width: 468px) {
-  .ieq-container img {
-    width: 200px;
-    height: 200px;
-  }
-}
-
-/* ============================
-   FLIP CARDS
-============================ */
-.flip-card {
-  background: transparent;
+  object-position: center;
   width: 100%;
-  height: 230px;
+}
+
+/* ===== IMAGEM IEQ ===== */
+.ieq-container {
+  max-width: 600px;
+  margin: 30px auto;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.ieq-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.ieq-img:hover {
+  transform: scale(1.08);
+}
+
+/* ===== FLIP CARD CÉLULAS ===== */
+.flip-card {
+  background-color: transparent;
+  height: 300px;
   perspective: 1000px;
-  margin-top: 20px;
 }
 
 .flip-card-inner {
   position: relative;
   width: 100%;
   height: 100%;
+  text-align: center;
   transition: transform 0.8s;
   transform-style: preserve-3d;
 }
@@ -92,60 +72,78 @@
   transform: rotateY(180deg);
 }
 
-.flip-card-front,
-.flip-card-back {
+.flip-card-front, .flip-card-back {
   position: absolute;
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  border-radius: 10px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
-/* Frente */
-.flip-card-front img {
-  border-radius: 10px;
+.flip-card-front {
+  background: white;
+}
+
+.celula-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* Verso */
 .flip-card-back {
-  background-color: #024c24;
+  background: linear-gradient(135deg, #28a745, #20c997);
   color: white;
   transform: rotateY(180deg);
-  padding: 10px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.flip-card-back h3 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.flip-card-back h5 {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+}
+
+.flip-card-back p {
+  font-size: 1.1rem;
+  margin: 15px 0;
 }
 
 .icon-map {
-  font-size: 30px;
   color: white;
-  margin-top: 10px;
+  transition: color 0.3s;
 }
 
-/* Ajuste mobile */
-@media (max-width: 468px) {
-  .flip-card {
-    height: 200px;
-  }
+.icon-map:hover {
+  color: #ffd700;
 }
 
-/* ============================
-   REDES SOCIAIS
-============================ */
-.social-area {
-  display: flex;
-  justify-content: center;
-  gap: 25px;
-  margin: 20px 0;
-}
-
+/* ===== REDES SOCIAIS ===== */
 .social-area a {
-  font-size: 40px;
-  transition: 0.3s;
+  margin: 0 30px;
+  transition: transform 0.3s;
 }
 
 .social-area a:hover {
-  transform: scale(1.2);
+  transform: translateY(-8px);
 }
+
+.social-icon.fb {
+  color: #3b5998;
+}
+
+.social-icon.ig {
+  color: #E1306C;
+}
+
+.social-icon.fb:hover { color: #1877f2; }
+.social-icon.ig:hover { color: #c13584; }

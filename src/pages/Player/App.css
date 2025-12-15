@@ -1,61 +1,113 @@
-/* Reset e padrão global */
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-}
-
-html, body {
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(0,0,0,0.3);
+  position: fixed;
   width: 100%;
-  min-height: 100%;
-  font-family: "Lato", sans-serif;
-  background-color: #f5f5f5; /* opcional, mas deixa mais consistente */
-  overflow-x: hidden;        /* evita scroll lateral */
+  top: 0;
+  z-index: 10;
 }
 
-/* Cabeçalhos */
-h1, h2, h3 {
-  color: rgb(54, 54, 54);
-  line-height: 1.3;
-  word-wrap: break-word;
+nav button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
 }
 
-/* Subtítulos */
-h3, h4 {
-  font-weight: 400;
-  color: rgb(100, 100, 100);
+.player {
+  text-align: center;
+  margin-top: 6rem;
 }
 
-/* Responsividade para telas pequenas */
-@media (max-width: 480px) {
-  h1 {
-    font-size: 1.6rem;
-  }
-
-  h2 {
-    font-size: 1.4rem;
-  }
-
-  h3 {
-    font-size: 1.2rem;
-  }
-
-  h4 {
-    font-size: 1rem;
-  }
+.time-control {
+  width: 70%;
+  max-width: 500px;
+  margin: 2rem auto;
+  display: flex;
+  align-items: center;
 }
 
-/* Responsividade para tablets */
+.time-control input {
+  width: 100%;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.time-control input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  background: #00dbde;
+  border-radius: 50%;
+}
+
+.play-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.play-control .play {
+  color: #00dbde;
+}
+
+.library {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20rem;
+  height: 100%;
+  background: rgba(30, 30, 50, 0.95);
+  box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+  transform: translateX(-100%);
+  transition: all 0.5s ease;
+  overflow: scroll;
+  padding-top: 6rem;
+}
+
+.library.active {
+  transform: translateX(0);
+}
+
+.library h2 {
+  padding: 2rem;
+  text-align: center;
+}
+
+.library-song {
+  display: flex;
+  align-items: center;
+  padding: 1rem 2rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.library-song:hover {
+  background: rgba(0, 219, 222, 0.2);
+}
+
+.library-song.selected {
+  background: rgba(0, 219, 222, 0.4);
+}
+
+.library-song img {
+  width: 60px;
+  border-radius: 8px;
+}
+
+.song-description {
+  margin-left: 1rem;
+}
+
 @media (max-width: 768px) {
-  h1 {
-    font-size: 1.8rem;
-  }
-
-  h2 {
-    font-size: 1.5rem;
-  }
-
-  h3 {
-    font-size: 1.25rem;
+  .library {
+    width: 100%;
   }
 }
