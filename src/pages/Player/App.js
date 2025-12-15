@@ -9,7 +9,7 @@ import data from "./data";
 function App() {
   const audioRef = useRef(null);
   const [songs, setSongs] = useState(data());
-  const [currentSong, setCurrentSong] = useState(null); // ← começa como null
+  const [currentSong, setCurrentSong] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [libraryStatus, setLibraryStatus] = useState(false);
   const [songInfo, setSongInfo] = useState({
@@ -18,12 +18,10 @@ function App() {
     percentage: 0,
   });
 
-  // Define a primeira música apenas depois que songs estiver carregado
   useEffect(() => {
     if (songs.length > 0 && !currentSong) {
       const firstSong = { ...songs[0], active: true };
       setCurrentSong(firstSong);
-      // Atualiza todas as músicas para marcar a primeira como ativa
       setSongs(songs.map((s, i) => ({ ...s, active: i === 0 })));
     }
   }, [songs, currentSong]);
@@ -32,7 +30,7 @@ function App() {
     const current = e.target.currentTime;
     const duration = e.target.duration || 0;
     const percentage = (current / duration) * 100 || 0;
-    setSongInfo({ ...songInfo, currentTime: current, duration, percentage });
+    setSongInfo({ currentTime: current, duration, percentage });
   };
 
   const songEndHandler = () => {
@@ -56,25 +54,30 @@ function App() {
     }
   }, [isPlaying, currentSong]);
 
-  // Proteção extra: se ainda não carregou, mostra loading
   if (!currentSong) {
-    return <div style={{ color: "white", textAlign: "center", marginTop: "50vh" }}>Carregando músicas...</div>;
+    return (
+      <LoadingContainer>
+        <h2>Carregando músicas...</h2>
+      </LoadingContainer>
+    );
   }
 
   return (
     <AppContainer libraryStatus={libraryStatus}>
       <Nav libraryStatus={libraryStatus} setLibraryStatus={setLibraryStatus} />
-      <Song currentSong={currentSong} isPlaying={isPlaying} />
-      <Player
-        currentSong={currentSong}
-        isPlaying={isPlaying}
-        setIsPlaying={setIsPlaying}
-        audioRef={audioRef}
-        songInfo={songInfo}
-        songs={songs}
-        setCurrentSong={setCurrentSong}
-        updateActive={updateActive}
-      />
+      <MainContent>
+        <Song currentSong={currentSong} isPlaying={isPlaying} />
+        <Player
+          currentSong={currentSong}
+          isPlaying={isPlaying}
+          setIsPlaying={setIsPlaying}
+          audioRef={audioRef}
+          songInfo={songInfo}
+          songs={songs}
+          setCurrentSong={setCurrentSong}
+          updateActive={updateActive}
+        />
+      </MainContent>
       <Library
         songs={songs}
         currentSong={currentSong}
@@ -96,11 +99,32 @@ function App() {
 }
 
 const AppContainer = styled.div`
-  transition: margin-left 0.5s ease;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  transition: margin-left 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   margin-left: ${(p) => (p.libraryStatus ? "20rem" : "0")};
+
   @media (max-width: 768px) {
     margin-left: 0;
   }
+`;
+
+const MainContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #00dbde;
+  font-size: 2rem;
 `;
 
 export default App;
