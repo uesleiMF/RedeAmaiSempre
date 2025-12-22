@@ -1,5 +1,7 @@
 import React from "react";
 import styled from "styled-components"; // ← ESSA LINHA ESTAVA FALTANDO!
+import "./Song.js";
+
 
 const Song = ({ currentSong, isPlaying = false }) => {
   return (

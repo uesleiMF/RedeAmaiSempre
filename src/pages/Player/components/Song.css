@@ -1,0 +1,128 @@
+/* ====================== CSS PURO ====================== */
+
+.song-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 8rem auto 4rem;
+  padding: 3rem 2rem;
+  max-width: 500px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border-radius: 30px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cover-container {
+  margin-bottom: 2.5rem;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  transition: all 0.5s ease;
+}
+
+.cover-container.playing {
+  box-shadow: 0 0 40px rgba(0, 219, 222, 0.6);
+}
+
+.cover-img {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  display: block;
+  border-radius: 24px;
+  transition: transform 0.5s ease;
+}
+
+/* Animação de rotação só quando .playing está presente */
+.cover-container.playing .cover-img {
+  animation: rotate 30s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.song-info {
+  text-align: center;
+}
+
+.song-title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin: 0 0 1rem 0;
+  background: linear-gradient(90deg, #00dbde, #fc00ff, #00dbde);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientFlow 8s ease infinite;
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.song-artist {
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+/* ====================== MEDIA QUERIES ====================== */
+
+@media (max-width: 768px) {
+  .song-container {
+    margin: 6rem auto 3rem;
+    padding: 2rem 1.5rem;
+    border-radius: 24px;
+  }
+
+  .cover-img {
+    width: 250px;
+    height: 250px;
+  }
+
+  .song-title {
+    font-size: 2.2rem;
+  }
+
+  .song-artist {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cover-img {
+    width: 200px;
+    height: 200px;
+  }
+}

@@ -185,7 +185,7 @@ export default function ListaChamadas({ token }) {
     // Título principal
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.text(`LISTA DE CASAIS - ${formatDateBR(selectedDate)}`, width / 2, startY, { align: "center" });
+    doc.text(`CELULA DE CASAIS - ${formatDateBR(selectedDate)}`, width / 2, startY, { align: "center" });
     startY += 12;
 
     // Informações da célula
@@ -318,7 +318,7 @@ export default function ListaChamadas({ token }) {
     <div className="lista-chamadas-container">
       <AniversariantesDiaMes token={token} onLoad={receberAniversarios} />
 
-      <h2>LISTA DE CASAIS</h2>
+      <h2>CELULA DE CASAIS</h2>
       <input
         type="text"
         placeholder="Nome da Célula"

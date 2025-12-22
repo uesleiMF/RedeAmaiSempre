@@ -1,5 +1,8 @@
+// src/components/Library.jsx (ou onde estiver)
+
 import React, { useState } from "react";
-import "./Library.css"
+import "./Library.css";
+
 const Library = ({
   songs,
   currentSong,
@@ -16,6 +19,24 @@ const Library = ({
       song.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       song.artist.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleSongClick = (song) => {
+    // Se clicar na mesma música que já está tocando, não faz nada (ou pode adicionar toggle se quiser)
+    if (currentSong.id === song.id) return;
+
+    // Troca a música
+    setCurrentSong(song);
+    updateActive(song.id);
+
+    // Força o play após trocar a fonte do áudio
+    setTimeout(() => {
+      if (audioRef.current) {
+        audioRef.current.play().catch((e) => {
+          console.warn("Play bloqueado (precisa de interação):", e);
+        });
+      }
+    }, 100);
+  };
 
   return (
     <div className={`library ${libraryStatus ? "active-library" : ""}`}>
@@ -46,21 +67,17 @@ const Library = ({
             <div
               key={song.id}
               className={`song-item ${currentSong.id === song.id ? "active-song" : ""}`}
-              onClick={() => {
-                setCurrentSong(song);
-                updateActive(song.id);
-                if (isPlaying && audioRef.current) {
-                  audioRef.current.play();
-                }
-              }}
+              onClick={() => handleSongClick(song)}
             >
               <img src={song.cover} alt={song.name} className="song-cover" />
               <div className="song-info">
                 <h3 className="song-name">{song.name}</h3>
                 <p className="song-artist">{song.artist}</p>
               </div>
+
               {currentSong.id === song.id && isPlaying && (
                 <div className="playing-indicator">
+                  <div className="wave"></div>
                   <div className="wave"></div>
                   <div className="wave"></div>
                   <div className="wave"></div>

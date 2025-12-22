@@ -8,7 +8,7 @@ import data from "./data";
 
 function App() {
   const audioRef = useRef(null);
-  const [songs, setSongs] = useState(data());
+  const [songs, setSongs] = useState(data()); // data() retorna o array
   const [currentSong, setCurrentSong] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [libraryStatus, setLibraryStatus] = useState(false);
@@ -18,42 +18,52 @@ function App() {
     percentage: 0,
   });
 
+  // Define a primeira música como currentSong ao carregar
   useEffect(() => {
     if (songs.length > 0 && !currentSong) {
       const firstSong = { ...songs[0], active: true };
       setCurrentSong(firstSong);
       setSongs(songs.map((s, i) => ({ ...s, active: i === 0 })));
     }
-  }, [songs, currentSong]);
+  }, [songs]);
 
+  // Atualiza tempo e porcentagem da barra
   const timeUpdateHandler = (e) => {
     const current = e.target.currentTime;
     const duration = e.target.duration || 0;
-    const percentage = (current / duration) * 100 || 0;
+    const percentage = duration ? (current / duration) * 100 : 0;
     setSongInfo({ currentTime: current, duration, percentage });
   };
 
+  // Quando a música termina, pula para a próxima
   const songEndHandler = () => {
-    if (!currentSong) return;
+    if (!currentSong || songs.length === 0) return;
     const currentIndex = songs.findIndex((s) => s.id === currentSong.id);
     const nextSong = songs[(currentIndex + 1) % songs.length];
     setCurrentSong(nextSong);
     updateActive(nextSong);
-    if (isPlaying) audioRef.current.play();
+    if (isPlaying && audioRef.current) {
+      audioRef.current.play().catch(() => {});
+    }
   };
 
+  // Marca a música como ativa na lista
   const updateActive = (selectedSong) => {
     setSongs(songs.map((s) => ({ ...s, active: s.id === selectedSong.id })));
   };
 
+  // Controla play/pause automático
   useEffect(() => {
-    if (isPlaying && audioRef.current) {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
       audioRef.current.play().catch(() => setIsPlaying(false));
-    } else if (audioRef.current) {
+    } else {
       audioRef.current.pause();
     }
   }, [isPlaying, currentSong]);
 
+  // Tela de loading se ainda não tiver música
   if (!currentSong) {
     return (
       <LoadingContainer>
@@ -88,8 +98,8 @@ function App() {
         libraryStatus={libraryStatus}
       />
       <audio
-        src={currentSong.audio}
         ref={audioRef}
+        src={currentSong.audio}
         onTimeUpdate={timeUpdateHandler}
         onLoadedMetadata={timeUpdateHandler}
         onEnded={songEndHandler}
@@ -103,7 +113,6 @@ const AppContainer = styled.div`
   background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
   transition: margin-left 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   margin-left: ${(p) => (p.libraryStatus ? "20rem" : "0")};
-
   @media (max-width: 768px) {
     margin-left: 0;
   }
