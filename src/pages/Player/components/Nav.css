@@ -1,9 +1,12 @@
 .nav-container {
   position: fixed;
-  top: 0;
+  top: 80px; /* ← Aqui você controla quanto ela "desce" */
   left: 0;
-  width: 100%;
+  right: 0; /* adicionado para centralizar melhor */
+  width: 95%; /* ou 90%, para não encostar nas laterais */
+  max-width: 540px; /* opcional: limite máximo */
   height: 80px;
+  margin: 0 auto; /* centraliza horizontalmente */
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
   backdrop-filter: blur(20px);
   display: flex;
@@ -13,6 +16,7 @@
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
+  border-radius: 20px; /* opcional: cantos arredondados para ficar mais moderno */
 }
 
 .nav-title {

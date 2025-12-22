@@ -8,7 +8,8 @@ import data from "./data";
 
 function App() {
   const audioRef = useRef(null);
-  const [songs, setSongs] = useState(data()); // data() retorna o array
+
+  const [songs, setSongs] = useState(data());
   const [currentSong, setCurrentSong] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [libraryStatus, setLibraryStatus] = useState(false);
@@ -18,7 +19,7 @@ function App() {
     percentage: 0,
   });
 
-  // Define a primeira música como currentSong ao carregar
+  // Define a primeira música ao carregar
   useEffect(() => {
     if (songs.length > 0 && !currentSong) {
       const firstSong = { ...songs[0], active: true };
@@ -27,7 +28,7 @@ function App() {
     }
   }, [songs]);
 
-  // Atualiza tempo e porcentagem da barra
+  // Atualiza tempo, duração e porcentagem
   const timeUpdateHandler = (e) => {
     const current = e.target.currentTime;
     const duration = e.target.duration || 0;
@@ -35,35 +36,36 @@ function App() {
     setSongInfo({ currentTime: current, duration, percentage });
   };
 
-  // Quando a música termina, pula para a próxima
+  // Quando a música termina, vai para a próxima
   const songEndHandler = () => {
-    if (!currentSong || songs.length === 0) return;
     const currentIndex = songs.findIndex((s) => s.id === currentSong.id);
-    const nextSong = songs[(currentIndex + 1) % songs.length];
+    const nextIndex = (currentIndex + 1) % songs.length;
+    const nextSong = songs[nextIndex];
     setCurrentSong(nextSong);
     updateActive(nextSong);
-    if (isPlaying && audioRef.current) {
-      audioRef.current.play().catch(() => {});
-    }
+    // O useEffect abaixo vai tocar automaticamente
   };
 
-  // Marca a música como ativa na lista
+  // Marca música como ativa na biblioteca
   const updateActive = (selectedSong) => {
     setSongs(songs.map((s) => ({ ...s, active: s.id === selectedSong.id })));
   };
 
-  // Controla play/pause automático
+  // ESSA É A CHAVE: Toca/pausa automaticamente quando muda a música ou estado de play
   useEffect(() => {
     if (!audioRef.current) return;
 
     if (isPlaying) {
-      audioRef.current.play().catch(() => setIsPlaying(false));
+      audioRef.current.play().catch((error) => {
+        console.log("Play bloqueado (interação necessária?):", error);
+        setIsPlaying(false); // Evita ficar preso em "tocando" sem áudio
+      });
     } else {
       audioRef.current.pause();
     }
-  }, [isPlaying, currentSong]);
+  }, [isPlaying, currentSong]); // ← Observa currentSong também!
 
-  // Tela de loading se ainda não tiver música
+  // Loading enquanto carrega as músicas
   if (!currentSong) {
     return (
       <LoadingContainer>
@@ -83,6 +85,7 @@ function App() {
           setIsPlaying={setIsPlaying}
           audioRef={audioRef}
           songInfo={songInfo}
+          setSongInfo={setSongInfo}        // ← CORRIGIDO: agora passa a função!
           songs={songs}
           setCurrentSong={setCurrentSong}
           updateActive={updateActive}

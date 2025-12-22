@@ -5,7 +5,7 @@ const data = () => [
   {
     name: "Deus de Detalhes",
     artist: "Aso, Middle School",
-    cover: "https://chillhop.com/wp-content/uploads/2020/09/0255e8b8c74c90d4a27c594b3452b2daafae608d-1024x1024.jpg",
+    cover: "/images/2.png",
     audio: "/music/a.mp3",
     color: ["#205950", "#2ab3bf"],
     id: uuidv4(),
@@ -15,7 +15,7 @@ const data = () => [
     name: "Bondade de Deus",
     artist: "Isaías Saad",
     cover: "https://i.scdn.co/image/ab67616d0000b2739e1cfc756886e3c4d7e9923e",
-    audio: "",
+    audio: "/music/bondade-de-deus.mp3",
     color: ["#EF8EA9", "#ab417f"],
     id: uuidv4(),
     active: false,
