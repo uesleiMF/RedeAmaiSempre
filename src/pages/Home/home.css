@@ -1,56 +1,72 @@
-/* Variáveis */
+/* Variáveis (mantive as suas + adicionei algumas úteis) */
 :root {
   --primary: #17a2b8;
   --primary-dark: #0d6efd;
   --success: #28a745;
   --success-light: #20c997;
-  --shadow-md: 0 10px 30px rgba(0,0,0,0.15);
-  --border-radius: 20px;
-  --transition: all 0.4s ease;
+  --warning-soft: #fff3cd;
+  --shadow-md: 0 10px 30px rgba(0,0,0,0.12);
+  --shadow-lg: 0 15px 40px rgba(0,0,0,0.18);
+  --border-radius: 1.25rem; /* 20px */
+  --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-heading: 'Segoe UI', system-ui, sans-serif;
 }
 
-/* Container principal */
+/* Reset leve e container principal */
+* {
+  box-sizing: border-box;
+}
+
 .home-wrapper {
   max-width: 1400px;
   margin: 0 auto;
   padding: 1.5rem 1rem;
 }
 
-/* Cards gerais */
+/* Cards gerais (usado em quase tudo) */
 .home-card {
   border-radius: var(--border-radius);
   overflow: hidden;
   box-shadow: var(--shadow-md);
-  border: none !important;
+  border: none;
+  transition: var(--transition);
 }
 
-/* Título */
+.home-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-6px);
+}
+
+/* Títulos com gradiente */
 .bg-gradient-title {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;
-  padding: 2rem 1rem;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
 }
 
 .title1 {
-  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-family: var(--font-heading);
+  font-size: clamp(2.2rem, 6vw, 3.2rem);
   font-weight: 900;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.5px;
 }
 
 .title2 {
-  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-size: clamp(1.6rem, 5vw, 2.4rem);
   font-weight: 700;
-  opacity: 0.95;
+  opacity: 0.92;
 }
 
-/* CARROSSEL - imagens menores, centralizadas, sem corte */
+/* CARROSSEL - ajustes para melhor visualização */
 .carousel-custom {
   position: relative;
   width: 100%;
-  height: 1000px;                    /* altura fixa do carrossel - ajuste aqui */
-  max-height: 80vh;
+  height: clamp(500px, 70vh, 900px); /* mais adaptável */
   overflow: hidden;
-  background-color: #c96fc7;
+  background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+  border-radius: var(--border-radius);
 }
 
 .slide-wrapper {
@@ -59,55 +75,81 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  background: rgba(0,0,0,0.03);
 }
 
 .carousel-img {
-  max-width: 25%;                   /* tamanho da imagem - ajuste se quiser menor/maior */
-  max-height: 90%;
-  width: auto !important;
-  height: auto !important;
+  max-width: 30%;          /* ajuste aqui se quiser imagens maiores/menores */
+  max-height: 85%;
+  width: auto;
+  height: auto;
   object-fit: contain;
   object-position: center;
-  display: block;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  transition: transform 0.6s ease;
 }
 
-/* Garante visibilidade dos controles */
+.carousel-custom:hover .carousel-img {
+  transform: scale(1.04);
+}
+
+/* Controles do carrossel mais visíveis */
 .carousel-custom .carousel-control-prev,
-.carousel-custom .carousel-control-next,
-.carousel-custom .carousel-indicators {
-  z-index: 15;
-  opacity: 0.85;
+.carousel-custom .carousel-control-next {
+  opacity: 0.9;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+  width: 5%;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-  .carousel-custom {
-    height: 400px;
-  }
-  .carousel-img {
-    max-width: 90%;
-  }
+.carousel-custom .carousel-indicators [data-bs-target] {
+  background-color: white;
+  opacity: 0.7;
 }
 
-@media (max-width: 576px) {
-  .carousel-custom {
-    height: 350px;
-  }
+/* VISITE-NOS - otimizado para dois cards lado a lado */
+.visite-nos-wrapper {
+  margin: 4rem 0;
 }
 
-/* IEQ */
+.visite-nos-title {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 800;
+}
+
+.row.visite-nos-row {
+  --bs-gutter-x: 1.75rem;
+}
+
+.ieq-card {
+  height: 100%;
+  background: var(--warning-soft);
+  border-radius: var(--border-radius);
+}
+
 .ieq-container {
-  max-width: 700px;
-  margin: 2rem auto;
+  max-width: 320px;
+  margin: 1.5rem auto;
+  padding: 0.75rem;
   border-radius: var(--border-radius);
   overflow: hidden;
   box-shadow: var(--shadow-md);
+  background: white;
+  transition: var(--transition);
+}
+
+.ieq-container:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
 }
 
 .ieq-img {
   width: 100%;
   height: auto;
   display: block;
+  border-radius: 10px;
   transition: var(--transition);
 }
 
@@ -115,11 +157,26 @@
   transform: scale(1.06);
 }
 
-/* Flip Card - Células */
+/* Se quiser imagem à direita DENTRO do card (descomente e ajuste o HTML se precisar) */
+/*
+@media (min-width: 768px) {
+  .card-body.ieq-card-body {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+  }
+  .ieq-container {
+    margin: 0 0 0 2rem;
+    max-width: 45%;
+  }
+}
+*/
+
+/* Flip Card - Células (mantive e refinei) */
 .flip-card {
-  background-color: transparent;
-  height: 320px;
-  perspective: 1200px;
+  height: 340px;
+  perspective: 1400px;
 }
 
 .flip-card-inner {
@@ -127,9 +184,10 @@
   width: 100%;
   height: 100%;
   text-align: center;
-  transition: transform 0.75s ease;
+  transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   transform-style: preserve-3d;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-md);
+  border-radius: 16px;
 }
 
 .flip-card:hover .flip-card-inner {
@@ -154,11 +212,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s ease;
+  transition: transform 0.7s ease;
 }
 
 .flip-card:hover .celula-img {
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
 
 .flip-card-back {
@@ -169,25 +227,26 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 1.5rem;
+  padding: 2rem;
 }
 
 .flip-card-back h3 {
-  font-size: 1.9rem;
-  margin-bottom: 0.6rem;
-  font-weight: 800;
+  font-size: 2rem;
+  margin-bottom: 0.8rem;
+  font-weight: 900;
 }
 
 .flip-card-back h5 {
-  font-size: 1.35rem;
-  margin-bottom: 1rem;
-  opacity: 0.95;
+  font-size: 1.4rem;
+  margin-bottom: 1.2rem;
+  opacity: 0.9;
 }
 
 .flip-card-back p {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   margin: 1rem 0;
   text-align: center;
+  font-weight: 500;
 }
 
 .icon-map {
@@ -196,16 +255,17 @@
 }
 
 .icon-map:hover {
-  color: #ffd700;
-  transform: scale(1.15);
+  color: #ffeb3b;
+  transform: scale(1.3) rotate(15deg);
 }
 
 /* Redes sociais */
 .social-area {
   display: flex;
   justify-content: center;
-  gap: 3rem;
+  gap: 3.5rem;
   flex-wrap: wrap;
+  margin: 2rem 0;
 }
 
 .social-area a {
@@ -213,17 +273,32 @@
 }
 
 .social-area a:hover {
-  transform: translateY(-10px) scale(1.15);
+  transform: translateY(-12px) scale(1.2);
+  filter: drop-shadow(0 8px 15px rgba(0,0,0,0.2));
 }
 
 .social-icon {
-  font-size: 3.2rem;
+  font-size: 3.5rem;
 }
 
-.social-icon.fb {
-  color: #1877f2;
+.social-icon.fb { color: #1877f2; }
+.social-icon.ig { color: #E1306C; }
+
+/* Responsividade global */
+@media (max-width: 992px) {
+  .carousel-custom { height: 600px; }
+  .carousel-img { max-width: 50%; }
 }
 
-.social-icon.ig {
-  color: #E1306C;
+@media (max-width: 768px) {
+  .carousel-custom { height: 450px; }
+  .carousel-img { max-width: 80%; }
+  .flip-card { height: 380px; }
+  .ieq-container { max-width: 280px; }
+}
+
+@media (max-width: 576px) {
+  .home-wrapper { padding: 1rem 0.75rem; }
+  .carousel-custom { height: 350px; }
+  .title1 { font-size: clamp(1.8rem, 8vw, 2.4rem); }
 }

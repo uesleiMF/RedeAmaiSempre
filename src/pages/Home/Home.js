@@ -3,7 +3,6 @@ import { CCarousel, CCarouselItem, CImage } from "@coreui/react";
 import { BsFillGeoAltFill } from "react-icons/bs";
 import { GrInstagram } from "react-icons/gr";
 import { FaFacebookSquare } from "react-icons/fa";
-
 import c0 from "../../components/Img/c0.jpg";
 import c1 from "../../components/Img/c1.jpg";
 import c2 from "../../components/Img/c2.jpg";
@@ -14,7 +13,8 @@ import c6 from "../../components/Img/c6.jpg";
 import c7 from "../../components/Img/c7.jpg";
 import c8 from "../../components/Img/c8.jpg";
 import c9 from "../../components/Img/c9.jpg";
-import ieq from "../../components/Img/ieq2.jpg";
+import ieq from "../../components/Img/ieq2.jpg";  // sede
+// import ieqKm07 from "../../components/Img/ieq-km07.jpg";  // descomente se tiver imagem diferente
 
 import "./home.css";
 
@@ -41,20 +41,14 @@ export default function Home() {
           <h3 className="title1 mb-0">REDE DE CASAIS</h3>
           <h4 className="title2">AMAI SEMPRE</h4>
         </div>
-
-        <CCarousel 
-          controls 
-          indicators 
-          interval={4000} 
-          className="carousel-custom"
-        >
+        <CCarousel controls indicators interval={4000} className="carousel-custom">
           {carouselImages.map((img, index) => (
             <CCarouselItem key={index}>
               <div className="slide-wrapper">
                 <CImage
                   className="carousel-img"
                   src={img}
-                  alt={`Slide ${index + 1}`}
+                  alt={`Slide ${index + 1} - Rede de Casais`}
                   loading="lazy"
                 />
               </div>
@@ -63,22 +57,64 @@ export default function Home() {
         </CCarousel>
       </div>
 
-      {/* Visite-nos - IEQ */}
-      <div className="card mt-5 home-card shadow-lg border-0 text-center bg-warning bg-opacity-10">
-        <h2 className="fw-bold mt-4">VISITE-NOS</h2>
-        <p className="fs-4 fw-bold">CLIQUE NA IMAGEM ABAIXO:</p>
-        <div className="ieq-container">
-          <a
-            href="https://maps.app.goo.gl/SEU_LINK_AQUI"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img src={ieq} alt="IEQ Sede" className="ieq-img" loading="lazy" />
-          </a>
+      {/* Visite-nos - IEQ (duplicado lado a lado) */}
+      <div className="mt-5">
+        <h2 className="text-center fw-bold mb-4">VISITE-NOS</h2>
+        <div className="row g-4">
+          
+          {/* Card 1 - Sede */}
+          <div className="col-12 col-md-6">
+            <div className="card home-card shadow-lg border-0 text-center bg-warning bg-opacity-10 h-100">
+              <div className="card-body d-flex flex-column">
+                <h2 className="fw-bold mt-3">IEQ - SEDE</h2>
+                <p className="fs-4 fw-bold">CLIQUE NA IMAGEM ABAIXO:</p>
+                <div className="ieq-container mt-auto mb-3 mx-auto">
+                  <a
+                    href="https://maps.app.goo.gl/e9p6hr2WNqNPU19V9"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={ieq}
+                      alt="IEQ Sede - Marabá/PA"
+                      className="ieq-img img-fluid rounded shadow-sm"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+                <h3 className="fw-bold">Igreja do Evangelho Quadrangular</h3>
+                <p className="fs-4 fw-bold mb-3">Marabá - PA</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2 - Exemplo: Km 07 (troque link/imagem se necessário) */}
+          <div className="col-12 col-md-6">
+            <div className="card home-card shadow-lg border-0 text-center bg-warning bg-opacity-10 h-100">
+              <div className="card-body d-flex flex-column">
+                <h2 className="fw-bold mt-3">IEQ - KM 07</h2>
+                <p className="fs-4 fw-bold">CLIQUE NA IMAGEM ABAIXO:</p>
+                <div className="ieq-container mt-auto mb-3 mx-auto">
+                  <a
+                    href="https://www.facebook.com/QuadrangularKm07/"  // ← link real da página da IEQ Km 07 em Marabá
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <img
+                      src={ieq}  // ← mesma imagem por enquanto; troque por outra se quiser
+                      alt="IEQ Km 07 - Marabá/PA"
+                      className="ieq-img img-fluid rounded shadow-sm"
+                      loading="lazy"
+                    />
+                  </a>
+                </div>
+                <h3 className="fw-bold">Igreja do Evangelho Quadrangular</h3>
+                <p className="fs-4 fw-bold mb-3">Marabá - PA</p>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <h3 className="fw-bold mt-3">IEQ - SEDE</h3>
-        <p className="fs-4 fw-bold">Igreja do Evangelho Quadrangular</p>
-        <p className="fs-4 fw-bold mb-4">Marabá - PA</p>
       </div>
 
       {/* Células */}
@@ -95,7 +131,7 @@ export default function Home() {
                   <div className="flip-card-front">
                     <img
                       src={celula.img}
-                      alt="Célula"
+                      alt={`Célula - ${celula.endereco}`}
                       className="celula-img"
                       loading="lazy"
                     />
@@ -105,7 +141,7 @@ export default function Home() {
                     <h5>UM SÓ PROPÓSITO</h5>
                     <p>{celula.endereco}</p>
                     <a
-                      href="https://maps.app.goo.gl/e9p6hr2WNqNPU19V9"
+                      href="https://maps.app.goo.gl/e9p6hr2WNqNPU19V9"  // ← mude para link específico se tiver
                       target="_blank"
                       rel="noopener noreferrer"
                       className="icon-map"
@@ -132,7 +168,7 @@ export default function Home() {
             <FaFacebookSquare size={50} className="social-icon fb" />
           </a>
           <a
-            href="https://instagram.com/SEU_INSTAGRAM"
+            href="https://instagram.com/SEU_INSTAGRAM"  // ← troque pelo @ real
             target="_blank"
             rel="noopener noreferrer"
           >
