@@ -1,62 +1,125 @@
+/* Variáveis */
+:root {
+  --primary: #17a2b8;
+  --primary-dark: #0d6efd;
+  --success: #28a745;
+  --success-light: #20c997;
+  --shadow-md: 0 10px 30px rgba(0,0,0,0.15);
+  --border-radius: 20px;
+  --transition: all 0.4s ease;
+}
+
+/* Container principal */
 .home-wrapper {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 1.5rem 1rem;
 }
 
+/* Cards gerais */
 .home-card {
-  border-radius: 20px !important;
+  border-radius: var(--border-radius);
   overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: none !important;
 }
 
+/* Título */
 .bg-gradient-title {
-  background: linear-gradient(135deg, #17a2b8, #0d6efd);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;
+  padding: 2rem 1rem;
 }
 
 .title1 {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 5vw, 2.8rem);
   font-weight: 900;
+  margin-bottom: 0.5rem;
 }
 
 .title2 {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
   font-weight: 700;
+  opacity: 0.95;
 }
 
-/* ===== CARROSSEL - IMAGENS MESMO TAMANHO ===== */
-.carousel-custom .carousel-img {
-  height: 500px !important; /* Altura fixa - mude se quiser */
-  object-fit: cover;
-  object-position: center;
+/* CARROSSEL - imagens menores, centralizadas, sem corte */
+.carousel-custom {
+  position: relative;
   width: 100%;
+  height: 1000px;                    /* altura fixa do carrossel - ajuste aqui */
+  max-height: 80vh;
+  overflow: hidden;
+  background-color: #c96fc7;
 }
 
-/* ===== IMAGEM IEQ ===== */
+.slide-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel-img {
+  max-width: 25%;                   /* tamanho da imagem - ajuste se quiser menor/maior */
+  max-height: 90%;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+}
+
+/* Garante visibilidade dos controles */
+.carousel-custom .carousel-control-prev,
+.carousel-custom .carousel-control-next,
+.carousel-custom .carousel-indicators {
+  z-index: 15;
+  opacity: 0.85;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .carousel-custom {
+    height: 400px;
+  }
+  .carousel-img {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 576px) {
+  .carousel-custom {
+    height: 350px;
+  }
+}
+
+/* IEQ */
 .ieq-container {
-  max-width: 600px;
-  margin: 30px auto;
-  border-radius: 20px;
+  max-width: 700px;
+  margin: 2rem auto;
+  border-radius: var(--border-radius);
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .ieq-img {
   width: 100%;
   height: auto;
   display: block;
-  transition: transform 0.4s ease;
+  transition: var(--transition);
 }
 
 .ieq-img:hover {
-  transform: scale(1.08);
+  transform: scale(1.06);
 }
 
-/* ===== FLIP CARD CÉLULAS ===== */
+/* Flip Card - Células */
 .flip-card {
   background-color: transparent;
-  height: 300px;
-  perspective: 1000px;
+  height: 320px;
+  perspective: 1200px;
 }
 
 .flip-card-inner {
@@ -64,22 +127,23 @@
   width: 100%;
   height: 100%;
   text-align: center;
-  transition: transform 0.8s;
+  transition: transform 0.75s ease;
   transform-style: preserve-3d;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .flip-card:hover .flip-card-inner {
   transform: rotateY(180deg);
 }
 
-.flip-card-front, .flip-card-back {
+.flip-card-front,
+.flip-card-back {
   position: absolute;
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  border-radius: 15px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 
 .flip-card-front {
@@ -90,60 +154,76 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.flip-card:hover .celula-img {
+  transform: scale(1.08);
 }
 
 .flip-card-back {
-  background: linear-gradient(135deg, #28a745, #20c997);
+  background: linear-gradient(135deg, var(--success), var(--success-light));
   color: white;
   transform: rotateY(180deg);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 1.5rem;
 }
 
 .flip-card-back h3 {
-  font-size: 1.8rem;
-  margin-bottom: 10px;
+  font-size: 1.9rem;
+  margin-bottom: 0.6rem;
+  font-weight: 800;
 }
 
 .flip-card-back h5 {
-  font-size: 1.3rem;
-  margin-bottom: 15px;
+  font-size: 1.35rem;
+  margin-bottom: 1rem;
+  opacity: 0.95;
 }
 
 .flip-card-back p {
-  font-size: 1.1rem;
-  margin: 15px 0;
+  font-size: 1.15rem;
+  margin: 1rem 0;
+  text-align: center;
 }
 
 .icon-map {
   color: white;
-  transition: color 0.3s;
+  transition: var(--transition);
 }
 
 .icon-map:hover {
   color: #ffd700;
+  transform: scale(1.15);
 }
 
-/* ===== REDES SOCIAIS ===== */
+/* Redes sociais */
+.social-area {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
 .social-area a {
-  margin: 0 30px;
-  transition: transform 0.3s;
+  transition: var(--transition);
 }
 
 .social-area a:hover {
-  transform: translateY(-8px);
+  transform: translateY(-10px) scale(1.15);
+}
+
+.social-icon {
+  font-size: 3.2rem;
 }
 
 .social-icon.fb {
-  color: #3b5998;
+  color: #1877f2;
 }
 
 .social-icon.ig {
   color: #E1306C;
 }
-
-.social-icon.fb:hover { color: #1877f2; }
-.social-icon.ig:hover { color: #c13584; }

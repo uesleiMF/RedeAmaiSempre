@@ -42,10 +42,22 @@ export default function Home() {
           <h4 className="title2">AMAI SEMPRE</h4>
         </div>
 
-        <CCarousel controls indicators interval={4000} className="carousel-custom">
+        <CCarousel 
+          controls 
+          indicators 
+          interval={4000} 
+          className="carousel-custom"
+        >
           {carouselImages.map((img, index) => (
             <CCarouselItem key={index}>
-              <CImage className="d-block w-100 carousel-img" src={img} alt={`Slide ${index + 1}`} />
+              <div className="slide-wrapper">
+                <CImage
+                  className="carousel-img"
+                  src={img}
+                  alt={`Slide ${index + 1}`}
+                  loading="lazy"
+                />
+              </div>
             </CCarouselItem>
           ))}
         </CCarousel>
@@ -56,8 +68,12 @@ export default function Home() {
         <h2 className="fw-bold mt-4">VISITE-NOS</h2>
         <p className="fs-4 fw-bold">CLIQUE NA IMAGEM ABAIXO:</p>
         <div className="ieq-container">
-          <a href="https://maps.app.goo.gl/SEU_LINK_AQUI" target="_blank" rel="noopener noreferrer">
-            <img src={ieq} alt="IEQ Sede" className="ieq-img" />
+          <a
+            href="https://maps.app.goo.gl/SEU_LINK_AQUI"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img src={ieq} alt="IEQ Sede" className="ieq-img" loading="lazy" />
           </a>
         </div>
         <h3 className="fw-bold mt-3">IEQ - SEDE</h3>
@@ -77,13 +93,23 @@ export default function Home() {
               <div className="flip-card">
                 <div className="flip-card-inner">
                   <div className="flip-card-front">
-                    <img src={celula.img} alt="Célula" className="celula-img" />
+                    <img
+                      src={celula.img}
+                      alt="Célula"
+                      className="celula-img"
+                      loading="lazy"
+                    />
                   </div>
                   <div className="flip-card-back">
                     <h3>CÉLULA</h3>
                     <h5>UM SÓ PROPÓSITO</h5>
                     <p>{celula.endereco}</p>
-                    <a href="https://maps.app.goo.gl/e9p6hr2WNqNPU19V9" target="_blank" rel="noopener noreferrer" className="icon-map">
+                    <a
+                      href="https://maps.app.goo.gl/e9p6hr2WNqNPU19V9"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="icon-map"
+                    >
                       <BsFillGeoAltFill size={40} />
                     </a>
                   </div>
@@ -98,10 +124,18 @@ export default function Home() {
       <div className="card mt-5 mb-5 home-card shadow-lg border-0 text-center">
         <h5 className="my-4">CONHEÇA NOSSAS MÍDIAS SOCIAIS</h5>
         <div className="social-area mb-4">
-          <a href="https://www.facebook.com/ministerio.amai7" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://www.facebook.com/ministerio.amai7"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <FaFacebookSquare size={50} className="social-icon fb" />
           </a>
-          <a href="https://instagram.com/SEU_INSTAGRAM" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://instagram.com/SEU_INSTAGRAM"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <GrInstagram size={50} className="social-icon ig" />
           </a>
         </div>
