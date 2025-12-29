@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { CCarousel, CCarouselItem, CImage } from "@coreui/react";
 import { BsFillGeoAltFill } from "react-icons/bs";
 import { GrInstagram } from "react-icons/gr";
 import { FaFacebookSquare } from "react-icons/fa";
+
 import c0 from "../../components/Img/c0.jpg";
 import c1 from "../../components/Img/c1.jpg";
 import c2 from "../../components/Img/c2.jpg";
@@ -13,10 +14,38 @@ import c6 from "../../components/Img/c6.jpg";
 import c7 from "../../components/Img/c7.jpg";
 import c8 from "../../components/Img/c8.jpg";
 import c9 from "../../components/Img/c9.jpg";
-import ieq from "../../components/Img/ieq2.jpg";  // sede
-// import ieqKm07 from "../../components/Img/ieq-km07.jpg";  // descomente se tiver imagem diferente
+import ieq from "../../components/Img/ieq2.jpg"; // usada para sede e km07
+import bi from "../bib.gif";
 
 import "./home.css";
+
+// Frases bíblicas para a "Frase do Dia"
+const frasesBiblicas = [
+  {
+    versiculo: "Efésios 5:25",
+    texto: "Maridos, amem suas mulheres, assim como Cristo amou a igreja e entregou-se a si mesmo por ela.",
+  },
+  {
+    versiculo: "Gênesis 2:24",
+    texto: "Por isso o homem deixa seu pai e sua mãe para se unir à sua mulher, e os dois se tornam uma só carne.",
+  },
+  {
+    versiculo: "Provérbios 18:22",
+    texto: "Quem acha uma esposa acha algo excelente; recebeu uma bênção do Senhor.",
+  },
+  {
+    versiculo: "1 Coríntios 13:4-7",
+    texto: "O amor é paciente, é bondoso. O amor não inveja, não se vangloria, não se orgulha. Tudo sofre, tudo crê, tudo espera, tudo suporta.",
+  },
+  {
+    versiculo: "Eclesiastes 4:9-10",
+    texto: "Melhor é serem dois do que um... Porque se caírem, um levanta o companheiro.",
+  },
+  {
+    versiculo: "Colossenses 3:14",
+    texto: "Acima de tudo, porém, revistam-se do amor, que é o elo perfeito.",
+  },
+];
 
 export default function Home() {
   const carouselImages = [c0, c1, c2, c3, c4, c5, c6, c7, c8, c9];
@@ -33,10 +62,20 @@ export default function Home() {
     { img: c9, endereco: "FOLHA 12 QUADRA 04 LOTE 22" },
   ];
 
+  // Estado para o modal da Frase do Dia
+  const [showModal, setShowModal] = useState(false);
+  const [fraseSelecionada, setFraseSelecionada] = useState(null);
+
+  const handleFraseClick = () => {
+    const randomIndex = Math.floor(Math.random() * frasesBiblicas.length);
+    setFraseSelecionada(frasesBiblicas[randomIndex]);
+    setShowModal(true);
+  };
+
   return (
-    <div className="container home-wrapper">
+    <div className="home-wrapper">
       {/* Título + Carrossel */}
-      <div className="card mt-4 home-card shadow-lg border-0">
+      <div className="card home-card shadow-lg border-0 mt-4">
         <div className="text-center py-4 bg-gradient-title">
           <h3 className="title1 mb-0">REDE DE CASAIS</h3>
           <h4 className="title2">AMAI SEMPRE</h4>
@@ -57,11 +96,10 @@ export default function Home() {
         </CCarousel>
       </div>
 
-      {/* Visite-nos - IEQ (duplicado lado a lado) */}
-      <div className="mt-5">
+      {/* VISITE-NOS */}
+      <section className="mt-5">
         <h2 className="text-center fw-bold mb-4">VISITE-NOS</h2>
         <div className="row g-4">
-          
           {/* Card 1 - Sede */}
           <div className="col-12 col-md-6">
             <div className="card home-card shadow-lg border-0 text-center bg-warning bg-opacity-10 h-100">
@@ -88,37 +126,35 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Card 2 - Exemplo: Km 07 (troque link/imagem se necessário) */}
+          {/* Card 2 - IEQ KM 07 (com Frase do Dia integrada) */}
           <div className="col-12 col-md-6">
             <div className="card home-card shadow-lg border-0 text-center bg-warning bg-opacity-10 h-100">
               <div className="card-body d-flex flex-column">
-                <h2 className="fw-bold mt-3">IEQ - KM 07</h2>
+                <h2 className="fw-bold mt-3">VERSICULOS BIBLICOS</h2>
                 <p className="fs-4 fw-bold">CLIQUE NA IMAGEM ABAIXO:</p>
-                <div className="ieq-container mt-auto mb-3 mx-auto">
-                  <a
-                    href="https://www.facebook.com/QuadrangularKm07/"  // ← link real da página da IEQ Km 07 em Marabá
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <img
-                      src={ieq}  // ← mesma imagem por enquanto; troque por outra se quiser
-                      alt="IEQ Km 07 - Marabá/PA"
-                      className="ieq-img img-fluid rounded shadow-sm"
-                      loading="lazy"
-                    />
-                  </a>
+
+                {/* Frase do Dia */}
+                <div className="frase-do-dia mt-3 mb-4">
+                  <h5 className="fw-bold text-primary">FRASES DO DIA</h5>
+                  <p className="text-muted small mb-2">
+                    Clique na imagem para uma palavra de Deus para o seu casamento!
+                  </p>
+                  <img
+                    src={bi}
+                    alt="Frase do Dia - Rede Amai Sempre"
+                    className="frase-img shadow rounded-circle"
+                    onClick={handleFraseClick}
+                  />
                 </div>
-                <h3 className="fw-bold">Igreja do Evangelho Quadrangular</h3>
-                <p className="fs-4 fw-bold mb-3">Marabá - PA</p>
-              </div>
+
+                   </div>
             </div>
           </div>
-
         </div>
-      </div>
+      </section>
 
       {/* Células */}
-      <div className="card mt-5 home-card shadow-lg border-0 bg-success bg-opacity-10">
+      <section className="card mt-5 home-card shadow-lg border-0 bg-success bg-opacity-10">
         <div className="text-center py-4">
           <h2 className="fw-bold">VISITE UMA CÉLULA</h2>
           <p className="fs-4 fw-bold">CLIQUE NA IMAGEM PARA VER A LOCALIZAÇÃO</p>
@@ -141,7 +177,7 @@ export default function Home() {
                     <h5>UM SÓ PROPÓSITO</h5>
                     <p>{celula.endereco}</p>
                     <a
-                      href="https://maps.app.goo.gl/e9p6hr2WNqNPU19V9"  // ← mude para link específico se tiver
+                      href="https://maps.app.goo.gl/e9p6hr2WNqNPU19V9"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="icon-map"
@@ -154,28 +190,45 @@ export default function Home() {
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Redes Sociais */}
-      <div className="card mt-5 mb-5 home-card shadow-lg border-0 text-center">
+      <section className="card mt-5 mb-5 home-card shadow-lg border-0 text-center">
         <h5 className="my-4">CONHEÇA NOSSAS MÍDIAS SOCIAIS</h5>
         <div className="social-area mb-4">
           <a
             href="https://www.facebook.com/ministerio.amai7"
             target="_blank"
             rel="noopener noreferrer"
+            className="social-link"
           >
             <FaFacebookSquare size={50} className="social-icon fb" />
           </a>
           <a
-            href="https://instagram.com/SEU_INSTAGRAM"  // ← troque pelo @ real
+            href="https://www.instagram.com/redecasaisamaisempre/"
             target="_blank"
             rel="noopener noreferrer"
+            className="social-link"
           >
             <GrInstagram size={50} className="social-icon ig" />
           </a>
         </div>
-      </div>
+      </section>
+
+      {/* Modal da Frase do Dia */}
+      {showModal && (
+        <div className="frase-modal" onClick={() => setShowModal(false)}>
+          <div className="frase-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowModal(false)}>
+              ×
+            </button>
+            <h4 className="fw-bold text-primary mb-3">FRASE DO DIA</h4>
+            <p className="fs-5 fst-italic">"{fraseSelecionada.texto}"</p>
+            <p className="fw-bold text-secondary">{fraseSelecionada.versiculo}</p>
+            <small className="text-muted">Rede de Casais Amai Sempre ❤️</small>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
