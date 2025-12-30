@@ -79,7 +79,7 @@ export default function Home() {
 <section className="home-header home-card">
   <div className="bg-gradient-title header-flex">
     <div className="header-text">
-      <h3 className="title1">REDE DE CASAIS</h3>
+      <h3 className="title1">𝑹𝑬𝑫𝑬 𝑫𝑬 𝑪𝑨𝑺𝑨𝑰𝑺</h3>
       <h4 className="title2">𝓐𝓜𝓐𝓘--𝓢𝓔𝓜𝓟𝓡𝓔</h4>
     </div>
 
