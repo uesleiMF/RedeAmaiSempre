@@ -16,7 +16,7 @@ import c8 from "../../components/Img/c8.jpg";
 import c9 from "../../components/Img/c9.jpg";
 import ieq from "../../components/Img/ieq2.jpg"; // usada para sede e km07
 import bi from "../bib.gif";
-
+import c00 from "../../components/Img/c00.jpg";
 import "./home.css";
 
 // Frases bíblicas para a "Frase do Dia"
@@ -60,6 +60,7 @@ export default function Home() {
     { img: c7, endereco: "FOLHA 17 QUADRA 01 LOTE 50" },
     { img: c8, endereco: "FOLHA 22 QUADRA 03 LOTE 18" },
     { img: c9, endereco: "FOLHA 12 QUADRA 04 LOTE 22" },
+
   ];
 
   // Estado para o modal da Frase do Dia
@@ -74,27 +75,36 @@ export default function Home() {
 
   return (
     <div className="home-wrapper">
-      {/* Título + Carrossel */}
-      <div className="card home-card shadow-lg border-0 mt-4">
-        <div className="text-center py-4 bg-gradient-title">
-          <h3 className="title1 mb-0">REDE DE CASAIS</h3>
-          <h4 className="title2">AMAI SEMPRE</h4>
+      {/* HEADER / ÍNDICE */}
+<section className="home-header home-card">
+  <div className="bg-gradient-title header-flex">
+    <div className="header-text">
+      <h3 className="title1">REDE DE CASAIS</h3>
+      <h4 className="title2">𝓐𝓜𝓐𝓘--𝓢𝓔𝓜𝓟𝓡𝓔</h4>
+    </div>
+
+    <img src={c00} alt="logo" className="header-logo" />
+  </div>
+</section>
+
+
+{/* CARROSSEL */}
+<section className="home-carousel home-card">
+  <CCarousel controls indicators interval={4000} className="carousel-custom">
+    {carouselImages.map((img, index) => (
+      <CCarouselItem key={index}>
+        <div className="slide-wrapper">
+          <CImage
+            className="carousel-img"
+            src={img}
+            alt={`Slide ${index + 1}`}
+            loading="lazy"
+          />
         </div>
-        <CCarousel controls indicators interval={4000} className="carousel-custom">
-          {carouselImages.map((img, index) => (
-            <CCarouselItem key={index}>
-              <div className="slide-wrapper">
-                <CImage
-                  className="carousel-img"
-                  src={img}
-                  alt={`Slide ${index + 1} - Rede de Casais`}
-                  loading="lazy"
-                />
-              </div>
-            </CCarouselItem>
-          ))}
-        </CCarousel>
-      </div>
+      </CCarouselItem>
+    ))}
+  </CCarousel>
+</section>
 
       {/* VISITE-NOS */}
       <section className="mt-5">
