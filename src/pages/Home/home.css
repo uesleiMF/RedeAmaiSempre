@@ -159,7 +159,7 @@ body {
   max-width: 300px;
   margin: 1.5rem auto;
   padding: 1rem;
-  background: #fff;
+  background: #8ce473;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
 }
@@ -180,7 +180,7 @@ body {
    FRASE DO DIA
 ================================ */
 .frase-do-dia {
-  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  background: linear-gradient(135deg, #3d7a9d, #f9fafb);
   padding: 2rem;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);

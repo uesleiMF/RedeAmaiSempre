@@ -108,7 +108,7 @@ export default function Home() {
 
       {/* VISITE-NOS */}
       <section className="mt-5">
-        <h2 className="text-center fw-bold mb-4">VISITE-NOS</h2>
+        <h2 className="text-center fw-bold mb-4">VISITE-NÓS</h2>
         <div className="row g-4">
           {/* Card 1 - Sede */}
           <div className="col-12 col-md-6">
