@@ -32,6 +32,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+ 
 }
 
 body {
@@ -52,13 +53,14 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4rem;
+  
 }
 
 /* ===============================
    CARD PADRÃO (mais premium)
 ================================ */
 .home-card {
-  background: white;
+  background: rgb(177, 51, 51);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
@@ -76,7 +78,7 @@ body {
 ================================ */
 .bg-gradient-title {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color: white;
+  color: rgb(255, 255, 255);
   padding: clamp(4rem, 10vw, 7rem) 2rem;
   border-radius: var(--border-radius);
   position: relative;
@@ -104,18 +106,19 @@ body {
 }
 
 .title1 {
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
-  font-weight: 800;
+  font-size: clamp(2.5rem, 2vw, 0.5rem);
+  font-weight: 500;
   letter-spacing: 3px;
   color: var(--accent);
-  text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  text-shadow: 0 4px 12px rgba(35, 93, 192, 0.3);
 }
 
 .title2 {
   font-family: 'Playfair Display', serif; /* fonte elegante para casais */
-  font-size: clamp(2rem, 4vw, 3.8rem);
+   font-weight: 400;
+  font-size: clamp(2rem, 2.5vw, 1.8rem);
   letter-spacing: 4px;
-  color: white;
+  color: rgb(255, 255, 255);
   opacity: 0.95;
 }
 
