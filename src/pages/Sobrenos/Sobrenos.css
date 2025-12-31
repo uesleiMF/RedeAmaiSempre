@@ -36,7 +36,7 @@
 .main-title-card h2,
 .main-title-card h3,
 .main-title-card h6 {
-  color: #2e7d32;
+  color: #c8a19f;
   margin: 6px 0;
   font-weight: 700;
 }
@@ -57,6 +57,48 @@
 }
 
 /* ===============================
+   SOBRE A CÉLULA DE CASAIS
+================================ */
+.card.bg-light {
+  background: linear-gradient(135deg, #cbe9a8, #e8f5e9) !important;
+  border-radius: 18px;
+  border: 1px solid rgba(46, 125, 50, 0.2);
+  box-shadow: 0 8px 22px rgba(46, 125, 50, 0.18);
+}
+.sobre-celula {
+  margin-top: 60px;
+}
+
+.sobre-celula .card {
+  border-radius: 18px;
+  border: none;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+}
+
+.sobre-celula .card-body {
+  padding: 45px 40px;
+}
+
+/* Título */
+.sobre-celula h3 {
+  font-weight: 800;
+  color: #5813a8;
+  letter-spacing: 1px;
+}
+
+/* Texto principal */
+.texto-justificado {
+  text-align: justify;
+  font-size: 1.15rem;
+  line-height: 1.4;
+  color: #a61b1b;
+  margin-top: 20px;
+
+/* 👇 margens laterais */
+  margin-left: 2.5rem;
+  margin-right: 2.0rem;
+}
+/* ===============================
    SEÇÃO INFORMATIVA – 4 CARDS
 ================================ */
 
@@ -68,7 +110,7 @@
 }
 
 .info-card {
-  background: #ffffff;
+  background: #e5e856;
   border-radius: 18px;
   padding: 25px 22px;
   text-align: left;
@@ -83,7 +125,7 @@
 }
 
 .info-card h5 {
-  font-size: 1.05rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #2e7d32;
   margin-bottom: 12px;
@@ -95,8 +137,8 @@
 }
 
 .info-card ul li {
-  font-size: 0.95rem;
-  margin-bottom: 6px;
+  font-size: 1.25rem;
+  margin-bottom: 12px;
   color: #444;
 }
 
@@ -140,6 +182,93 @@
   color: #333;
   font-size: 0.95rem;
 }
+/* ===============================
+   GALERIA DE FOTOS
+================================ */
+
+.galeria-casais {
+  margin: 70px auto 40px;
+  max-width: 1200px;
+}
+
+.galeria-casais h3 {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.galeria-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.galeria-item {
+  overflow: hidden;
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.galeria-item img {
+  width: 100%;
+  height: 200px;          /* 👈 ALTURA MENOR */
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.galeria-item:hover img {
+  transform: scale(1.08);
+}
+
+
+/* ===============================
+   GALERIA DE VÍDEOS
+================================ */
+
+.videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.video-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 12px;
+
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.video-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.25);
+}
+
+.video-card iframe {
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+}
+
+.video-card p {
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 600;
+  color: #2e7d32;
+  font-size: 0.95rem;
+}
+
+/* ===============================
+   RESPONSIVO VÍDEOS
+================================ */
+
+@media (max-width: 480px) {
+  .video-card iframe {
+    height: 180px;
+  }
+}
+
 
 /* ===============================
    SOCIAL (WHATSAPP)
