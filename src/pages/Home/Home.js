@@ -184,8 +184,8 @@ export default function Home() {
       {/* Células */}
       <section className="card mt-5 home-card shadow-lg border-0 bg-success bg-opacity-10">
         <div className="text-center py-4">
-          <h2 className="fw-bold">VISITEM UMA DE NOSSAS CÉLULAS</h2>
-          <p className="fs-4 fw-bold">CLIQUEM NAS IMAGENS PARA VEREM AS LOCALIZAÇÕES</p>
+          <h2 className="fw-bold">VISITEM NOSSAS CÉLULAS</h2>
+          <p className="fs-4 fw-bold">CLIQUEM NAS IMAGENS VEJAM AS LOCALIZAÇÕES</p>
         </div>
         <div className="row g-4 p-4 justify-content-center">
           {celulas.map((celula, i) => (
