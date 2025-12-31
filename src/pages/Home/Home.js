@@ -3,6 +3,8 @@ import { CCarousel, CCarouselItem, CImage } from "@coreui/react";
 import { BsFillGeoAltFill } from "react-icons/bs";
 import { GrInstagram } from "react-icons/gr";
 import { FaFacebookSquare } from "react-icons/fa";
+import Typewriter from "typewriter-effect";
+
 
 import c0 from "../../components/Img/c0.jpg";
 import c1 from "../../components/Img/c1.jpg";
@@ -108,14 +110,14 @@ export default function Home() {
 
       {/* VISITE-NOS */}
       <section className="mt-5">
-        <h2 className="text-center fw-bold mb-4">VISITE-NÓS</h2>
+        <h2 className="text-center fw-bold mb-4">VISITEM-NÓS</h2>
         <div className="row g-4">
           {/* Card 1 - Sede */}
           <div className="col-12 col-md-6">
             <div className="card home-card shadow-lg border-0 text-center bg-warning bg-opacity-10 h-100">
               <div className="card-body d-flex flex-column">
                 <h2 className="fw-bold mt-3">IEQ - SEDE</h2>
-                <p className="fs-4 fw-bold">CLIQUE NA IMAGEM ABAIXO:</p>
+                <p className="fs-4 fw-bold">CLIQUE NA IMAGEM:</p>
                 <div className="ieq-container mt-auto mb-3 mx-auto">
                   <a
                     href="https://maps.app.goo.gl/e9p6hr2WNqNPU19V9"
@@ -138,17 +140,33 @@ export default function Home() {
 
           {/* Card 2 - IEQ KM 07 (com Frase do Dia integrada) */}
           <div className="col-12 col-md-6">
-            <div className="card home-card shadow-lg border-0 text-center bg-warning bg-opacity-10 h-100">
+            <div className="card home-card shadow-lg border-5 text-center bg-warning bg-opacity-10 h-100">
               <div className="card-body d-flex flex-column">
-                <h2 className="fw-bold mt-3">VERSICULOS BIBLICOS</h2>
-                <p className="fs-4 fw-bold">CLIQUE NA IMAGEM ABAIXO:</p>
+                <h2 className="fw-bold mt-3">VERSÍCULOS BÍBLICOS</h2>
+                <p className="fs-4 fw-bold">CLIQUE NA IMAGEM:</p>
 
                 {/* Frase do Dia */}
                 <div className="frase-do-dia mt-3 mb-4">
-                  <h5 className="fw-bold text-primary">FRASES DO DIA</h5>
-                  <p className="text-muted small mb-2">
-                    Clique na imagem para uma palavra de Deus para o seu casamento!
-                  </p>
+                   <Typewriter
+                onInit={(typewriter) => {
+                  typewriter
+
+                    .typeString ("𝑪𝑳𝑰𝑸𝑼𝑬 𝑵𝑨 𝑰𝑴𝑨𝑮𝑬M")
+                    .pauseFor(700)
+                    
+                  
+                    .typeString("  𝑬 𝑻𝑬𝑵𝑯𝑨 𝑼𝑴𝑨 ")
+                    .pauseFor(700)
+
+                    .typeString(
+                      " PALAVRA 𝑩𝑰𝑩𝑳𝑰𝑪𝑨 𝑷𝑨𝑹𝑨 𝑶 𝑺𝑬𝑼 Ⓒ𝑨ⓈⒶⓂⒺⓃⓉⓄ "
+                    )
+                    .pauseFor(700)
+
+                    .typeString(" 𝑱𝑬𝑺𝑼𝑺 𝑫𝑬𝑼𝑺 𝑫𝑨 𝑭𝑨𝑴𝑰𝑳𝑰𝑨.")
+                    .start();
+                }}
+              />
                   <img
                     src={bi}
                     alt="Frase do Dia - Rede Amai Sempre"
@@ -166,8 +184,8 @@ export default function Home() {
       {/* Células */}
       <section className="card mt-5 home-card shadow-lg border-0 bg-success bg-opacity-10">
         <div className="text-center py-4">
-          <h2 className="fw-bold">VISITE UMA CÉLULA</h2>
-          <p className="fs-4 fw-bold">CLIQUE NA IMAGEM PARA VER A LOCALIZAÇÃO</p>
+          <h2 className="fw-bold">VISITEM UMA DE NOSSAS CÉLULAS</h2>
+          <p className="fs-4 fw-bold">CLIQUEM NAS IMAGENS PARA VEREM AS LOCALIZAÇÕES</p>
         </div>
         <div className="row g-4 p-4 justify-content-center">
           {celulas.map((celula, i) => (
@@ -204,7 +222,7 @@ export default function Home() {
 
       {/* Redes Sociais */}
       <section className="card mt-5 mb-5 home-card shadow-lg border-0 text-center">
-        <h5 className="my-4">CONHEÇA NOSSAS MÍDIAS SOCIAIS</h5>
+        <h5 className="my-4">CONHEÇAM NOSSAS MÍDIAS SOCIAIS</h5>
         <div className="social-area mb-4">
           <a
             href="https://www.facebook.com/ministerio.amai7"
@@ -232,7 +250,7 @@ export default function Home() {
             <button className="modal-close" onClick={() => setShowModal(false)}>
               ×
             </button>
-            <h4 className="fw-bold text-primary mb-3">FRASE DO DIA</h4>
+            <h4 className="fw-bold text-primary mb-3">FRASES DO DIA</h4>
             <p className="fs-5 fst-italic">"{fraseSelecionada.texto}"</p>
             <p className="fw-bold text-secondary">{fraseSelecionada.versiculo}</p>
             <small className="text-muted">Rede de Casais Amai Sempre ❤️</small>
