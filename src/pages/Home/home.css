@@ -47,7 +47,7 @@ body {
    CONTAINER PRINCIPAL
 ================================ */
 .home-wrapper {
-  max-width: 1200px;               /* Mais largo para telas modernas */
+  max-width: 1500px;               /* Mais largo para telas modernas */
   margin: 0 auto;
   padding: clamp(3rem, 6vw, 6rem) 1.5rem;
   display: flex;
@@ -140,7 +140,7 @@ body {
    CARROSSEL (mais clean)
 ================================ */
 .carousel-custom {
-  height: clamp(420px, 85vh, 720px);
+  height: clamp(y40px, 25vh, 920px);
   background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-lg);
@@ -157,8 +157,8 @@ body {
 }
 
 .carousel-img {
-  max-width: 92%;
-  max-height: 92%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: cover;
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-md);

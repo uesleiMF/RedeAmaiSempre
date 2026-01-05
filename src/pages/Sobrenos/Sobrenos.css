@@ -8,7 +8,7 @@
   margin: 80px auto 30px;
   padding: 45px 60px;
 
-  background: linear-gradient(135deg, #ffe082, #fff3c4);
+  background: linear-gradient(135deg, #ecbc29, #39a53b);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.6);
 
@@ -112,7 +112,7 @@
 .info-card {
   background: #e5e856;
   border-radius: 18px;
-  padding: 25px 22px;
+  padding: 5px 22px;
   text-align: left;
 
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
