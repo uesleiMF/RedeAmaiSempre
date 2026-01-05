@@ -7,14 +7,14 @@ import "./Nav.css";
 const Nav = ({ libraryStatus, setLibraryStatus }) => {
   return (
     <nav className="nav-container">
-      <h1 className="nav-title">Player de Louvor</h1>
+      <h1 className="nav-title">Louvor</h1>
 
       <button
         className={`library-toggle-btn ${libraryStatus ? "active" : ""}`}
         onClick={() => setLibraryStatus(!libraryStatus)}
       >
         <FontAwesomeIcon icon={faMusic} className="music-icon" />
-        <span>Biblioteca</span>
+        
         <div className="indicator" />
       </button>
     </nav>
