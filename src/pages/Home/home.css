@@ -339,8 +339,9 @@ body {
 .social-area {
   display: flex;
   justify-content: center;
+   background: linear-gradient(145deg, rgb(223, 158, 158), var(--light-bg));
   gap: 4rem;
-  margin: 2.5rem 0;
+  margin: 1.0rem 0;
 }
 
 .social-area a {

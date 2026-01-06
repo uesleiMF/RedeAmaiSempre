@@ -92,7 +92,8 @@ export default function Home() {
 
 {/* CARROSSEL */}
 <section className="home-carousel home-card">
-  <CCarousel controls indicators interval={3000} className="carousel-custom">
+  <CCarousel controls interval={3000}>
+
     {carouselImages.map((img, index) => (
       <CCarouselItem key={index}>
         <div className="slide-wrapper">
