@@ -2,6 +2,7 @@ import React from "react";
 import { Social } from "./styles";
 import { FaWhatsapp } from "react-icons/fa";
 import c1 from "../../components/Img/uj.png";
+import c2 from "../../components/Img/c0.jpg";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Sobrenos.css";
 
@@ -33,15 +34,16 @@ export default function Sobrenos() {
           </h3>
 
       <p className="texto-justificado">
-  Na <strong>Igreja do Evangelho Quadrangular</strong>, as células de casais são
-  pequenos grupos formados por casais que se reúnem regularmente, geralmente em
-  lares, com o propósito de fortalecer a fé, o casamento e a comunhão cristã,
-  fundamentados na Palavra de Deus.
+  Na <strong>Igreja do Evangelho Quadrangular</strong>, a Célula de Casais é um pequeno grupo formado por casais
+   que se reúnem regularmente, 
+  geralmente em lares, com o propósito de fortalecer a fé, 
+  o casamento e a comunhão cristã, sempre fundamentados na Palavra de Deus.
   <br /><br />
-  Trata-se de um encontro cristão realizado fora do culto tradicional, voltado
-  para o crescimento da vida espiritual do casal, o fortalecimento do
-  relacionamento conjugal, a valorização da família e dos princípios cristãos,
-  promovendo discipulado, cuidado mútuo e comunhão.
+  Esses encontros acontecem fora do culto tradicional e têm como foco o crescimento espiritual do casal, 
+  o fortalecimento do relacionamento conjugal, a valorização da família e a vivência dos princípios cristãos.
+   A célula promove um ambiente de discipulado, cuidado mútuo, 
+   apoio espiritual e comunhão, onde os casais podem compartilhar experiências,
+   aprender juntos e caminhar em unidade, edificando lares firmes e alinhados com os propósitos de Deus.
 </p>
 
 
@@ -173,7 +175,7 @@ export default function Sobrenos() {
         <div className="d-flex flex-wrap justify-content-center gap-4 p-3">
 
           <div className="cardd">
-            <img src={c1} alt="Casal Líder" />
+            <img src={c2} alt="Casal Líder" />
             <h2 className="card-title">CASAL — LÍDER</h2>
             <h3 className="card-title">Pastores</h3>
             <h4 className="card-title">Marcos & Solange</h4>
@@ -185,7 +187,7 @@ export default function Sobrenos() {
           </div>
 
           <div className="cardd">
-            <img src={c1} alt="Casal Líder" />
+            <img src={c2} alt="Casal Líder" />
             <h2 className="card-title">CASAL — LÍDER</h2>
             <h3 className="card-title">Pastores</h3>
             <h4 className="card-title">Pina & Carla</h4>
@@ -208,10 +210,10 @@ export default function Sobrenos() {
         <div className="d-flex flex-wrap justify-content-center gap-4 p-3">
 
           <div className="cardd">
-            <img src={c1} alt="Casal Líder" />
+            <img src={c2} alt="Casal Líder" />
             <h2 className="card-title">CASAL</h2>
             <h3 className="card-title">LÍDER</h3>
-            <h4 className="card-title">Altair & Ellen</h4>
+            <h4 className="card-title">Altair & Hellen</h4>
             <Social>
               <a href={linkZap} target="_blank" rel="noreferrer">
                 <FaWhatsapp />
@@ -220,10 +222,10 @@ export default function Sobrenos() {
           </div>
 
           <div className="cardd">
-            <img src={c1} alt="Vice Líder" />
+            <img src={c2} alt="Vice Líder" />
             <h2 className="card-title">CASAL</h2>
             <h3 className="card-title">VICE-LÍDER</h3>
-            <h4 className="card-title">________ & ________</h4>
+            <h4 className="card-title">Paulo & Vaildes</h4>
             <Social>
               <a href={linkZap} target="_blank" rel="noreferrer">
                 <FaWhatsapp />
