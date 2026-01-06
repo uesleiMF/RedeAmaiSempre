@@ -82,7 +82,7 @@ export default function Home() {
   <div className="bg-gradient-title header-flex">
     <div className="header-text">
       <h3 className="title1">𝑹𝑬𝑫𝑬 𝑫𝑬 𝑪𝑨𝑺𝑨𝑰𝑺</h3>
-      <h4 className="title2">𝓐𝓜𝓐𝓘--𝓢𝓔𝓜𝓟𝓡𝓔</h4>
+      <h4 className="title2"><i>💗AMAI💗SEMPRE💗</i></h4>
     </div>
 
     <img src={c00} alt="logo" className="header-logo" />
@@ -116,7 +116,7 @@ export default function Home() {
           <div className="col-12 col-md-6">
             <div className="card home-card shadow-lg border-0 text-center bg-warning bg-opacity-10 h-100">
               <div className="card-body d-flex flex-column">
-                <h2 className="fw-bold mt-3">IEQ - SEDE</h2>
+                <h2 className="fw-bold mt-3">IEQ-SEDE</h2>
                 <p className="fs-4 fw-bold">CLIQUE NA IMAGEM:</p>
                 <div className="ieq-container mt-auto mb-3 mx-auto">
                   <a
@@ -133,7 +133,7 @@ export default function Home() {
                   </a>
                 </div>
                 <h3 className="fw-bold">Igreja do Evangelho Quadrangular</h3>
-                <p className="fs-4 fw-bold mb-3">Marabá - PA</p>
+                <p className="fs-4 fw-bold mb-3">Marabá-PA</p>
               </div>
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function Home() {
                     .pauseFor(700)
 
                     .typeString(
-                      " PALAVRA 𝑩𝑰𝑩𝑳𝑰𝑪𝑨 𝑷𝑨𝑹𝑨 𝑶 𝑺𝑬𝑼 Ⓒ𝑨ⓈⒶⓂⒺⓃⓉⓄ "
+                      " PALAVRA 𝑩𝑰𝑩𝑳𝑰𝑪𝑨 𝑷𝑨𝑹𝑨 𝑶 𝑺𝑬𝑼 CASAMENTO "
                     )
                     .pauseFor(700)
 
