@@ -30,9 +30,9 @@ const data = () => [
     active: false,
   },
   {
-    name: "Deus_de_Obras_Completas",
+    name: "Deus de Obras Completas",
     artist: "Kemilly_Santos",
-    cover: "/images/1.gif",
+    cover: "/images/2.gif",
     audio: "/music/Deus_de_Obras_Completas.mp3", // FUNCIONA 100%
     color: ["#84fab0", "#8fd3f4"],
     id: uuidv4(),
