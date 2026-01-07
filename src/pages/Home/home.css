@@ -5,24 +5,27 @@
 ===================================================== */
 
 /* ===============================
-   VARIÁVEIS GLOBAIS (atualizadas 2025)
+   VARIÁVEIS GLOBAIS
 ================================ */
 :root {
-  --primary:       #5b4ea6;       /* Roxo suave fé/espiritualidade */
-  --primary-dark:  #483d85;
-  --accent:        #f4c95b;       /* Dourado quente — esperança, luz, casamento */
-  --accent-dark:   #e0b04a;
-  --success:       #4a9d6e;       /* Verde esperança/comunidade */
+  --primary: #5b4ea6;
+  --primary-dark: #483d85;
+  --accent: #f4c95b;
+  --accent-dark: #e0b04a;
+  --success: #4a9d6e;
   --success-light: #a8d5c2;
-  --light-bg:      #fdfaf6;       /* Off-white quente, acolhedor */
-  --dark-text:     #2d2d44;
-  --muted:         #6e778c;
-  --shadow-sm:     0 8px 24px rgba(91, 78, 166, 0.08);
-  --shadow-md:     0 16px 40px rgba(91, 78, 166, 0.12);
-  --shadow-lg:     0 24px 60px rgba(91, 78, 166, 0.16);
+  --light-bg: #fdfaf6;
+  --dark-text: #2d2d44;
+  --muted: #6e778c;
+
+  --shadow-sm: 0 8px 24px rgba(91, 78, 166, 0.08);
+  --shadow-md: 0 16px 40px rgba(91, 78, 166, 0.12);
+  --shadow-lg: 0 24px 60px rgba(91, 78, 166, 0.16);
+
   --border-radius: 1.5rem;
   --border-radius-sm: 1rem;
-  --transition:    all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* ===============================
@@ -32,7 +35,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
- 
 }
 
 body {
@@ -40,32 +42,31 @@ body {
   background: var(--light-bg);
   color: var(--dark-text);
   line-height: 1.7;
-  -webkit-font-smoothing: antialiased;
 }
 
 /* ===============================
    CONTAINER PRINCIPAL
 ================================ */
 .home-wrapper {
-  max-width: 1500px;               /* Mais largo para telas modernas */
+  max-width: 1500px;
   margin: 0 auto;
   padding: clamp(3rem, 6vw, 6rem) 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 4rem;
-  
 }
 
 /* ===============================
-   CARD PADRÃO (mais premium)
+   CARD PADRÃO
 ================================ */
 .home-card {
-  background: rgb(177, 51, 51);
+  background: linear-gradient(145deg, #ffffff, #f7f6fb);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
   overflow: hidden;
-  border: 1px solid rgba(91, 78, 166, 0.06);
+  border: 1px solid rgba(91, 78, 166, 0.08);
+  position: relative;
 }
 
 .home-card:hover {
@@ -74,11 +75,15 @@ body {
 }
 
 /* ===============================
-   HEADER (mais impactante)
+   HEADER
 ================================ */
+.home-header {
+  padding: 0;
+}
+
 .bg-gradient-title {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color: rgb(255, 255, 255);
+  color: #fff;
   padding: clamp(4rem, 10vw, 7rem) 2rem;
   border-radius: var(--border-radius);
   position: relative;
@@ -89,8 +94,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 30% 70%, rgba(244, 201, 91, 0.15), transparent 60%);
-  pointer-events: none;
+  background: radial-gradient(circle at 30% 70%, rgba(244,201,91,0.18), transparent 60%);
 }
 
 .header-flex {
@@ -106,20 +110,15 @@ body {
 }
 
 .title1 {
-  font-size: clamp(2.5rem, 2vw, 0.5rem);
-  font-weight: 500;
+  font-size: clamp(2.4rem, 4vw, 3.4rem);
   letter-spacing: 3px;
   color: var(--accent);
-  text-shadow: 0 4px 12px rgba(35, 93, 192, 0.3);
 }
 
 .title2 {
-  font-family: 'Playfair Display', serif; /* fonte elegante para casais */
-   font-weight: 400;
-  font-size: clamp(2rem, 2.5vw, 1.8rem);
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
   letter-spacing: 4px;
-  color: rgb(255, 255, 255);
-  opacity: 0.95;
 }
 
 /* LOGO */
@@ -127,7 +126,7 @@ body {
   width: 240px;
   border-radius: 50%;
   padding: 6px;
-  background: white;
+  background: #fff;
   box-shadow: var(--shadow-md);
   transition: var(--transition);
 }
@@ -137,10 +136,14 @@ body {
 }
 
 /* ===============================
-   CARROSSEL (mais clean)
+   CARROSSEL
 ================================ */
+.home-carousel {
+  padding: 1.5rem;
+}
+
 .carousel-custom {
-  height: clamp(y40px, 25vh, 920px);
+  height: clamp(360px, 45vh, 520px);
   background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-lg);
@@ -153,15 +156,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.15);
 }
 
 .carousel-img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   border-radius: var(--border-radius-sm);
-  box-shadow: var(--shadow-md);
   transition: transform 1.2s ease;
 }
 
@@ -170,113 +171,107 @@ body {
 }
 
 /* ===============================
-   VISITE-NÓS — IEQ SEDE
+   IEQ / VISITE-NÓS
 ================================ */
 .ieq-container {
-  max-width: 240px;
+  max-width: 260px;
   margin: 2rem auto;
   padding: 1.5rem;
-  background: linear-gradient(145deg, rgb(223, 158, 158), var(--light-bg));
+  background: linear-gradient(145deg, #ffffff, var(--light-bg));
   border-radius: var(--border-radius);
-  box-shadow: inset 0 2px 12px rgba(91, 78, 166, 0.08);
-  transition: var(--transition);
-}
-
-.ieq-container:hover {
-  transform: scale(1.04);
-  box-shadow: var(--shadow-md);
-}
-
-.ieq-img {
-  width: 80%;
-  height: auto;
-  border-radius: var(--border-radius-sm);
-  border: 32px solid white;
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
 }
 
-.ieq-img:hover {
-  transform: scale(1.08);
-  border-color: var(--accent);
+.ieq-container:hover {
+  transform: scale(1.05);
+}
+
+.ieq-img {
+  width: 100%;
+  border-radius: var(--border-radius-sm);
+  border: 10px solid #fff;
+  box-shadow: var(--shadow-md);
 }
 
 /* ===============================
    FRASE DO DIA
 ================================ */
 .frase-do-dia {
- max-width: 200px;
-  margin: 2rem auto;
-  padding: 0.5rem;
-  background: linear-gradient(145deg, rgb(223, 158, 158), var(--light-bg));
+  max-width: 260px;
+  margin: auto;
+  padding: 1rem;
+  background: linear-gradient(145deg, #ffffff, var(--light-bg));
   border-radius: var(--border-radius);
-  box-shadow: inset 0 2px 12px rgba(91, 78, 166, 0.08);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
   transition: var(--transition);
 }
 
 .frase-do-dia:hover {
-  border-color: var(--primary);
-  box-shadow: var(--shadow-md);
   transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
 }
 
 .frase-img {
-  width: 100px;
-  height:100px;
-  border-radius: 50% !important;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
   border: 5px solid var(--primary);
-  box-shadow: var(--shadow-md);
   cursor: pointer;
   transition: var(--transition);
 }
 
 .frase-img:hover {
-  transform: scale(1.18) rotate(5deg);
+  transform: scale(1.15) rotate(5deg);
   border-color: var(--accent);
-  box-shadow: 0 20px 50px rgba(244, 201, 91, 0.3);
+}
+
+/* Typewriter */
+.frase-do-dia .Typewriter__wrapper {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-bottom: 1rem;
+}
+
+.frase-do-dia .Typewriter__cursor {
+  color: var(--accent);
 }
 
 /* ===============================
-   MODAL (glassmorphism leve 2025)
+   MODAL
 ================================ */
 .frase-modal {
   position: fixed;
   inset: 0;
-  background: rgba(45, 45, 68, 0.7);
+  background: rgba(45,45,68,0.75);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  backdrop-filter: blur(10px);
 }
 
 .frase-modal-content {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  padding: 3rem 2.5rem;
+  background: rgba(255,255,255,0.95);
+  padding: 3rem;
   border-radius: var(--border-radius);
   max-width: 520px;
   width: 90%;
   text-align: center;
   box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(91, 78, 166, 0.15);
-  animation: modalPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes modalPop {
-  from { opacity: 0; transform: scale(0.85) translateY(30px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .modal-close {
   position: absolute;
-  top: 1.2rem;
-  right: 1.8rem;
-  font-size: 2.4rem;
-  color: var(--primary);
-  background: none;
+  top: 1rem;
+  right: 1.5rem;
+  font-size: 2.2rem;
   border: none;
+  background: none;
   cursor: pointer;
+  color: var(--primary);
   transition: var(--transition);
 }
 
@@ -286,7 +281,7 @@ body {
 }
 
 /* ===============================
-   FLIP CARD (mais suave)
+   FLIP CARD / CÉLULAS
 ================================ */
 .flip-card {
   height: 380px;
@@ -296,7 +291,7 @@ body {
 .flip-card-inner {
   width: 100%;
   height: 100%;
-  transition: transform 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: transform 1s ease;
   transform-style: preserve-3d;
 }
 
@@ -307,30 +302,45 @@ body {
 .flip-card-front,
 .flip-card-back {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   backface-visibility: hidden;
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow-sm);
 }
 
-.flip-card-front img {
+.celula-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+}
+
+.flip-card-front:hover .celula-img {
+  transform: scale(1.08);
 }
 
 .flip-card-back {
   background: linear-gradient(135deg, var(--success), var(--success-light));
-  color: white;
+  color: #fff;
   transform: rotateY(180deg);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 1.5rem;
   text-align: center;
+  padding: 1.5rem;
+}
+
+.icon-map {
+  margin-top: 1rem;
+  color: #fff;
+  transition: var(--transition);
+}
+
+.icon-map:hover {
+  color: var(--accent);
+  transform: scale(1.2);
 }
 
 /* ===============================
@@ -339,38 +349,64 @@ body {
 .social-area {
   display: flex;
   justify-content: center;
-   background: linear-gradient(145deg, rgb(223, 158, 158), var(--light-bg));
-  gap: 4rem;
-  margin: 1.0rem 0;
+  gap: 3rem;
+  margin: 2rem 0;
 }
 
-.social-area a {
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.social-icon {
+  padding: 5px;
+  border-radius: 30%;
+  background: #8a5795;
+  box-shadow: var(--shadow-sm);
   transition: var(--transition);
-}
-
-.social-area a:hover {
-  transform: translateY(-10px) scale(1.2);
 }
 
 .social-icon.fb { color: #0866ff; }
 .social-icon.ig { color: #dd2a7b; }
 
-/* ===============================
-   RESPONSIVO (melhorado)
-================================ */
-@media (max-width: 768px) {
-  .home-wrapper { gap: 3rem; padding: 2rem 1rem; }
-  
-  .header-flex { flex-direction: column; text-align: center; }
-  .header-logo { width: 160px; margin-top: 1.5rem; }
-  
-  .ieq-container { max-width: 280px; }
-  .frase-img { width: 120px; height: 120px; }
-  
-  .flip-card { height: 320px; }
+.social-link:hover .social-icon {
+  transform: translateY(-8px) scale(1.15);
 }
 
-@media (max-width: 576px) {
-  .title1 { font-size: clamp(2rem, 8vw, 3.2rem); }
-  .title2 { font-size: clamp(1.6rem, 6vw, 2.8rem); }
+/* imagem IEQ nas redes (sem classe no JSX) */
+.home-card > img {
+  max-width: 180px;
+  margin: 1.5rem auto 0;
+  display: block;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+}
+
+.home-card > img:hover {
+  transform: scale(1.05);
+}
+
+/* ===============================
+   RESPONSIVO
+================================ */
+@media (max-width: 768px) {
+  .header-flex {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .header-logo {
+    width: 160px;
+  }
+
+  .flip-card {
+    height: 320px;
+  }
+
+  .home-carousel {
+    padding: 1rem;
+  }
 }

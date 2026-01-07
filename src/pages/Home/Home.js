@@ -224,6 +224,10 @@ export default function Home() {
       {/* Redes Sociais */}
       <section className="card mt-5 mb-5 home-card shadow-lg border-0 text-center">
         <h5 className="my-4">CONHEÇAM NOSSAS MÍDIAS SOCIAIS</h5>
+
+        <img src={ieq}                 
+ />
+
         <div className="social-area mb-4">
           <a
             href="https://www.facebook.com/ministerio.amai7"
