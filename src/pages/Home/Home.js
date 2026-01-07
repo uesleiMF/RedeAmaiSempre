@@ -19,6 +19,7 @@ import c9 from "../../components/Img/c9.jpg";
 import ieq from "../../components/Img/ieq2.jpg"; // usada para sede e km07
 import bi from "../bib.gif";
 import c00 from "../../components/Img/c00.jpg";
+import qr from "../../components/Img/qr-code.png";
 import "./home.css";
 
 // Frases bíblicas para a "Frase do Dia"
@@ -222,10 +223,13 @@ export default function Home() {
       </section>
 
       {/* Redes Sociais */}
-      <section className="card mt-5 mb-5 home-card shadow-lg border-0 text-center">
-        <h5 className="my-4">CONHEÇAM NOSSAS MÍDIAS SOCIAIS</h5>
+      <section className="card mt-5 mb-5 home-card social-card shadow-lg border-0 text-center">
 
-        <img src={ieq}                 
+        <h3 className="my-4">CONHEÇAM NOSSA PAGINA</h3>
+         <h4 className="my-4">E NOSSAS MÍDIAS SOCIAIS</h4>
+
+
+        <img src={qr}                 
  />
 
         <div className="social-area mb-4">

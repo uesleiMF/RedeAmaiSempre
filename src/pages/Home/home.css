@@ -177,7 +177,7 @@ body {
   max-width: 260px;
   margin: 2rem auto;
   padding: 1.5rem;
-  background: linear-gradient(145deg, #ffffff, var(--light-bg));
+  background: linear-gradient(145deg, #575ab1, var(--light-bg));
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
@@ -190,7 +190,7 @@ body {
 .ieq-img {
   width: 100%;
   border-radius: var(--border-radius-sm);
-  border: 10px solid #fff;
+  border: 10px solid #9336aa;
   box-shadow: var(--shadow-md);
 }
 
@@ -201,7 +201,7 @@ body {
   max-width: 260px;
   margin: auto;
   padding: 1rem;
-  background: linear-gradient(145deg, #ffffff, var(--light-bg));
+  background: linear-gradient(145deg, #b43db8, var(--light-bg));
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
   text-align: center;
@@ -343,50 +343,93 @@ body {
   transform: scale(1.2);
 }
 
+/* =====================================================
+   CARD REDES SOCIAIS — VISUAL PREMIUM
+===================================================== */
+.social-card {
+  background: linear-gradient(135deg, #bfcd58, #e6d9ff);
+  border-radius: 1.5rem;
+  padding: 3.5rem 2rem;
+  box-shadow: 0 25px 55px rgba(140, 110, 200, 0.35);
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* efeito de luz suave */
+.social-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at top left,
+    rgba(255, 255, 255, 0.45),
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
 /* ===============================
-   REDES SOCIAIS
+   TÍTULOS
+================================ */
+.social-card h3 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #4b2e83;
+}
+
+.social-card h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #6a4fb3;
+  margin-bottom: 2rem;
+}
+
+/* ===============================
+   IMAGEM (QR CODE)
+================================ */
+.social-card img {
+  width: 180px;
+  max-width: 80%;
+  margin: 1.5rem auto 2.5rem;
+  display: block;
+  border-radius: 1.5rem;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
+  transition: transform 0.4s ease;
+}
+
+/* zoom suave ao passar o mouse */
+.social-card img:hover {
+  transform: scale(1.08);
+}
+
+/* ===============================
+   ÁREA DOS ÍCONES (links intactos)
 ================================ */
 .social-area {
   display: flex;
   justify-content: center;
-  gap: 3rem;
-  margin: 2rem 0;
+  gap: 2.5rem;
 }
 
-.social-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-}
-
+/* ícones */
 .social-icon {
-  padding: 5px;
-  border-radius: 30%;
-  background: #8a5795;
-  box-shadow: var(--shadow-sm);
-  transition: var(--transition);
+  transition: transform 0.3s ease, filter 0.3s ease;
 }
-
-.social-icon.fb { color: #0866ff; }
-.social-icon.ig { color: #dd2a7b; }
 
 .social-link:hover .social-icon {
-  transform: translateY(-8px) scale(1.15);
+  transform: scale(1.2);
+  filter: brightness(1.15);
 }
 
-/* imagem IEQ nas redes (sem classe no JSX) */
-.home-card > img {
-  max-width: 180px;
-  margin: 1.5rem auto 0;
-  display: block;
-  border-radius: var(--border-radius-sm);
-  box-shadow: var(--shadow-md);
-  transition: var(--transition);
+/* cores individuais continuam */
+.social-icon.fb {
+  color: #1877f2;
 }
 
-.home-card > img:hover {
-  transform: scale(1.05);
+.social-icon.ig {
+  color: #e1306c;
 }
 
 /* ===============================
