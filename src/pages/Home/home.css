@@ -343,6 +343,27 @@ body {
   transform: scale(1.2);
 }
 
+.react-calendar {
+  border: none;
+  border-radius: 12px;
+  padding: 10px;
+  background: #cf7070;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.react-calendar__tile--active {
+  background: #0a176c !important;
+  color: #fff !important;
+  border-radius: 8px;
+}
+
+.react-calendar__tile--now {
+  background: #e9b949 !important;
+  border-radius: 8px;
+}
+
+
+
 /* =====================================================
    CARD REDES SOCIAIS — VISUAL PREMIUM
 ===================================================== */

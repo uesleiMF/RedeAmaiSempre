@@ -1,0 +1,122 @@
+/* ===============================
+   CONTAINER DO CALENDÁRIO
+================================ */
+.calendario-container {
+  max-width: 100%;
+  width: 100%;
+  margin: 0 auto;
+  padding: 10px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* ===============================
+   AJUSTES DO REACT-CALENDAR
+================================ */
+.react-calendar {
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+  border: none;
+  border-radius: 14px;
+  padding: 8px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.react-calendar__navigation button {
+  color: #0a176c;
+  font-weight: bold;
+}
+
+.react-calendar__month-view__weekdays {
+  font-size: 11px;
+}
+
+/* ===============================
+   DIA COM EVENTO
+================================ */
+.dia-com-evento abbr {
+  background: #0a176c;
+  color: #fff;
+  border-radius: 50%;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  min-height: 26px;
+}
+
+/* Hover desktop */
+@media (hover: hover) {
+  .dia-com-evento:hover abbr {
+    background: #071053;
+  }
+}
+
+/* ===============================
+   MODAL DO CALENDÁRIO
+================================ */
+.calendario-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.calendario-modal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 14px;
+  width: 92%;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.calendario-modal h4 {
+  margin-bottom: 10px;
+  color: #0a176c;
+}
+
+.calendario-modal p {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.calendario-modal button {
+  margin-top: 15px;
+  padding: 10px 16px;
+  background: #0a176c;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.calendario-modal button:hover {
+  background: #071053;
+}
+
+/* ===============================
+   MOBILE EXTRA (TELAS MUITO PEQUENAS)
+================================ */
+@media (max-width: 360px) {
+  .react-calendar {
+    max-width: 250px;
+  }
+
+  .react-calendar__tile {
+    padding: 6px 0;
+    font-size: 12px;
+  }
+
+  .calendario-modal {
+    padding: 16px;
+  }
+}
