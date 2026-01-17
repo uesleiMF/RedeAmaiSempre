@@ -17,13 +17,13 @@ import c6 from "../../components/Img/c6.jpg";
 import c7 from "../../components/Img/c7.jpg";
 import c8 from "../../components/Img/c8.jpg";
 import c9 from "../../components/Img/c9.jpg";
-import ieq from "../../components/Img/ieq2.jpg"; // usada para sede e km07
+import ieq from "../../components/Img/ieq2.jpg";
 import bi from "../bib.gif";
 import c00 from "../../components/Img/c00.jpg";
 import qr from "../../components/Img/qr-code.png";
+
 import "./home.css";
 
-// Frases bíblicas para a "Frase do Dia"
 const frasesBiblicas = [
   {
     versiculo: "Efésios 5:25",
@@ -51,8 +51,6 @@ const frasesBiblicas = [
   },
 ];
 
-
-
 export default function Home() {
   const carouselImages = [c0, c1, c2, c3, c4, c5, c6, c7, c8, c9];
 
@@ -66,13 +64,10 @@ export default function Home() {
     { img: c7, endereco: "FOLHA 17 QUADRA 01 LOTE 50" },
     { img: c8, endereco: "FOLHA 22 QUADRA 03 LOTE 18" },
     { img: c9, endereco: "FOLHA 12 QUADRA 04 LOTE 22" },
-
   ];
 
-  // Estado para o modal da Frase do Dia
   const [showModal, setShowModal] = useState(false);
   const [fraseSelecionada, setFraseSelecionada] = useState(null);
-  
 
   const handleFraseClick = () => {
     const randomIndex = Math.floor(Math.random() * frasesBiblicas.length);
@@ -82,43 +77,37 @@ export default function Home() {
 
   return (
     <div className="home-wrapper">
-      {/* HEADER / ÍNDICE */}
-<section className="home-header home-card">
-  <div className="bg-gradient-title header-flex">
-    <div className="header-text">
-      <h3 className="title1">𝑹𝑬𝑫𝑬 𝑫𝑬 𝑪𝑨𝑺𝑨𝑰𝑺</h3>
-      <h4 className="title2"><i>💗AMAI💗SEMPRE💗</i></h4>
-    </div>
-
-    <img src={c00} alt="logo" className="header-logo" />
-  </div>
-</section>
-
-
-{/* CARROSSEL */}
-<section className="home-carousel home-card">
-  <CCarousel controls interval={3000}>
-
-    {carouselImages.map((img, index) => (
-      <CCarouselItem key={index}>
-        <div className="slide-wrapper">
-          <CImage
-            className="carousel-img"
-            src={img}
-            alt={`Slide ${index + 1}`}
-            loading="lazy"
-          />
+      {/* HEADER / TÍTULO */}
+      <section className="home-header home-card">
+        <div className="bg-gradient-title header-flex">
+          <div className="header-text">
+            <h3 className="title1">𝑹𝑬𝑫𝑬 𝑫𝑬 𝑪𝑨𝑺𝑨𝑰𝑺</h3>
+            <h4 className="title2"><i>💗AMAI💗SEMPRE💗</i></h4>
+          </div>
+          <img src={c00} alt="Logo Rede Amai Sempre" className="header-logo" loading="lazy" />
         </div>
-      </CCarouselItem>
-    ))}
-  </CCarousel>
-</section>
+      </section>
+
+      {/* CARROSSEL */}
+      <section className="home-carousel home-card">
+        <CCarousel controls interval={3000}>
+          {carouselImages.map((img, index) => (
+            <CCarouselItem key={index}>
+              <CImage
+                className="carousel-img"
+                src={img}
+                alt={`Slide ${index + 1}`}
+                loading="lazy"
+              />
+            </CCarouselItem>
+          ))}
+        </CCarousel>
+      </section>
 
       {/* VISITE-NOS */}
       <section className="mt-5">
         <h2 className="text-center fw-bold mb-4">VISITEM-NÓS</h2>
         <div className="row g-4">
-          {/* Card 1 - Sede */}
           <div className="col-12 col-md-6">
             <div className="card home-card shadow-lg border-0 text-center bg-warning bg-opacity-10 h-100">
               <div className="card-body d-flex flex-column">
@@ -144,58 +133,44 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Card 2 - IEQ KM 07 (com Frase do Dia integrada) */}
           <div className="col-12 col-md-6">
             <div className="card home-card shadow-lg border-5 text-center bg-warning bg-opacity-10 h-100">
               <div className="card-body d-flex flex-column">
                 <h2 className="fw-bold mt-3">VERSÍCULOS BÍBLICOS</h2>
                 <p className="fs-4 fw-bold">CLIQUE NA IMAGEM:</p>
-
-                {/* Frase do Dia */}
                 <div className="frase-do-dia mt-3 mb-4">
-                   <Typewriter
-                onInit={(typewriter) => {
-                  typewriter
-
-                    .typeString ("𝑪𝑳𝑰𝑸𝑼𝑬 𝑵𝑨 𝑰𝑴𝑨𝑮𝑬M")
-                    .pauseFor(700)
-                    
-                  
-                    .typeString("  𝑬 𝑻𝑬𝑵𝑯𝑨 𝑼𝑴𝑨 ")
-                    .pauseFor(700)
-
-                    .typeString(
-                      " PALAVRA 𝑩𝑰𝑩𝑳𝑰𝑪𝑨 𝑷𝑨𝑹𝑨 𝑶 𝑺𝑬𝑼 CASAMENTO "
-                    )
-                    .pauseFor(700)
-
-                    .typeString(" 𝑱𝑬𝑺𝑼𝑺 𝑫𝑬𝑼𝑺 𝑫𝑨 𝑭𝑨𝑴𝑰𝑳𝑰𝑨.")
-                    .start();
-                }}
-              />
+                  <Typewriter
+                    onInit={(typewriter) => {
+                      typewriter
+                        .typeString("𝑪𝑳𝑰𝑸𝑼𝑬 𝑵𝑨 𝑰𝑴𝑨𝑮𝑬M")
+                        .pauseFor(700)
+                        .typeString("  𝑬 𝑻𝑬𝑵𝑯𝑨 𝑼𝑴𝑨 ")
+                        .pauseFor(700)
+                        .typeString(" PALAVRA 𝑩𝑰𝑩𝑳𝑰𝑪𝑨 𝑷𝑨𝑹𝑨 𝑶 𝑺𝑬𝑼 CASAMENTO ")
+                        .pauseFor(700)
+                        .typeString(" 𝑱𝑬𝑺𝑼𝑺 𝑫𝑬𝑼𝑺 𝑫𝑨 𝑭𝑨𝑴𝑰𝑳𝑰𝑨.")
+                        .start();
+                    }}
+                  />
                   <img
                     src={bi}
                     alt="Frase do Dia - Rede Amai Sempre"
                     className="frase-img shadow rounded-circle"
                     onClick={handleFraseClick}
+                    loading="lazy"
                   />
                 </div>
-
-                   </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
- {/* CALENDÁRIO */}
+      {/* CALENDÁRIO */}
       <section className="card mt-5 home-card text-center">
         <h2>CALENDÁRIO DE EVENTOS</h2>
         <Calendario />
       </section>
-
-
-
-
 
       {/* Células */}
       <section className="card mt-5 home-card shadow-lg border-0 bg-success bg-opacity-10">
@@ -238,14 +213,9 @@ export default function Home() {
 
       {/* Redes Sociais */}
       <section className="card mt-5 mb-5 home-card social-card shadow-lg border-0 text-center">
-
         <h3 className="my-4">CONHEÇAM NOSSA PAGINA</h3>
-         <h4 className="my-4">E NOSSAS MÍDIAS SOCIAIS</h4>
-
-
-        <img src={qr}                 
- />
-
+        <h4 className="my-4">E NOSSAS MÍDIAS SOCIAIS</h4>
+        <img src={qr} alt="QR Code Rede Amai Sempre" loading="lazy" />
         <div className="social-area mb-4">
           <a
             href="https://www.facebook.com/ministerio.amai7"
@@ -265,9 +235,6 @@ export default function Home() {
           </a>
         </div>
       </section>
-
-
-
 
       {/* Modal da Frase do Dia */}
       {showModal && (

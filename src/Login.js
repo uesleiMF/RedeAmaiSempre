@@ -31,7 +31,7 @@ export default class Login extends Component {
         "https://backtestmar.onrender.com/health",
         { timeout: 5000 }
       );
-    } catch (e) {
+    } catch {
       // ignora erro
     }
   };
@@ -44,10 +44,7 @@ export default class Login extends Component {
     if (loading) return;
 
     if (!username || !password) {
-      swal({
-        text: "Preencha usuário e senha",
-        icon: "error"
-      });
+      swal({ text: "Preencha usuário e senha", icon: "error" });
       return;
     }
 
@@ -60,40 +57,26 @@ export default class Login extends Component {
       // 2️⃣ Axios com timeout curto
       const api = axios.create({
         baseURL: "https://backtestmar.onrender.com",
-        timeout: 6000
+        timeout: 4000
       });
 
-      // 3️⃣ Login (2 tentativas)
+      // 3️⃣ Login
       let response;
       try {
-        response = await api.post("/login", {
-          username,
-          password
-        });
+        response = await api.post("/login", { username, password });
       } catch {
-        response = await api.post("/login", {
-          username,
-          password
-        });
+        response = await api.post("/login", { username, password });
       }
 
-      // 4️⃣ Extrai dados (compatível com backend antigo e novo)
+      // 4️⃣ Extrai dados
       const token = response?.data?.token;
       const user = response?.data?.user;
 
-      const id =
-        user?.id ||
-        response?.data?.id ||
-        response?.data?._id;
-
-      const role =
-        user?.role || "user"; // fallback seguro
+      const id = user?.id || response?.data?.id || response?.data?._id;
+      const role = user?.role || "user"; // fallback seguro
 
       if (!token) {
-        swal({
-          text: "Servidor respondeu sem token.",
-          icon: "error"
-        });
+        swal({ text: "Servidor respondeu sem token.", icon: "error" });
         this.setState({ loading: false });
         return;
       }
@@ -104,29 +87,18 @@ export default class Login extends Component {
       localStorage.setItem("role", role);
 
       // 6️⃣ Feedback
-      swal({
-        text: "Login realizado com sucesso!",
-        icon: "success"
-      });
+      swal({ text: "Login realizado com sucesso!", icon: "success" });
 
       // 7️⃣ Redireciona
       this.props.history.push("/dashboard");
 
     } catch (err) {
-      if (err?.code === "ECONNABORTED") {
-        swal({
-          text:
-            "Servidor demorou para responder (timeout). Tente novamente.",
-          icon: "error"
-        });
-      } else {
-        swal({
-          text:
-            err?.response?.data?.errorMessage ||
-            "Erro ao logar",
-          icon: "error"
-        });
-      }
+      swal({
+        text:
+          err?.response?.data?.errorMessage ||
+          "Erro ao logar. O servidor pode estar lento.",
+        icon: "error"
+      });
     } finally {
       this.setState({ loading: false });
     }
@@ -149,6 +121,7 @@ export default class Login extends Component {
             onChange={this.onChange}
             placeholder="Usuário"
             margin="dense"
+            disabled={loading}
           />
 
           <TextField
@@ -160,6 +133,7 @@ export default class Login extends Component {
             onChange={this.onChange}
             placeholder="Senha"
             margin="dense"
+            disabled={loading}
           />
 
           <div className="login-actions">
@@ -174,16 +148,10 @@ export default class Login extends Component {
             </Button>
 
             {loading && (
-              <CircularProgress
-                size={26}
-                className="login-loading"
-              />
+              <CircularProgress size={26} className="login-loading" />
             )}
 
-            <Link
-              href="/register"
-              className="login-register-link"
-            >
+            <Link href="/register" className="login-register-link">
               Registro
             </Link>
           </div>

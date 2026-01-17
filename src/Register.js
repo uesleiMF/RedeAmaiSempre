@@ -1,16 +1,21 @@
-import React, { Component } from 'react';
-import swal from 'sweetalert';
-import { Button, TextField, Link, CircularProgress } from '@material-ui/core';
-import axios from 'axios';
+import React, { Component } from "react";
+import swal from "sweetalert";
+import {
+  Button,
+  TextField,
+  Link,
+  CircularProgress
+} from "@material-ui/core";
+import axios from "axios";
 import "./Register.css";
 
 export default class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: '',
-      password: '',
-      confirm_password: '',
+      username: "",
+      password: "",
+      confirm_password: "",
       loading: false
     };
   }
@@ -27,25 +32,36 @@ export default class Register extends Component {
     }
 
     if (password.length < 4) {
-      swal({ text: "A senha deve ter pelo menos 4 caracteres!", icon: "error" });
+      swal({
+        text: "A senha deve ter pelo menos 4 caracteres!",
+        icon: "error"
+      });
       return;
     }
 
     if (password !== confirm_password) {
-      swal({ text: "As senhas não coincidem!", icon: "error" });
+      swal({
+        text: "As senhas não coincidem!",
+        icon: "error"
+      });
       return;
     }
 
     this.setState({ loading: true });
 
     try {
-      const res = await axios.post(
+      // ✅ NÃO cria variável não utilizada (evita erro no build)
+      await axios.post(
         "https://backtestmar.onrender.com/register",
         { username, password },
-        { timeout: 25000 } // evita travar caso o Render demore a acordar
+        { timeout: 25000 }
       );
 
-      swal({ text: "Registrado com sucesso!", icon: "success" });
+      swal({
+        text: "Registrado com sucesso!",
+        icon: "success"
+      });
+
       this.props.history.push("/");
 
     } catch (err) {
@@ -54,17 +70,22 @@ export default class Register extends Component {
         "Erro ao registrar usuário. O servidor pode estar lento.";
 
       swal({ text: msg, icon: "error" });
+
     } finally {
       this.setState({ loading: false });
     }
   };
 
   render() {
-    const { username, password, confirm_password, loading } = this.state;
+    const {
+      username,
+      password,
+      confirm_password,
+      loading
+    } = this.state;
 
     return (
       <div className="register-container">
-        
         {loading && (
           <div className="overlay-loading">
             <CircularProgress size={50} />

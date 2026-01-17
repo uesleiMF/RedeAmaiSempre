@@ -1,0 +1,34 @@
+{
+  "files": {
+    "main.css": "/static/css/main.8352ed9e.css",
+    "main.js": "/static/js/main.db76f998.js",
+    "static/js/239.e39fb35b.chunk.js": "/static/js/239.e39fb35b.chunk.js",
+    "static/js/213.bd954327.chunk.js": "/static/js/213.bd954327.chunk.js",
+    "static/js/455.290bb6bf.chunk.js": "/static/js/455.290bb6bf.chunk.js",
+    "static/media/uj.png": "/static/media/uj.23e0c692b687b74787d4.png",
+    "static/media/bib.gif": "/static/media/bib.58d578cfddb7070ab7c4.gif",
+    "static/media/c8.jpg": "/static/media/c8.0029fc78621ca8d194ad.jpg",
+    "static/media/c6.jpg": "/static/media/c6.2945fce0ca45b5fcc8e2.jpg",
+    "static/media/c5.jpg": "/static/media/c5.db50ed9049550de7735e.jpg",
+    "static/media/c7.jpg": "/static/media/c7.f29d8121d2a5b45ad5ec.jpg",
+    "static/media/c4.jpg": "/static/media/c4.672f076d5ac46b2c510e.jpg",
+    "static/media/c2.jpg": "/static/media/c2.797a172bcb3fc568bd98.jpg",
+    "static/media/c3.jpg": "/static/media/c3.97cf02f393cd0185b641.jpg",
+    "static/media/c0.jpg": "/static/media/c0.60548e1584ad974e7a48.jpg",
+    "static/media/c9.jpg": "/static/media/c9.5274d8fdf3bff0be20a8.jpg",
+    "static/media/c1.jpg": "/static/media/c1.baa9616a056c5b8f6f15.jpg",
+    "static/media/ieq2.jpg": "/static/media/ieq2.a94bffa6d69dbfffed6c.jpg",
+    "static/media/c00.jpg": "/static/media/c00.05cef13185b58656906f.jpg",
+    "static/media/biblia.jpg": "/static/media/biblia.5c6f3da9d40a983cd093.jpg",
+    "index.html": "/index.html",
+    "main.8352ed9e.css.map": "/static/css/main.8352ed9e.css.map",
+    "main.db76f998.js.map": "/static/js/main.db76f998.js.map",
+    "239.e39fb35b.chunk.js.map": "/static/js/239.e39fb35b.chunk.js.map",
+    "213.bd954327.chunk.js.map": "/static/js/213.bd954327.chunk.js.map",
+    "455.290bb6bf.chunk.js.map": "/static/js/455.290bb6bf.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8352ed9e.css",
+    "static/js/main.db76f998.js"
+  ]
+}
