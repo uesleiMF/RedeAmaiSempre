@@ -20,7 +20,7 @@ import c9 from "../../components/Img/c9.jpg";
 import ieq from "../../components/Img/ieq2.jpg";
 import bi from "../bib.gif";
 import c00 from "../../components/Img/c00.jpg";
-import qr from "../../components/Img/qr-code.png";
+import qr from "../../components/Img/qr.png";
 
 import "./home.css";
 
