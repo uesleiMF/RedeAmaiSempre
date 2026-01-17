@@ -26,6 +26,7 @@ import CakeIcon from "@material-ui/icons/Cake";
 import swal from "sweetalert";
 import axios from "axios";
 import "./ListaAniversariantes.css";
+
 const BASE_URL = "https://backtestmar.onrender.com";
 
 export default function ListaAniversariantes({ token: propToken }) {
@@ -45,20 +46,15 @@ export default function ListaAniversariantes({ token: propToken }) {
   // Corrige timezone para o input type="date"
   const formatDateToInput = (dateStr) => {
     if (!dateStr) return "";
-    // Pega só a parte da data (yyyy-mm-dd) ignorando hora/timezone
     const datePart = typeof dateStr === "string" ? dateStr.split("T")[0] : "";
     return datePart;
   };
 
-  // NOVA FUNÇÃO CORRIGIDA: formata data de forma segura (nunca mais Invalid Date)
+  // Formata data para exibição (DD/MM/YYYY)
   const formatDateBR = (birthDate) => {
     if (!birthDate) return "-";
-
-    // Extrai apenas a parte da data da string ISO (ex: "2025-12-13T00:00:00.000Z" → "2025-12-13")
     const dateStr = typeof birthDate === "string" ? birthDate.split("T")[0] : "";
-    
     if (!dateStr || dateStr.length !== 10) return "Data inválida";
-
     const [year, month, day] = dateStr.split("-");
     return `${day}/${month}/${year}`;
   };
@@ -93,7 +89,7 @@ export default function ListaAniversariantes({ token: propToken }) {
     }
 
     return () => controller.abort();
-  }, [token]);
+  }, [token, headers]);
 
   useEffect(() => {
     fetchAniversariantes();

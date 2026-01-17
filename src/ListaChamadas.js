@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -38,10 +38,9 @@ export default function ListaChamadas({ token }) {
   // Aniversariantes
   const [aniverDia, setAniverDia] = useState([]);
   const [aniverMes, setAniverMes] = useState([]);
-  const [aniverCarregado, setAniverCarregado] = useState(false);
 
   // ================= HELPERS ======================
-  const authHeaders = () => ({ Authorization: `Bearer ${token}` });
+  const authHeaders = useCallback(() => ({ Authorization: `Bearer ${token}` }), [token]);
 
   const ajustarDataInput = (dateStr) => {
     if (!dateStr) return "";
@@ -66,7 +65,7 @@ export default function ListaChamadas({ token }) {
         if (res.data.status) setNameHistory(res.data.history || []);
       })
       .catch((err) => console.log("Erro buscar histórico:", err));
-  }, [token]);
+  }, [token, authHeaders]);
 
   const saveNameToHistory = (nome) => {
     if (!nome || !token) return;
@@ -163,7 +162,7 @@ export default function ListaChamadas({ token }) {
   };
 
   // ================= RECEBER ANIVERSÁRIOS ====================
-  function receberAniversarios({ dia = [], mes = [] }) {
+  const receberAniversarios = ({ dia = [], mes = [] }) => {
     const mapear = (lista) =>
       lista.map((item) => ({
         nome: item.name || item.nome || "Sem nome",
@@ -171,10 +170,9 @@ export default function ListaChamadas({ token }) {
       }));
     setAniverDia(mapear(dia));
     setAniverMes(mapear(mes));
-    setAniverCarregado(true);
-  }
+  };
 
-  // ================= EXPORTAR PDF (COM TÍTULO PARA LISTA DE CASAIS) ====================
+  // ================= EXPORTAR PDF ====================
   const exportPDF = () => {
     const doc = new jsPDF();
     const width = doc.internal.pageSize.getWidth();
@@ -182,13 +180,11 @@ export default function ListaChamadas({ token }) {
     const marginLeft = 14;
     const labelWidth = 48;
 
-    // Título principal
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.text(`CELULA DE CASAIS - ${formatDateBR(selectedDate)}`, width / 2, startY, { align: "center" });
     startY += 12;
 
-    // Informações da célula
     const addLabel = (label, value) => {
       doc.setFont("helvetica", "bold");
       doc.text(label, marginLeft, startY);
@@ -204,7 +200,7 @@ export default function ListaChamadas({ token }) {
     addLabel("LOUVOR:", louvor);
     startY += 10;
 
-    // ===== TÍTULO DA LISTA DE CASAIS NO PDF =====
+    // ===== Lista de casais =====
     if (students.length > 0) {
       if (startY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
@@ -229,51 +225,30 @@ export default function ListaChamadas({ token }) {
       startY = doc.lastAutoTable.finalY + 10;
     }
 
-    // ===== ANIVERSARIANTES DO DIA =====
-    if (aniverDia.length > 0) {
+    // ===== Aniversariantes do dia e do mês =====
+    const gerarTabelaAniversariantes = (titulo, lista) => {
+      if (lista.length === 0) return;
       if (startY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
         startY = 20;
       }
       doc.setFont("helvetica", "bold");
       doc.setFontSize(14);
-      doc.text("ANIVERSARIANTES DO DIA", width / 2, startY, { align: "center" });
+      doc.text(titulo, width / 2, startY, { align: "center" });
       startY += 6;
       autoTable(doc, {
         head: [["#", "Nome", "Data de Aniversário"]],
-        body: aniverDia.map((a, i) => [i + 1, a.nome, formatDateBR(a.birthDate)]),
-        startY,
-        margin: { left: marginLeft, right: marginLeft },
-        didParseCell: (data) => {
-          if (data.section === "body") {
-            data.cell.styles.fillColor = [255, 255, 150];
-            data.cell.styles.fontStyle = "bold";
-          }
-        },
-      });
-      startY = doc.lastAutoTable.finalY + 10;
-    }
-
-    // ===== ANIVERSARIANTES DO MÊS =====
-    if (aniverMes.length > 0) {
-      if (startY > doc.internal.pageSize.getHeight() - 50) {
-        doc.addPage();
-        startY = 20;
-      }
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(14);
-      doc.text("ANIVERSARIANTES DO MÊS", width / 2, startY, { align: "center" });
-      startY += 6;
-      autoTable(doc, {
-        head: [["#", "Nome", "Data de Aniversário"]],
-        body: aniverMes.map((a, i) => [i + 1, a.nome, formatDateBR(a.birthDate)]),
+        body: lista.map((a, i) => [i + 1, a.nome, formatDateBR(a.birthDate)]),
         startY,
         margin: { left: marginLeft, right: marginLeft },
       });
       startY = doc.lastAutoTable.finalY + 10;
-    }
+    };
 
-    // ===== OFERTAS =====
+    gerarTabelaAniversariantes("ANIVERSARIANTES DO DIA", aniverDia);
+    gerarTabelaAniversariantes("ANIVERSARIANTES DO MÊS", aniverMes);
+
+    // ===== Ofertas =====
     if (ofertas.length > 0) {
       if (startY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
@@ -296,7 +271,7 @@ export default function ListaChamadas({ token }) {
       startY = doc.lastAutoTable.finalY + 10;
     }
 
-    // ===== OBSERVAÇÕES =====
+    // ===== Observações =====
     if (observacoes.trim() !== "") {
       if (startY > doc.internal.pageSize.getHeight() - 50) {
         doc.addPage();
@@ -313,10 +288,11 @@ export default function ListaChamadas({ token }) {
     doc.save("lista-casais.pdf");
   };
 
-  // ================= RENDER (mantido igual) =====================
   return (
     <div className="lista-chamadas-container">
       <AniversariantesDiaMes token={token} onLoad={receberAniversarios} />
+
+      
 
       <h2>CELULA DE CASAIS</h2>
       <input

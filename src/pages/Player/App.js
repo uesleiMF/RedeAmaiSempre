@@ -26,7 +26,7 @@ function App() {
       setCurrentSong(firstSong);
       setSongs(songs.map((s, i) => ({ ...s, active: i === 0 })));
     }
-  }, [songs]);
+  }, [songs, currentSong]);
 
   // Atualiza tempo, duração e porcentagem
   const timeUpdateHandler = (e) => {
@@ -38,20 +38,22 @@ function App() {
 
   // Quando a música termina, vai para a próxima
   const songEndHandler = () => {
+    if (!currentSong) return;
     const currentIndex = songs.findIndex((s) => s.id === currentSong.id);
     const nextIndex = (currentIndex + 1) % songs.length;
     const nextSong = songs[nextIndex];
     setCurrentSong(nextSong);
     updateActive(nextSong);
-    // O useEffect abaixo vai tocar automaticamente
   };
 
   // Marca música como ativa na biblioteca
   const updateActive = (selectedSong) => {
-    setSongs(songs.map((s) => ({ ...s, active: s.id === selectedSong.id })));
+    setSongs((prevSongs) =>
+      prevSongs.map((s) => ({ ...s, active: s.id === selectedSong.id }))
+    );
   };
 
-  // ESSA É A CHAVE: Toca/pausa automaticamente quando muda a música ou estado de play
+  // Toca/pausa automaticamente quando muda a música ou estado de play
   useEffect(() => {
     if (!audioRef.current) return;
 
@@ -63,7 +65,7 @@ function App() {
     } else {
       audioRef.current.pause();
     }
-  }, [isPlaying, currentSong]); // ← Observa currentSong também!
+  }, [isPlaying, currentSong]);
 
   // Loading enquanto carrega as músicas
   if (!currentSong) {
@@ -85,7 +87,7 @@ function App() {
           setIsPlaying={setIsPlaying}
           audioRef={audioRef}
           songInfo={songInfo}
-          setSongInfo={setSongInfo}        // ← CORRIGIDO: agora passa a função!
+          setSongInfo={setSongInfo}
           songs={songs}
           setCurrentSong={setCurrentSong}
           updateActive={updateActive}
