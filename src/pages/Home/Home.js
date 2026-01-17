@@ -243,7 +243,7 @@ export default function Home() {
             <button className="modal-close" onClick={() => setShowModal(false)}>
               ×
             </button>
-            <h4 className="fw-bold text-primary mb-3">FRASES DO DIA</h4>
+            <h4 className="fw-bold text-primary mb-3">VERSÍCULOS E FRASES DO DIA</h4>
             <p className="fs-5 fst-italic">"{fraseSelecionada.texto}"</p>
             <p className="fw-bold text-secondary">{fraseSelecionada.versiculo}</p>
             <small className="text-muted">Rede de Casais Amai Sempre ❤️</small>
