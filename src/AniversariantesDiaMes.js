@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import axios from "axios";
 
 const BASE_URL = "https://backtestmar.onrender.com";
 
 export default function AniversariantesDiaMes({ token, onLoad }) {
-  const [aniversariantesDia, setAniversariantesDia] = useState([]);
-  const [aniversariantesMes, setAniversariantesMes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Extrai dia e mês de uma data (string ISO ou yyyy-mm-dd)
+  // Extrai dia e mês de uma data (string ISO ou yyyy-mm-dd) de forma segura
   const getDayMonth = (birthDate) => {
     if (!birthDate) return null;
     const dateStr = typeof birthDate === "string" ? birthDate.split("T")[0] : null;
@@ -23,29 +19,26 @@ export default function AniversariantesDiaMes({ token, onLoad }) {
   const isBirthdayToday = (birthDate) => {
     const dm = getDayMonth(birthDate);
     if (!dm) return false;
-    const hoje = new Date();
-    return hoje.getDate() === dm.day && hoje.getMonth() + 1 === dm.month;
+    const today = new Date();
+    return today.getDate() === dm.day && today.getMonth() + 1 === dm.month;
   };
 
   // Verifica aniversário neste mês (exceto hoje)
   const isBirthdayThisMonth = (birthDate) => {
     const dm = getDayMonth(birthDate);
     if (!dm) return false;
-    const hoje = new Date();
-    return hoje.getMonth() + 1 === dm.month && !isBirthdayToday(birthDate);
+    const today = new Date();
+    return today.getMonth() + 1 === dm.month && !isBirthdayToday(birthDate);
   };
 
   // Notificação
   const notifyBirthday = (nome) => {
     if (typeof Notification === "undefined") return;
-
     if (Notification.permission === "granted") {
       new Notification("Aniversariante do Dia 🎉", { body: nome });
     } else if (Notification.permission !== "denied") {
       Notification.requestPermission().then((perm) => {
-        if (perm === "granted") {
-          new Notification("Aniversariante do Dia 🎉", { body: nome });
-        }
+        if (perm === "granted") new Notification("Aniversariante do Dia 🎉", { body: nome });
       });
     }
   };
@@ -58,17 +51,11 @@ export default function AniversariantesDiaMes({ token, onLoad }) {
   };
 
   useEffect(() => {
-    if (!token) {
-      setLoading(false);
-      setError("Token não fornecido");
-      return;
-    }
+    if (!token) return;
 
     const controller = new AbortController();
 
     const fetchData = async () => {
-      setLoading(true);
-      setError(null);
       try {
         const res = await axios.get(`${BASE_URL}/get-casal-simple`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -76,29 +63,21 @@ export default function AniversariantesDiaMes({ token, onLoad }) {
         });
 
         const todos = res.data?.casal || [];
-
         const dia = todos.filter((item) => isBirthdayToday(item.birthDate));
         const mes = todos.filter((item) => isBirthdayThisMonth(item.birthDate));
-
-        setAniversariantesDia(dia);
-        setAniversariantesMes(mes);
 
         if (dia.length > 0) sendNotificationsOncePerDay(dia);
         if (onLoad) onLoad({ dia, mes });
       } catch (err) {
-        if (axios.isCancel(err)) return;
-        console.error("Erro ao buscar aniversariantes:", err);
-        setError("Erro na conexão");
-      } finally {
-        setLoading(false);
+        if (!axios.isCancel(err)) console.error("Erro ao buscar aniversariantes:", err);
       }
     };
 
     fetchData();
 
     return () => controller.abort();
-  }, [token, onLoad]);
+  }, [token, onLoad, isBirthdayToday, isBirthdayThisMonth, sendNotificationsOncePerDay]);
 
-  // Componente invisível
+  // Invisível no DOM
   return null;
 }

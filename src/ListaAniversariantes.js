@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Dialog,
   DialogActions,
@@ -36,21 +36,22 @@ export default function ListaAniversariantes({ token: propToken }) {
   const [isEdit, setIsEdit] = useState(false);
   const [current, setCurrent] = useState({ id: "", name: "", birthDate: "" });
 
-  // Token: prop ou localStorage
   const token = propToken || localStorage.getItem("token");
 
-  const headers = {
-    Authorization: `Bearer ${token}`,
-  };
+  // ✅ UseMemo para headers para não recriar a cada render
+  const headers = useMemo(
+    () => ({
+      Authorization: `Bearer ${token}`,
+    }),
+    [token]
+  );
 
-  // Corrige timezone para o input type="date"
   const formatDateToInput = (dateStr) => {
     if (!dateStr) return "";
     const datePart = typeof dateStr === "string" ? dateStr.split("T")[0] : "";
     return datePart;
   };
 
-  // Formata data para exibição (DD/MM/YYYY)
   const formatDateBR = (birthDate) => {
     if (!birthDate) return "-";
     const dateStr = typeof birthDate === "string" ? birthDate.split("T")[0] : "";
@@ -59,7 +60,6 @@ export default function ListaAniversariantes({ token: propToken }) {
     return `${day}/${month}/${year}`;
   };
 
-  // Busca os aniversariantes
   const fetchAniversariantes = useCallback(async () => {
     if (!token) {
       setAniversariantes([]);
@@ -95,7 +95,6 @@ export default function ListaAniversariantes({ token: propToken }) {
     fetchAniversariantes();
   }, [fetchAniversariantes]);
 
-  // Modal
   const handleOpenModal = (aniversariante = null) => {
     setIsEdit(!!aniversariante);
     setCurrent(
@@ -120,7 +119,6 @@ export default function ListaAniversariantes({ token: propToken }) {
     setCurrent((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Salvar
   const handleSave = async () => {
     if (!current.name.trim() || !current.birthDate) {
       return swal({ text: "Preencha nome e data de nascimento", icon: "warning" });
@@ -130,20 +128,14 @@ export default function ListaAniversariantes({ token: propToken }) {
       if (isEdit) {
         await axios.put(
           `${BASE_URL}/update-casal-simple/${current.id}`,
-          {
-            name: current.name.trim(),
-            birthDate: current.birthDate,
-          },
+          { name: current.name.trim(), birthDate: current.birthDate },
           { headers }
         );
         swal({ text: "Aniversariante atualizado!", icon: "success" });
       } else {
         await axios.post(
           `${BASE_URL}/add-casal-simple`,
-          {
-            name: current.name.trim(),
-            birthDate: current.birthDate,
-          },
+          { name: current.name.trim(), birthDate: current.birthDate },
           { headers }
         );
         swal({ text: "Aniversariante adicionado!", icon: "success" });
@@ -159,7 +151,6 @@ export default function ListaAniversariantes({ token: propToken }) {
     }
   };
 
-  // Deletar
   const handleDelete = async (id) => {
     if (!window.confirm("Deseja realmente excluir este aniversariante?")) return;
 
@@ -237,7 +228,6 @@ export default function ListaAniversariantes({ token: propToken }) {
         </TableContainer>
       )}
 
-      {/* Modal */}
       <Dialog open={openModal} onClose={handleCloseModal} maxWidth="sm" fullWidth>
         <DialogTitle>
           {isEdit ? "Editar Aniversariante" : "Adicionar Novo Aniversariante"}
