@@ -9,29 +9,20 @@ export default function AniversariantesDiaMes({ token, onLoad }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Extrai dia e mês de uma data (string ISO ou yyyy-mm-dd) de forma segura
+  // Extrai dia e mês de uma data (string ISO ou yyyy-mm-dd)
   const getDayMonth = (birthDate) => {
     if (!birthDate) return null;
-
-    let dateStr;
-    if (typeof birthDate === "string") {
-      // Se for ISO completa (com T e Z), pega só a parte da data
-      dateStr = birthDate.split("T")[0]; // "2025-12-13"
-    } else {
-      return null;
-    }
-
+    const dateStr = typeof birthDate === "string" ? birthDate.split("T")[0] : null;
+    if (!dateStr) return null;
     const [year, month, day] = dateStr.split("-").map(Number);
     if (!year || !month || !day) return null;
-
     return { day, month };
   };
 
-  // Verifica aniversário hoje (usa comparação local do navegador)
+  // Verifica aniversário hoje
   const isBirthdayToday = (birthDate) => {
     const dm = getDayMonth(birthDate);
     if (!dm) return false;
-
     const hoje = new Date();
     return hoje.getDate() === dm.day && hoje.getMonth() + 1 === dm.month;
   };
@@ -40,22 +31,8 @@ export default function AniversariantesDiaMes({ token, onLoad }) {
   const isBirthdayThisMonth = (birthDate) => {
     const dm = getDayMonth(birthDate);
     if (!dm) return false;
-
     const hoje = new Date();
-    return hoje.getMonth() + 1 === dm.month;
-  };
-
-  // Formata data para exibição em pt-BR (agora 100% segura)
-  const formatDateBR = (birthDate) => {
-    if (!birthDate) return "-";
-
-    let dateStr = typeof birthDate === "string" ? birthDate.split("T")[0] : "";
-    if (!dateStr) return "Data inválida";
-
-    const [year, month, day] = dateStr.split("-");
-    if (!year || !month || !day) return "Data inválida";
-
-    return `${day}/${month}/${year}`;
+    return hoje.getMonth() + 1 === dm.month && !isBirthdayToday(birthDate);
   };
 
   // Notificação
@@ -76,7 +53,6 @@ export default function AniversariantesDiaMes({ token, onLoad }) {
   const sendNotificationsOncePerDay = (dia) => {
     const todayKey = `birthday_notified_${new Date().toISOString().slice(0, 10)}`;
     if (localStorage.getItem(todayKey)) return;
-
     dia.forEach((a) => notifyBirthday(a.name || "Alguém"));
     localStorage.setItem(todayKey, "true");
   };
@@ -90,7 +66,7 @@ export default function AniversariantesDiaMes({ token, onLoad }) {
 
     const controller = new AbortController();
 
-    async function fetchData() {
+    const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
@@ -102,9 +78,7 @@ export default function AniversariantesDiaMes({ token, onLoad }) {
         const todos = res.data?.casal || [];
 
         const dia = todos.filter((item) => isBirthdayToday(item.birthDate));
-        const mes = todos.filter(
-          (item) => isBirthdayThisMonth(item.birthDate) && !isBirthdayToday(item.birthDate)
-        );
+        const mes = todos.filter((item) => isBirthdayThisMonth(item.birthDate));
 
         setAniversariantesDia(dia);
         setAniversariantesMes(mes);
@@ -112,16 +86,13 @@ export default function AniversariantesDiaMes({ token, onLoad }) {
         if (dia.length > 0) sendNotificationsOncePerDay(dia);
         if (onLoad) onLoad({ dia, mes });
       } catch (err) {
-        if (axios.isCancel(err)) {
-          console.log("Requisição cancelada");
-          return;
-        }
-        console.error("Erro:", err);
+        if (axios.isCancel(err)) return;
+        console.error("Erro ao buscar aniversariantes:", err);
         setError("Erro na conexão");
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchData();
 
@@ -129,7 +100,5 @@ export default function AniversariantesDiaMes({ token, onLoad }) {
   }, [token, onLoad]);
 
   // Componente invisível
-  if (loading || error) return null;
-
-  return <div style={{ display: "none" }}></div>;
+  return null;
 }
