@@ -1,67 +1,117 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import axios from "axios";
+import NovoEvento from "./NovoEvento";
 import "./Calendario.css";
 
-const eventosFixos = {
-  "2026-01-15": {
-    titulo: "Encontro de Casais",
-    descricao: "Encontro especial da Rede Amai Sempre às 19h"
-  },
-  "2026-01-20": {
-    titulo: "Célula de Oração",
-    descricao: "Reunião de oração na casa do líder"
-  },
-  "2026-01-28": {
-    titulo: "Culto Especial",
-    descricao: "Culto com convidados"
-  }
-};
-
 const Calendario = () => {
+  const [eventos, setEventos] = useState([]);
   const [dataSelecionada, setDataSelecionada] = useState(null);
-  const [eventoSelecionado, setEventoSelecionado] = useState(null);
+  const [eventosDoDia, setEventosDoDia] = useState([]);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
   const formatarData = (date) =>
-    date.toISOString().split("T")[0];
+    new Date(date).toISOString().split("T")[0];
 
+  // 🔹 Buscar eventos do backend
+  const carregarEventos = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await axios.get(
+        "https://backtestmar.onrender.com/eventos",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+
+      const lista = Array.isArray(res.data)
+        ? res.data
+        : res.data.eventos || [];
+
+      setEventos(lista);
+    } catch (err) {
+      console.error("Erro ao carregar eventos", err);
+      setEventos([]);
+    }
+  };
+
+  useEffect(() => {
+    carregarEventos();
+  }, []);
+
+  // 🔹 Clique no dia
   const onClickDay = (date) => {
     const data = formatarData(date);
-    if (eventosFixos[data]) {
-      setEventoSelecionado(eventosFixos[data]);
-      setDataSelecionada(date);
-    }
+
+    const filtrados = eventos.filter(
+      (e) => e.data?.split("T")[0] === data
+    );
+
+    setDataSelecionada(date);
+    setEventosDoDia(filtrados);
   };
 
   return (
     <div className="calendario-container">
       <h3>📅 Agenda da Igreja</h3>
 
+      {/* BOTÃO NOVO EVENTO */}
+      <button
+        className="btn-novo-evento"
+        onClick={() => setMostrarFormulario(!mostrarFormulario)}
+      >
+        {mostrarFormulario ? "❌ Cancelar" : "➕ Novo Evento"}
+      </button>
+
+      {/* FORMULÁRIO */}
+      {mostrarFormulario && (
+        <NovoEvento onEventoCriado={carregarEventos} />
+      )}
+
+      {/* CALENDÁRIO */}
       <Calendar
         onClickDay={onClickDay}
-        tileClassName={({ date }) =>
-          eventosFixos[formatarData(date)] ? "dia-com-evento" : null
-        }
+        tileClassName={({ date }) => {
+          const data = formatarData(date);
+          return eventos.some(
+            (e) => e.data?.split("T")[0] === data
+          )
+            ? "dia-com-evento"
+            : null;
+        }}
       />
 
-      {eventoSelecionado && (
+      {/* MODAL DE EVENTOS */}
+      {dataSelecionada && (
         <div
           className="calendario-modal-overlay"
-          onClick={() => setEventoSelecionado(null)}
+          onClick={() => setDataSelecionada(null)}
         >
           <div
             className="calendario-modal"
             onClick={(e) => e.stopPropagation()}
           >
-            <h4>{eventoSelecionado.titulo}</h4>
-            <p>{eventoSelecionado.descricao}</p>
-
-            <p>
+            <h4>
               📆{" "}
               {dataSelecionada.toLocaleDateString("pt-BR")}
-            </p>
+            </h4>
 
-            <button onClick={() => setEventoSelecionado(null)}>
+            {eventosDoDia.length === 0 ? (
+              <p>Nenhum evento neste dia.</p>
+            ) : (
+              eventosDoDia.map((evento) => (
+                <div key={evento._id}>
+                  <strong>{evento.titulo}</strong>
+                  <p>{evento.descricao}</p>
+                </div>
+              ))
+            )}
+
+            <button onClick={() => setDataSelecionada(null)}>
               Fechar
             </button>
           </div>

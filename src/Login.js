@@ -1,96 +1,132 @@
-import React, { Component } from 'react';
-import swal from 'sweetalert';
-import { Button, TextField, Link, CircularProgress } from '@material-ui/core';
-import axios from 'axios';
+import React, { Component } from "react";
+import swal from "sweetalert";
+import {
+  Button,
+  TextField,
+  Link,
+  CircularProgress
+} from "@material-ui/core";
+import axios from "axios";
 import "./Login.css";
 
 export default class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: '',
-      password: '',
+      username: "",
+      password: "",
       loading: false
     };
   }
 
-  onChange = (e) => this.setState({ [e.target.name]: e.target.value });
+  onChange = (e) =>
+    this.setState({ [e.target.name]: e.target.value });
 
   // ----------------------------------------
-  // FUNÇÃO PARA ACORDAR O RENDER (PING)
+  // ACORDAR SERVIDOR (RENDER)
   // ----------------------------------------
   wakeServer = async () => {
     try {
-      await axios.get("https://backtestmar.onrender.com/health", { timeout: 5000 });
+      await axios.get(
+        "https://backtestmar.onrender.com/health",
+        { timeout: 5000 }
+      );
     } catch (e) {
-      // ignora erro — a ideia é só "acordar"
+      // ignora erro
     }
   };
 
   // ----------------------------------------
-  // LOGIN OTIMIZADO
+  // LOGIN
   // ----------------------------------------
   login = async () => {
     const { username, password, loading } = this.state;
-
     if (loading) return;
 
     if (!username || !password) {
-      swal({ text: 'Preencha usuário e senha', icon: 'error' });
+      swal({
+        text: "Preencha usuário e senha",
+        icon: "error"
+      });
       return;
     }
 
     this.setState({ loading: true });
 
     try {
-      // 👉 Primeiro passo: acorda o servidor
+      // 1️⃣ Acorda o Render
       await this.wakeServer();
 
-      // 👉 Define um timeout curto (evita travar por 20s)
+      // 2️⃣ Axios com timeout curto
       const api = axios.create({
         baseURL: "https://backtestmar.onrender.com",
         timeout: 6000
       });
 
-      // 👉 Tenta fazer login (2 tentativas)
+      // 3️⃣ Login (2 tentativas)
       let response;
       try {
-        response = await api.post("/login", { username, password });
+        response = await api.post("/login", {
+          username,
+          password
+        });
       } catch {
-        response = await api.post("/login", { username, password });
+        response = await api.post("/login", {
+          username,
+          password
+        });
       }
 
+      // 4️⃣ Extrai dados (compatível com backend antigo e novo)
       const token = response?.data?.token;
-      const id = response?.data?.id || response?.data?._id;
+      const user = response?.data?.user;
+
+      const id =
+        user?.id ||
+        response?.data?.id ||
+        response?.data?._id;
+
+      const role =
+        user?.role || "user"; // fallback seguro
 
       if (!token) {
-        swal({ text: 'O servidor respondeu sem token.', icon: 'error' });
+        swal({
+          text: "Servidor respondeu sem token.",
+          icon: "error"
+        });
         this.setState({ loading: false });
         return;
       }
 
-      // 👉 Salva token + ID corretamente
+      // 5️⃣ Salva no localStorage
       localStorage.setItem("token", token);
       if (id) localStorage.setItem("user_id", id);
+      localStorage.setItem("role", role);
 
-      swal({ text: "Login realizado com sucesso!", icon: "success" });
+      // 6️⃣ Feedback
+      swal({
+        text: "Login realizado com sucesso!",
+        icon: "success"
+      });
 
+      // 7️⃣ Redireciona
       this.props.history.push("/dashboard");
 
     } catch (err) {
-
       if (err?.code === "ECONNABORTED") {
         swal({
-          text: "Servidor demorou para responder (timeout). Tente novamente.",
+          text:
+            "Servidor demorou para responder (timeout). Tente novamente.",
           icon: "error"
         });
       } else {
         swal({
-          text: err?.response?.data?.errorMessage || "Erro ao logar",
+          text:
+            err?.response?.data?.errorMessage ||
+            "Erro ao logar",
           icon: "error"
         });
       }
-
     } finally {
       this.setState({ loading: false });
     }
@@ -137,9 +173,17 @@ export default class Login extends Component {
               {loading ? "Entrando..." : "Login"}
             </Button>
 
-            {loading && <CircularProgress size={26} className="login-loading" />}
+            {loading && (
+              <CircularProgress
+                size={26}
+                className="login-loading"
+              />
+            )}
 
-            <Link href="/register" className="login-register-link">
+            <Link
+              href="/register"
+              className="login-register-link"
+            >
               Registro
             </Link>
           </div>

@@ -52,22 +52,6 @@ const frasesBiblicas = [
 ];
 
 
-// Eventos do calendário
-const eventosCalendario = {
-  "2026-01-15": {
-    titulo: "Encontro de Casais",
-    descricao: "Encontro especial às 19h na sede"
-  },
-  "2026-01-20": {
-    titulo: "Célula de Oração",
-    descricao: "Reunião de oração"
-  },
-  "2026-01-28": {
-    titulo: "Culto Especial",
-    descricao: "Culto especial para famílias"
-  }
-};
-
 
 export default function Home() {
   const carouselImages = [c0, c1, c2, c3, c4, c5, c6, c7, c8, c9];
@@ -88,9 +72,7 @@ export default function Home() {
   // Estado para o modal da Frase do Dia
   const [showModal, setShowModal] = useState(false);
   const [fraseSelecionada, setFraseSelecionada] = useState(null);
-   const [dataSelecionada, setDataSelecionada] = useState(new Date());
-  const [eventoSelecionado, setEventoSelecionado] = useState(null);
-
+  
 
   const handleFraseClick = () => {
     const randomIndex = Math.floor(Math.random() * frasesBiblicas.length);
@@ -283,38 +265,6 @@ export default function Home() {
           </a>
         </div>
       </section>
-
-{eventoSelecionado && (
-  <div className="frase-modal" onClick={() => setEventoSelecionado(null)}>
-    <div
-      className="frase-modal-content"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <button
-        className="modal-close"
-        onClick={() => setEventoSelecionado(null)}
-      >
-        ×
-      </button>
-
-      <h4 className="fw-bold text-primary mb-3">
-        {eventoSelecionado.titulo}
-      </h4>
-
-      <p className="fs-5">
-        {eventoSelecionado.descricao}
-      </p>
-
-      <p className="fw-bold mt-2">
-        📅 {new Date(eventoSelecionado.data).toLocaleDateString("pt-BR")}
-      </p>
-
-      <small className="text-muted">
-        Rede de Casais Amai Sempre ❤️
-      </small>
-    </div>
-  </div>
-)}
 
 
 
