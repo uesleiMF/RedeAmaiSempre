@@ -27,7 +27,7 @@ import swal from "sweetalert";
 import axios from "axios";
 import "./ListaAniversariantes.css";
 
-const BASE_URL = "https://alright-hetti-faculdade-49bca0ed.koyeb.app/";
+const BASE_URL = "https://alright-hetti-faculdade-49bca0ed.koyeb.app";
 
 export default function ListaAniversariantes({ token: propToken }) {
   const [loading, setLoading] = useState(false);

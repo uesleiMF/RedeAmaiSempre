@@ -28,7 +28,7 @@ export default class Login extends Component {
   wakeServer = async () => {
     try {
       await axios.get(
-        "alright-hetti-faculdade-49bca0ed.koyeb.app/health",
+        "https://alright-hetti-faculdade-49bca0ed.koyeb.app/health",
         { timeout: 5000 }
       );
     } catch {
