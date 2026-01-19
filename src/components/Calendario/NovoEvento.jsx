@@ -19,7 +19,7 @@ const NovoEvento = ({ onEventoCriado }) => {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "https://backtestmar.onrender.com/eventos",
+        "https://alright-hetti-faculdade-49bca0ed.koyeb.app/eventos",
         form,
         {
           headers: {

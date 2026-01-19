@@ -28,7 +28,7 @@ export default class Login extends Component {
   wakeServer = async () => {
     try {
       await axios.get(
-        "https://backtestmar.onrender.com/health",
+        "alright-hetti-faculdade-49bca0ed.koyeb.app/health",
         { timeout: 5000 }
       );
     } catch {
@@ -56,7 +56,7 @@ export default class Login extends Component {
 
       // 2️⃣ Axios com timeout curto
       const api = axios.create({
-        baseURL: "https://backtestmar.onrender.com",
+        baseURL: "https://alright-hetti-faculdade-49bca0ed.koyeb.app/",
         timeout: 4000
       });
 

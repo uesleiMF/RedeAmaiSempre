@@ -109,7 +109,7 @@ export default class Dashboard extends Component {
     try {
       let data = `?page=${this.state.page}`;
       if (this.state.search) data += `&search=${encodeURIComponent(this.state.search)}`;
-      const res = await axios.get(`https://backtestmar.onrender.com/get-casal${data}`, {
+      const res = await axios.get(`https://alright-hetti-faculdade-49bca0ed.koyeb.app/get-casal${data}`, {
         headers: this.getAuthHeaders()
       });
 
@@ -130,9 +130,9 @@ export default class Dashboard extends Component {
       const headers = { 'Content-Type': 'application/json', ...this.getAuthHeaders() };
       let res;
       try {
-        res = await axios.delete(`https://backtestmar.onrender.com/delete-casal/${id}`, { headers });
+        res = await axios.delete(`https://alright-hetti-faculdade-49bca0ed.koyeb.app/delete-casal/${id}`, { headers });
       } catch (e) {
-        res = await axios.post('https://backtestmar.onrender.com/delete-casal', { id }, { headers });
+        res = await axios.post('https://alright-hetti-faculdade-49bca0ed.koyeb.app/delete-casal', { id }, { headers });
       }
       swal({ text: res.data?.title || 'Deletado com sucesso!', icon: "success" });
       if (this._isMounted) this.setState({ page: 1 }, () => this.getCasal());
@@ -186,7 +186,7 @@ export default class Dashboard extends Component {
     fd.append('niverM', this.formatDateForSave(this.state.niverM));
 
     try {
-      const res = await axios.post('https://backtestmar.onrender.com/add-casal', fd, {
+      const res = await axios.post('https://alright-hetti-faculdade-49bca0ed.koyeb.app/add-casal', fd, {
         headers: { 'content-type': 'multipart/form-data', ...this.getAuthHeaders() }
       });
 
@@ -225,7 +225,7 @@ export default class Dashboard extends Component {
     if (fileInput && fileInput.files[0]) fd.append('file', fileInput.files[0]);
 
     try {
-      const res = await axios.put(`https://backtestmar.onrender.com/update-casal/${id}`, fd, {
+      const res = await axios.put(`https://alright-hetti-faculdade-49bca0ed.koyeb.app/update-casal/${id}`, fd, {
         headers: { 'content-type': 'multipart/form-data', ...this.getAuthHeaders() }
       });
       swal({ text: res.data?.message || 'Atualizado!', icon: 'success' });
@@ -277,7 +277,7 @@ export default class Dashboard extends Component {
   // ---------------- Histórico via backend ----------------
   getHistory = async () => {
     try {
-      const res = await axios.get('https://backtestmar.onrender.com/history', {
+      const res = await axios.get('https://alright-hetti-faculdade-49bca0ed.koyeb.app/history', {
         headers: this.getAuthHeaders()
       });
       if (this._isMounted) this.setState({ nameHistory: res.data.history || [] });
@@ -289,7 +289,7 @@ export default class Dashboard extends Component {
   saveNameToHistory = async (name) => {
     if (!name) return;
     try {
-      const res = await axios.post('https://backtestmar.onrender.com/history/add', { name }, {
+      const res = await axios.post('https://alright-hetti-faculdade-49bca0ed.koyeb.app/history/add', { name }, {
         headers: this.getAuthHeaders()
       });
       if (this._isMounted) this.setState({ nameHistory: res.data.history || [] });
@@ -301,7 +301,7 @@ export default class Dashboard extends Component {
   deleteNameFromHistory = async (nome, e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     try {
-      const res = await axios.delete(`https://backtestmar.onrender.com/history/delete/${encodeURIComponent(nome)}`, {
+      const res = await axios.delete(`https://alright-hetti-faculdade-49bca0ed.koyeb.app/history/delete/${encodeURIComponent(nome)}`, {
         headers: this.getAuthHeaders()
       });
       if (this._isMounted) this.setState({ nameHistory: res.data.history || [] });
@@ -313,7 +313,7 @@ export default class Dashboard extends Component {
   clearHistory = async () => {
     if (!window.confirm('Limpar todo o histórico de nomes?')) return;
     try {
-      await axios.delete('https://backtestmar.onrender.com/history/clear', {
+      await axios.delete('https://alright-hetti-faculdade-49bca0ed.koyeb.app/history/clear', {
         headers: this.getAuthHeaders()
       });
       if (this._isMounted) this.setState({ nameHistory: [] });

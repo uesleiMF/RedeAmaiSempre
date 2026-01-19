@@ -20,7 +20,7 @@ const Calendario = () => {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "https://backtestmar.onrender.com/eventos",
+        "https://alright-hetti-faculdade-49bca0ed.koyeb.app/eventos",
         {
           headers: {
             Authorization: `Bearer ${token}`
