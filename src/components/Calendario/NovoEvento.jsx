@@ -14,29 +14,24 @@ const NovoEvento = ({ onEventoCriado }) => {
 
   const salvarEvento = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Você precisa estar logado como líder");
 
     try {
-      const token = localStorage.getItem("token");
-
       await axios.post(
         "https://alright-hetti-faculdade-49bca0ed.koyeb.app/eventos",
         form,
         {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         }
       );
 
       alert("Evento cadastrado com sucesso!");
       setForm({ titulo: "", descricao: "", data: "" });
-
-      // 🔄 Recarrega calendário
       onEventoCriado();
-
     } catch (err) {
       console.error(err);
-      alert("Erro ao cadastrar evento");
+      alert(err.response?.data?.errorMessage || "Erro ao cadastrar evento");
     }
   };
 
