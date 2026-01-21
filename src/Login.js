@@ -19,75 +19,86 @@ export default class Login extends Component {
     };
   }
 
-  onChange = (e) =>
+  // ----------------------------
+  // HANDLE INPUT
+  // ----------------------------
+  onChange = (e) => {
     this.setState({ [e.target.name]: e.target.value });
+  };
 
-  // ----------------------------------------
-  // ACORDAR SERVIDOR (RENDER)
-  // ----------------------------------------
+  // ----------------------------
+  // ACORDAR SERVIDOR (KOYEB / RENDER)
+  // ----------------------------
   wakeServer = async () => {
     try {
       await axios.get(
         "https://alright-hetti-faculdade-49bca0ed.koyeb.app/health",
         { timeout: 5000 }
       );
-    } catch {
+    } catch (err) {
       // ignora erro
     }
   };
 
-  // ----------------------------------------
+  // ----------------------------
   // LOGIN
-  // ----------------------------------------
+  // ----------------------------
   login = async () => {
     const { username, password, loading } = this.state;
     if (loading) return;
 
     if (!username || !password) {
-      swal({ text: "Preencha usuário e senha", icon: "error" });
+      swal({
+        text: "Preencha usuário e senha",
+        icon: "error"
+      });
       return;
     }
 
     this.setState({ loading: true });
 
     try {
-      // 1️⃣ Acorda o Render
+      // 1️⃣ Acorda servidor
       await this.wakeServer();
 
-      // 2️⃣ Axios com timeout curto
+      // 2️⃣ Axios configurado
       const api = axios.create({
-        baseURL: "https://alright-hetti-faculdade-49bca0ed.koyeb.app/",
-        timeout: 4000
+        baseURL: "https://alright-hetti-faculdade-49bca0ed.koyeb.app",
+        timeout: 6000
       });
 
       // 3️⃣ Login
-      let response;
-      try {
-        response = await api.post("/login", { username, password });
-      } catch {
-        response = await api.post("/login", { username, password });
-      }
+      const response = await api.post("/login", {
+        username,
+        password
+      });
 
       // 4️⃣ Extrai dados
       const token = response?.data?.token;
-      const user = response?.data?.user;
+      const user = response?.data?.user || {};
 
-      const id = user?.id || response?.data?.id || response?.data?._id;
-      const role = user?.role || "user"; // fallback seguro
+      const id = user?.id || user?._id || response?.data?.id;
+      const role = user?.role || "user";
 
       if (!token) {
-        swal({ text: "Servidor respondeu sem token.", icon: "error" });
+        swal({
+          text: "Servidor respondeu sem token.",
+          icon: "error"
+        });
         this.setState({ loading: false });
         return;
       }
 
-      // 5️⃣ Salva no localStorage
+      // 5️⃣ Salva dados
       localStorage.setItem("token", token);
       if (id) localStorage.setItem("user_id", id);
       localStorage.setItem("role", role);
 
-      // 6️⃣ Feedback
-      swal({ text: "Login realizado com sucesso!", icon: "success" });
+      // 6️⃣ Sucesso
+      swal({
+        text: "Login realizado com sucesso!",
+        icon: "success"
+      });
 
       // 7️⃣ Redireciona
       this.props.history.push("/dashboard");
@@ -95,7 +106,8 @@ export default class Login extends Component {
     } catch (err) {
       swal({
         text:
-          err?.response?.data?.errorMessage ||
+          err?.response?.data?.error ||
+          err?.response?.data?.message ||
           "Erro ao logar. O servidor pode estar lento.",
         icon: "error"
       });
@@ -114,26 +126,25 @@ export default class Login extends Component {
 
           <TextField
             fullWidth
-            type="text"
-            autoComplete="off"
             name="username"
             value={username}
             onChange={this.onChange}
             placeholder="Usuário"
             margin="dense"
             disabled={loading}
+            autoComplete="off"
           />
 
           <TextField
             fullWidth
             type="password"
-            autoComplete="off"
             name="password"
             value={password}
             onChange={this.onChange}
             placeholder="Senha"
             margin="dense"
             disabled={loading}
+            autoComplete="off"
           />
 
           <div className="login-actions">
@@ -152,7 +163,7 @@ export default class Login extends Component {
             )}
 
             <Link href="/register" className="login-register-link">
-              Registro
+              Criar conta
             </Link>
           </div>
         </div>

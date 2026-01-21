@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import axios from "axios";
-import NovoEvento from "./NovoEvento";
 import "./Calendario.css";
+
+const API = "https://alright-hetti-faculdade-49bca0ed.koyeb.app";
 
 const Calendario = () => {
   const [eventos, setEventos] = useState([]);
@@ -13,37 +14,38 @@ const Calendario = () => {
   const [editEvento, setEditEvento] = useState(null);
 
   const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user"));
   const isLogado = !!token;
+  const isLeader = user?.role === "leader";
 
-  // 🔹 Normaliza data para yyyy-mm-dd
+  // 🔥 NORMALIZA DATA (SEM FUSO)
   const normalizarData = (data) => {
     if (!data) return "";
-    return new Date(data).toISOString().slice(0, 10);
+    return data.split("T")[0]; // YYYY-MM-DD
   };
 
-  // 🔓 Carregar todos os eventos do backend
+  // 🔄 CARREGAR EVENTOS
   const carregarEventos = async () => {
     try {
-      const res = await axios.get(
-        "https://alright-hetti-faculdade-49bca0ed.koyeb.app/eventos",
-        token
-          ? { headers: { Authorization: `Bearer ${token}` } }
-          : {}
-      );
+      const res = await axios.get(`${API}/eventos`);
+      const lista = Array.isArray(res.data) ? res.data : [];
 
-      const lista = Array.isArray(res.data)
-        ? res.data
-        : res.data.eventos || [];
-
-      const eventosNormalizados = lista.map((e) => ({
+      const normalizados = lista.map((e) => ({
         ...e,
         dataNormalizada: normalizarData(e.data),
       }));
 
-      setEventos(eventosNormalizados);
+      setEventos(normalizados);
+
+      if (dataSelecionada) {
+        setEventosDoDia(
+          normalizados.filter(
+            (e) => e.dataNormalizada === dataSelecionada
+          )
+        );
+      }
     } catch (err) {
       console.error("Erro ao carregar eventos", err);
-      setEventos([]);
     }
   };
 
@@ -51,34 +53,59 @@ const Calendario = () => {
     carregarEventos();
   }, []);
 
-  // 📅 Ao clicar em um dia
+  // 📅 CLIQUE NO DIA
   const onClickDay = (date) => {
-    const data = normalizarData(date);
-    const filtrados = eventos.filter((e) => e.dataNormalizada === data);
-    setDataSelecionada(date);
-    setEventosDoDia(filtrados);
+    const data = date.toISOString().split("T")[0];
+    setDataSelecionada(data);
+    setEventosDoDia(eventos.filter((e) => e.dataNormalizada === data));
     setEditEvento(null);
   };
 
-  // ✏️ Editar evento
-  const editarEvento = (evento) => {
-    setEditEvento({ ...evento });
+  // ➕ CRIAR EVENTO
+  const criarEvento = async (e) => {
+    e.preventDefault();
+
+    const titulo = e.target.titulo.value;
+    const descricao = e.target.descricao.value;
+    const data = e.target.data.value; // STRING YYYY-MM-DD
+
+    try {
+      await axios.post(
+        `${API}/eventos`,
+        { titulo, descricao, data },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      e.target.reset();
+      setMostrarFormulario(false);
+      carregarEventos();
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao criar evento");
+    }
   };
 
+  // ✏️ SALVAR EDIÇÃO
   const salvarEdicao = async () => {
     try {
       await axios.put(
-        `https://alright-hetti-faculdade-49bca0ed.koyeb.app/eventos/${editEvento._id}`,
+        `${API}/eventos/${editEvento._id}`,
         {
           titulo: editEvento.titulo,
           descricao: editEvento.descricao,
-          data: editEvento.data,
+          data: editEvento.dataNormalizada,
         },
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-      alert("Evento atualizado!");
+
       setEditEvento(null);
       carregarEventos();
     } catch (err) {
@@ -87,32 +114,30 @@ const Calendario = () => {
     }
   };
 
-  // 🗑️ Deletar evento
+  // 🗑️ DELETAR EVENTO
   const deletarEvento = async (id) => {
-    if (!window.confirm("Tem certeza que deseja excluir este evento?")) return;
+    if (!window.confirm("Deseja excluir este evento?")) return;
+
     try {
-      await axios.delete(
-        `https://alright-hetti-faculdade-49bca0ed.koyeb.app/eventos/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert("Evento deletado!");
+      await axios.delete(`${API}/eventos/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       setDataSelecionada(null);
       carregarEventos();
     } catch (err) {
       console.error(err);
-      alert("Erro ao deletar evento");
+      alert("Erro ao excluir evento");
     }
   };
 
-  // Verifica se usuário é líder (exemplo simples)
-  const isLeader = true; // você pode integrar com role real do backend
-
   return (
     <div className="calendario-container">
-      <h3>📅 Agenda da Igreja</h3>
+      <h3>📅 Agenda</h3>
 
-      {/* BOTÃO NOVO EVENTO */}
-      {isLogado && !editEvento && (
+      {isLogado && (
         <button
           className="btn-novo-evento"
           onClick={() => setMostrarFormulario(!mostrarFormulario)}
@@ -121,23 +146,27 @@ const Calendario = () => {
         </button>
       )}
 
-      {/* FORMULÁRIO NOVO EVENTO */}
-      {isLogado && mostrarFormulario && !editEvento && (
-        <NovoEvento
-          onEventoCriado={() => {
-            carregarEventos();
-            setMostrarFormulario(false);
-          }}
-        />
+      {/* FORM NOVO EVENTO */}
+      {isLogado && mostrarFormulario && (
+        <form className="form-evento" onSubmit={criarEvento}>
+          <input name="titulo" placeholder="Título" required />
+          <textarea name="descricao" placeholder="Descrição" />
+          <input type="date" name="data" required />
+          <button type="submit">Salvar</button>
+        </form>
       )}
 
       {/* CALENDÁRIO */}
       <Calendar
         onClickDay={onClickDay}
         tileClassName={({ date }) => {
-          const data = normalizarData(date);
-          if (normalizarData(new Date()) === data) return "dia-hoje";
-          return eventos.some((e) => e.dataNormalizada === data)
+          const d = date.toISOString().split("T")[0];
+
+          if (d === new Date().toISOString().split("T")[0]) {
+            return "dia-hoje";
+          }
+
+          return eventos.some((e) => e.dataNormalizada === d)
             ? "dia-com-evento"
             : null;
         }}
@@ -153,55 +182,73 @@ const Calendario = () => {
             className="calendario-modal"
             onClick={(e) => e.stopPropagation()}
           >
-            <h4>📆 {dataSelecionada.toLocaleDateString("pt-BR")}</h4>
+            <h4>
+              {new Date(dataSelecionada + "T00:00:00").toLocaleDateString(
+                "pt-BR"
+              )}
+            </h4>
 
-            {eventosDoDia.length === 0 ? (
-              <p>Nenhum evento neste dia.</p>
-            ) : (
-              eventosDoDia.map((evento) => (
-                <div key={evento._id} className="evento-item">
-                  {editEvento && editEvento._id === evento._id ? (
-                    <>
-                      <input
-                        type="text"
-                        value={editEvento.titulo}
-                        onChange={(e) =>
-                          setEditEvento({ ...editEvento, titulo: e.target.value })
-                        }
-                      />
-                      <textarea
-                        value={editEvento.descricao}
-                        onChange={(e) =>
-                          setEditEvento({ ...editEvento, descricao: e.target.value })
-                        }
-                      />
-                      <input
-                        type="date"
-                        value={editEvento.data}
-                        onChange={(e) =>
-                          setEditEvento({ ...editEvento, data: e.target.value })
-                        }
-                      />
+            {eventosDoDia.length === 0 && <p>Nenhum evento.</p>}
+
+            {eventosDoDia.map((evento) => (
+              <div key={evento._id} className="evento-item">
+                {editEvento?._id === evento._id ? (
+                  <>
+                    <input
+                      value={editEvento.titulo}
+                      onChange={(e) =>
+                        setEditEvento({
+                          ...editEvento,
+                          titulo: e.target.value,
+                        })
+                      }
+                    />
+
+                    <textarea
+                      value={editEvento.descricao}
+                      onChange={(e) =>
+                        setEditEvento({
+                          ...editEvento,
+                          descricao: e.target.value,
+                        })
+                      }
+                    />
+
+                    <input
+                      type="date"
+                      value={editEvento.dataNormalizada}
+                      onChange={(e) =>
+                        setEditEvento({
+                          ...editEvento,
+                          dataNormalizada: e.target.value,
+                        })
+                      }
+                    />
+
+                    <button onClick={salvarEdicao}>💾 Salvar</button>
+                    <button onClick={() => setEditEvento(null)}>
+                      ❌ Cancelar
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <strong>{evento.titulo}</strong>
+                    <p>{evento.descricao}</p>
+
+                    {isLeader && (
                       <div className="acoes-evento">
-                        <button onClick={salvarEdicao}>💾 Salvar</button>
-                        <button onClick={() => setEditEvento(null)}>❌ Cancelar</button>
+                        <button onClick={() => setEditEvento(evento)}>
+                          ✏️ Editar
+                        </button>
+                        <button onClick={() => deletarEvento(evento._id)}>
+                          🗑️ Excluir
+                        </button>
                       </div>
-                    </>
-                  ) : (
-                    <>
-                      <strong>{evento.titulo}</strong>
-                      <p>{evento.descricao}</p>
-                      {isLeader && (
-                        <div className="acoes-evento">
-                          <button onClick={() => editarEvento(evento)}>✏️ Editar</button>
-                          <button onClick={() => deletarEvento(evento._id)}>🗑️ Excluir</button>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              ))
-            )}
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
 
             <button onClick={() => setDataSelecionada(null)}>Fechar</button>
           </div>

@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./Calendario.css";
+
+const API = "https://alright-hetti-faculdade-49bca0ed.koyeb.app";
 
 const NovoEvento = ({ onEventoCriado }) => {
   const [form, setForm] = useState({
     titulo: "",
     descricao: "",
-    data: ""
+    data: "",
   });
+
+  const token = localStorage.getItem("token");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -14,21 +19,33 @@ const NovoEvento = ({ onEventoCriado }) => {
 
   const salvarEvento = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
-    if (!token) return alert("Você precisa estar logado como líder");
+
+    if (!token) {
+      alert("Você precisa estar logado");
+      return;
+    }
 
     try {
       await axios.post(
-        "https://alright-hetti-faculdade-49bca0ed.koyeb.app/eventos",
-        form,
+        `${API}/eventos`,
         {
-          headers: { Authorization: `Bearer ${token}` }
+          titulo: form.titulo,
+          descricao: form.descricao,
+          // 🔥 evita bug de fuso horário
+          data: new Date(form.data + "T00:00:00").toISOString(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
-      alert("Evento cadastrado com sucesso!");
       setForm({ titulo: "", descricao: "", data: "" });
-      onEventoCriado();
+
+      if (onEventoCriado) {
+        onEventoCriado();
+      }
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.errorMessage || "Erro ao cadastrar evento");
