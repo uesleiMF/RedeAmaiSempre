@@ -1,0 +1,135 @@
+/* ============================= */
+/* BOTÃO QUE ABRE O MODAL */
+/* ============================= */
+.qr-open-button {
+  padding: 14px 26px;
+  background: linear-gradient(135deg, #e91e63, #9c27b0);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 24px auto;   /* ✅ centralizado */
+  box-shadow: 0 8px 24px rgba(233, 30, 99, 0.4);
+  transition: all 0.25s ease;
+}
+
+
+.qr-open-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(233, 30, 99, 0.55);
+}
+
+.qr-open-button:active {
+  transform: scale(0.97);
+}
+
+/* ============================= */
+/* MODAL FUNDO */
+/* ============================= */
+.qr-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px); /* efeito premium */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* ============================= */
+/* CONTEÚDO DO MODAL */
+/* ============================= */
+.qr-modal-content {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px 20px;
+  width: 100%;
+  max-width: 360px;
+  position: relative;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  animation: fadeInScale 0.35s ease;
+}
+
+/* ============================= */
+/* BOTÃO FECHAR */
+/* ============================= */
+.qr-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  color: #777;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.qr-close:hover {
+  color: #e91e63;
+  transform: scale(1.2);
+}
+
+/* ============================= */
+/* ÁREA DO QR CODE */
+/* ============================= */
+.qr-box {
+  font-family: Arial, sans-serif;
+  background: #fafafa;
+  padding: 18px;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px #eee;
+}
+
+/* ============================= */
+/* TEXTO DO LINK */
+/* ============================= */
+.qr-link {
+  font-size: 12px;
+  margin-top: 12px;
+  word-break: break-all;
+  color: #666;
+}
+
+/* ============================= */
+/* BOTÃO DOWNLOAD */
+/* ============================= */
+.qr-download {
+  margin-top: 16px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(76, 175, 80, 0.4);
+  transition: all 0.25s ease;
+}
+
+.qr-download:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(76, 175, 80, 0.55);
+}
+
+/* ============================= */
+/* ANIMAÇÃO */
+/* ============================= */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

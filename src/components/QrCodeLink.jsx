@@ -1,47 +1,48 @@
 import QRCode from "react-qr-code";
 import { toPng } from "html-to-image";
 import { useRef, useState } from "react";
+import "./QrCode.css";
 
 export default function QrCode({
   path = "",
   size = 200,
-  label = "QR Code",
+  label = "📲 Acesse nosso site pelo QR Code",
   showModal = true,
   showDownload = true
 }) {
-  const baseUrl = process.env.REACT_APP_SITE_URL;
+  const baseUrl =
+    process.env.REACT_APP_SITE_URL || window.location.origin;
 
   const fullUrl = `${baseUrl}${path}`;
 
-  const ref = useRef();
+  const ref = useRef(null);
   const [open, setOpen] = useState(false);
 
   const baixar = async () => {
-    const dataUrl = await toPng(ref.current, {
-      skipFonts: true
-    });
+    try {
+      const dataUrl = await toPng(ref.current, {
+        skipFonts: true
+      });
 
-    const link = document.createElement("a");
-    link.download = "qrcode.png";
-    link.href = dataUrl;
-    link.click();
+      const link = document.createElement("a");
+      link.download = "qrcode.png";
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error("Erro ao gerar QR Code:", err);
+    }
   };
 
   const ConteudoQr = () => (
-    <div
-      ref={ref}
-      style={{
-        fontFamily: "Arial, sans-serif",
-        background: "#fff",
-        padding: 16,
-        borderRadius: 8,
-        textAlign: "center"
-      }}
-    >
+    <div className="qr-box" ref={ref}>
       <QRCode value={fullUrl} size={size} />
-      <p style={{ fontSize: 12, marginTop: 8 }}>
-        {fullUrl}
-      </p>
+      <p className="qr-link">{fullUrl}</p>
+
+      {showDownload && (
+        <button className="qr-download" onClick={baixar}>
+          💾 Baixar QR Code
+        </button>
+      )}
     </div>
   );
 
@@ -49,7 +50,10 @@ export default function QrCode({
     <>
       {showModal ? (
         <>
-          <button onClick={() => setOpen(true)}>
+          <button
+            className="qr-open-button"
+            onClick={() => setOpen(true)}
+          >
             {label}
           </button>
 
@@ -59,7 +63,13 @@ export default function QrCode({
                 className="qr-modal-content"
                 onClick={(e) => e.stopPropagation()}
               >
-                <button onClick={() => setOpen(false)}>×</button>
+                <button
+                  className="qr-close"
+                  onClick={() => setOpen(false)}
+                >
+                  ×
+                </button>
+
                 <ConteudoQr />
               </div>
             </div>
