@@ -122,6 +122,31 @@
 }
 
 /* ===============================
+   BOTÃO LOGOUT
+================================ */
+.btn-logout {
+  margin-bottom: 12px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  background: linear-gradient(135deg, #c62828, #ff5252);
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-logout:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(198, 40, 40, 0.55);
+}
+
+
+
+
+
+/* ===============================
    MOBILE
 ================================ */
 @media (max-height: 600px) {

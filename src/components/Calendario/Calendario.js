@@ -27,6 +27,16 @@ const Calendario = () => {
 
   const normalizarData = (data) => data?.split("T")[0];
 
+  // 🚪 LOGOUT
+  const handleLogout = () => {
+    if (!window.confirm("Deseja realmente sair?")) return;
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    window.location.reload();
+  };
+
   // 🔄 CARREGAR EVENTOS
   const carregarEventos = async () => {
     const res = await axios.get(`${API}/eventos`);
@@ -131,13 +141,27 @@ const Calendario = () => {
     <div className="calendario-container">
       <h3>📅 Agenda</h3>
 
+      {/* 🔐 USUÁRIO LOGADO */}
       {isLogado && (
-        <button
-          className="btn-novo-evento"
-          onClick={() => setMostrarFormulario(!mostrarFormulario)}
-        >
-          {mostrarFormulario ? "Cancelar" : "Novo Evento"}
-        </button>
+        <>
+          <p className="usuario-logado">
+            👤 {user?.nome || "Usuário logado"}
+          </p>
+
+          <button
+            className="btn-novo-evento"
+            onClick={() => setMostrarFormulario(!mostrarFormulario)}
+          >
+            {mostrarFormulario ? "Cancelar" : "Novo Evento"}
+          </button>
+
+          <button
+            className="btn-logout"
+            onClick={handleLogout}
+          >
+            🚪 Sair
+          </button>
+        </>
       )}
 
       {isLogado && mostrarFormulario && (
