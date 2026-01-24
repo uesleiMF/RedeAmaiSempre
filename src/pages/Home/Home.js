@@ -4,6 +4,7 @@ import { BsFillGeoAltFill } from "react-icons/bs";
 import { GrInstagram } from "react-icons/gr";
 import { FaFacebookSquare } from "react-icons/fa";
 import Typewriter from "typewriter-effect";
+import QrCode from "../../components/QrCodeLink.jsx";
 
 import Calendario from "../../components/Calendario/Calendario";
 
@@ -20,7 +21,7 @@ import c9 from "../../components/Img/c9.jpg";
 import ieq from "../../components/Img/ieq2.jpg";
 import bi from "../bib.gif";
 import c00 from "../../components/Img/c00.jpg";
-import qr from "../../components/Img/qr.png";
+
 
 import "./home.css";
 
@@ -215,7 +216,11 @@ export default function Home() {
       <section className="card mt-5 mb-5 home-card social-card shadow-lg border-0 text-center">
         <h3 className="my-4">CONHEÇAM NOSSA PAGINA</h3>
         <h4 className="my-4">E NOSSAS MÍDIAS SOCIAIS</h4>
-        <img src={qr} alt="QR Code Rede Amai Sempre" loading="lazy" />
+        <QrCode
+  path="/" 
+  label="QR Code do Site"
+/>
+
         <div className="social-area mb-4">
           <a
             href="https://www.facebook.com/ministerio.amai7"

@@ -13,39 +13,34 @@ const Calendario = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [editEvento, setEditEvento] = useState(null);
 
+  // 🔐 AUTH
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user"));
+
   const isLogado = !!token;
   const isLeader = user?.role === "leader";
 
-  // 🔥 NORMALIZA DATA (SEM FUSO)
-  const normalizarData = (data) => {
-    if (!data) return "";
-    return data.split("T")[0]; // YYYY-MM-DD
-  };
+  console.log("USER:", user);
+  console.log("ROLE:", user?.role);
+  console.log("IS LEADER:", isLeader);
 
-  // 🔄 CARREGAR EVENTOS
+  const normalizarData = (data) => data?.split("T")[0];
+
   const carregarEventos = async () => {
-    try {
-      const res = await axios.get(`${API}/eventos`);
-      const lista = Array.isArray(res.data) ? res.data : [];
+    const res = await axios.get(`${API}/eventos`);
+    const lista = res.data || [];
 
-      const normalizados = lista.map((e) => ({
-        ...e,
-        dataNormalizada: normalizarData(e.data),
-      }));
+    const normalizados = lista.map((e) => ({
+      ...e,
+      dataNormalizada: normalizarData(e.data)
+    }));
 
-      setEventos(normalizados);
+    setEventos(normalizados);
 
-      if (dataSelecionada) {
-        setEventosDoDia(
-          normalizados.filter(
-            (e) => e.dataNormalizada === dataSelecionada
-          )
-        );
-      }
-    } catch (err) {
-      console.error("Erro ao carregar eventos", err);
+    if (dataSelecionada) {
+      setEventosDoDia(
+        normalizados.filter(e => e.dataNormalizada === dataSelecionada)
+      );
     }
   };
 
@@ -53,84 +48,56 @@ const Calendario = () => {
     carregarEventos();
   }, []);
 
-  // 📅 CLIQUE NO DIA
   const onClickDay = (date) => {
     const data = date.toISOString().split("T")[0];
     setDataSelecionada(data);
-    setEventosDoDia(eventos.filter((e) => e.dataNormalizada === data));
+    setEventosDoDia(eventos.filter(e => e.dataNormalizada === data));
     setEditEvento(null);
   };
 
-  // ➕ CRIAR EVENTO
   const criarEvento = async (e) => {
     e.preventDefault();
 
-    const titulo = e.target.titulo.value;
-    const descricao = e.target.descricao.value;
-    const data = e.target.data.value; // STRING YYYY-MM-DD
+    await axios.post(
+      `${API}/eventos`,
+      {
+        titulo: e.target.titulo.value,
+        descricao: e.target.descricao.value,
+        data: e.target.data.value
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-    try {
-      await axios.post(
-        `${API}/eventos`,
-        { titulo, descricao, data },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      e.target.reset();
-      setMostrarFormulario(false);
-      carregarEventos();
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao criar evento");
-    }
+    e.target.reset();
+    setMostrarFormulario(false);
+    carregarEventos();
   };
 
-  // ✏️ SALVAR EDIÇÃO
   const salvarEdicao = async () => {
-    try {
-      await axios.put(
-        `${API}/eventos/${editEvento._id}`,
-        {
-          titulo: editEvento.titulo,
-          descricao: editEvento.descricao,
-          data: editEvento.dataNormalizada,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    await axios.put(
+      `${API}/eventos/${editEvento._id}`,
+      {
+        titulo: editEvento.titulo,
+        descricao: editEvento.descricao,
+        data: editEvento.dataNormalizada
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-      setEditEvento(null);
-      carregarEventos();
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao atualizar evento");
-    }
+    setEditEvento(null);
+    carregarEventos();
   };
 
-  // 🗑️ DELETAR EVENTO
   const deletarEvento = async (id) => {
     if (!window.confirm("Deseja excluir este evento?")) return;
 
-    try {
-      await axios.delete(`${API}/eventos/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    await axios.delete(
+      `${API}/eventos/${id}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-      setDataSelecionada(null);
-      carregarEventos();
-    } catch (err) {
-      console.error(err);
-      alert("Erro ao excluir evento");
-    }
+    setDataSelecionada(null);
+    carregarEventos();
   };
 
   return (
@@ -138,97 +105,45 @@ const Calendario = () => {
       <h3>📅 Agenda</h3>
 
       {isLogado && (
-        <button
-          className="btn-novo-evento"
-          onClick={() => setMostrarFormulario(!mostrarFormulario)}
-        >
-          {mostrarFormulario ? "❌ Cancelar" : "➕ Novo Evento"}
+        <button onClick={() => setMostrarFormulario(!mostrarFormulario)}>
+          {mostrarFormulario ? "Cancelar" : "Novo Evento"}
         </button>
       )}
 
-      {/* FORM NOVO EVENTO */}
       {isLogado && mostrarFormulario && (
-        <form className="form-evento" onSubmit={criarEvento}>
-          <input name="titulo" placeholder="Título" required />
-          <textarea name="descricao" placeholder="Descrição" />
+        <form onSubmit={criarEvento}>
+          <input name="titulo" required />
+          <textarea name="descricao" />
           <input type="date" name="data" required />
           <button type="submit">Salvar</button>
         </form>
       )}
 
-      {/* CALENDÁRIO */}
-      <Calendar
-        onClickDay={onClickDay}
-        tileClassName={({ date }) => {
-          const d = date.toISOString().split("T")[0];
+      <Calendar onClickDay={onClickDay} />
 
-          if (d === new Date().toISOString().split("T")[0]) {
-            return "dia-hoje";
-          }
-
-          return eventos.some((e) => e.dataNormalizada === d)
-            ? "dia-com-evento"
-            : null;
-        }}
-      />
-
-      {/* MODAL */}
       {dataSelecionada && (
-        <div
-          className="calendario-modal-overlay"
-          onClick={() => setDataSelecionada(null)}
-        >
-          <div
-            className="calendario-modal"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h4>
-              {new Date(dataSelecionada + "T00:00:00").toLocaleDateString(
-                "pt-BR"
-              )}
-            </h4>
+        <div className="calendario-modal-overlay">
+          <div className="calendario-modal">
+            <h4>{dataSelecionada}</h4>
 
-            {eventosDoDia.length === 0 && <p>Nenhum evento.</p>}
-
-            {eventosDoDia.map((evento) => (
-              <div key={evento._id} className="evento-item">
+            {eventosDoDia.map(evento => (
+              <div key={evento._id}>
                 {editEvento?._id === evento._id ? (
                   <>
                     <input
                       value={editEvento.titulo}
-                      onChange={(e) =>
-                        setEditEvento({
-                          ...editEvento,
-                          titulo: e.target.value,
-                        })
+                      onChange={e =>
+                        setEditEvento({ ...editEvento, titulo: e.target.value })
                       }
                     />
-
                     <textarea
                       value={editEvento.descricao}
-                      onChange={(e) =>
-                        setEditEvento({
-                          ...editEvento,
-                          descricao: e.target.value,
-                        })
+                      onChange={e =>
+                        setEditEvento({ ...editEvento, descricao: e.target.value })
                       }
                     />
-
-                    <input
-                      type="date"
-                      value={editEvento.dataNormalizada}
-                      onChange={(e) =>
-                        setEditEvento({
-                          ...editEvento,
-                          dataNormalizada: e.target.value,
-                        })
-                      }
-                    />
-
-                    <button onClick={salvarEdicao}>💾 Salvar</button>
-                    <button onClick={() => setEditEvento(null)}>
-                      ❌ Cancelar
-                    </button>
+                    <button onClick={salvarEdicao}>Salvar</button>
+                    <button onClick={() => setEditEvento(null)}>Cancelar</button>
                   </>
                 ) : (
                   <>
@@ -236,14 +151,14 @@ const Calendario = () => {
                     <p>{evento.descricao}</p>
 
                     {isLeader && (
-                      <div className="acoes-evento">
+                      <>
                         <button onClick={() => setEditEvento(evento)}>
-                          ✏️ Editar
+                          Editar
                         </button>
                         <button onClick={() => deletarEvento(evento._id)}>
-                          🗑️ Excluir
+                          Excluir
                         </button>
-                      </div>
+                      </>
                     )}
                   </>
                 )}
