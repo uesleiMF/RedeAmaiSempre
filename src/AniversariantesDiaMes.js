@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import axios from "axios";
 
-const BASE_URL = "https://alright-hetti-faculdade-49bca0ed.koyeb.app";
+const BASE_URL = "https://backtestmar.onrender.com";
 
 export default function AniversariantesDiaMes({ token, onLoad }) {
 

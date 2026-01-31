@@ -19,7 +19,7 @@ import "./ListaChamadas.css";
 import AniversariantesDiaMes from "./AniversariantesDiaMes";
 
 export default function ListaChamadas({ token }) {
-  const BASE_URL = "https://alright-hetti-faculdade-49bca0ed.koyeb.app";
+  const BASE_URL = "https://backtestmar.onrender.com";
   const [students, setStudents] = useState([]);
   const [name, setName] = useState("");
   const [selectedDate, setSelectedDate] = useState("");

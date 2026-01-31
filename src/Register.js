@@ -52,7 +52,7 @@ export default class Register extends Component {
     try {
       // ✅ NÃO cria variável não utilizada (evita erro no build)
       await axios.post(
-        "https://alright-hetti-faculdade-49bca0ed.koyeb.app/register",
+        "https://backtestmar.onrender.com/register",
         { username, password },
         { timeout: 25000 }
       );
