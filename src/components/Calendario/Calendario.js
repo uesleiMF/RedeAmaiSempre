@@ -4,7 +4,7 @@ import "react-calendar/dist/Calendar.css";
 import axios from "axios";
 import "./Calendario.css";
 
-const API = "hhttps://backtestmar.onrender.com";
+const API = "https://backtestmar.onrender.com";
 
 // 📅 FORMATA DATA PARA DD/MM/AAAA
 const formatarData = (dataISO) => {
