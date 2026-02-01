@@ -18,6 +18,11 @@ import GetAppIcon from "@material-ui/icons/GetApp";
 import "./ListaChamadas.css";
 import AniversariantesDiaMes from "./AniversariantesDiaMes";
 
+import logo1 from "../src/components/Img/ieq2.jpg"; 
+import logo2 from "../src/components/Img/c0.jpg"; 
+
+
+
 export default function ListaChamadas({ token }) {
   const BASE_URL = "https://backtestmar.onrender.com";
   const [students, setStudents] = useState([]);
@@ -180,9 +185,25 @@ export default function ListaChamadas({ token }) {
     const marginLeft = 14;
     const labelWidth = 48;
 
+    // ===== LOGOS =====
+  const imgWidth = 30;
+  const imgHeight = 30;
+
+  doc.addImage(logo1, "PNG", marginLeft, startY, imgWidth, imgHeight); // esquerda
+  doc.addImage(logo2, "PNG", width - imgWidth - marginLeft, startY, imgWidth, imgHeight); // direita
+  startY += imgHeight + 10;
+
+
+doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(`IGREJA DO EVANGELIO QUADRANGULAR (IEQ)`, width / 2, startY, { align: "center" });
+ startY += 12;
+
+
+
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.text(`CELULA DE CASAIS - ${formatDateBR(selectedDate)}`, width / 2, startY, { align: "center" });
+    doc.text(`CELULA DE CASAIS - (AMAI) - ${formatDateBR(selectedDate)}`, width / 2, startY, { align: "center" });
     startY += 12;
 
     const addLabel = (label, value) => {
