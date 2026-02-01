@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../../api/api";
 import "./Calendario.css";
-
-const API = "https://backtestmar.onrender.com";
 
 const NovoEvento = ({ onEventoCriado }) => {
   const [form, setForm] = useState({
@@ -11,44 +9,44 @@ const NovoEvento = ({ onEventoCriado }) => {
     data: "",
   });
 
-  const token = localStorage.getItem("token");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const salvarEvento = async (e) => {
     e.preventDefault();
+    if (loading) return;
 
-    if (!token) {
-      alert("Você precisa estar logado");
-      return;
-    }
+    setLoading(true);
 
     try {
-      await axios.post(
-        `${API}/eventos`,
-        {
-          titulo: form.titulo,
-          descricao: form.descricao,
-          // 🔥 evita bug de fuso horário
-          data: new Date(form.data + "T00:00:00").toISOString(),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.post("/eventos", {
+        titulo: form.titulo,
+        descricao: form.descricao,
+        // ✅ ENVIA YYYY-MM-DD (SEM FUSO)
+        data: form.data,
+      });
 
       setForm({ titulo: "", descricao: "", data: "" });
 
       if (onEventoCriado) {
-        onEventoCriado();
+        onEventoCriado(); // 🔄 força recarregar eventos no calendário
       }
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.errorMessage || "Erro ao cadastrar evento");
+      console.error("Erro ao criar evento:", err);
+
+      alert(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Erro ao cadastrar evento"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,7 +78,9 @@ const NovoEvento = ({ onEventoCriado }) => {
         required
       />
 
-      <button type="submit">Salvar</button>
+      <button type="submit" disabled={loading}>
+        {loading ? "Salvando..." : "Salvar"}
+      </button>
     </form>
   );
 };
