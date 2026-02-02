@@ -1,38 +1,38 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import axios from "axios";
 
 const BASE_URL = "https://backtestmar.onrender.com";
 
 export default function AniversariantesDiaMes({ token, onLoad }) {
 
-  // Extrai dia e mês de uma data (string ISO ou yyyy-mm-dd) de forma segura
-  const getDayMonth = (birthDate) => {
+  // Extrai dia e mês de uma data de forma segura
+  const getDayMonth = useCallback((birthDate) => {
     if (!birthDate) return null;
     const dateStr = typeof birthDate === "string" ? birthDate.split("T")[0] : null;
     if (!dateStr) return null;
     const [year, month, day] = dateStr.split("-").map(Number);
     if (!year || !month || !day) return null;
     return { day, month };
-  };
+  }, []);
 
-  // Verifica aniversário hoje
-  const isBirthdayToday = (birthDate) => {
+  // Verifica aniversário hoje (considerando UTC)
+  const isBirthdayToday = useCallback((birthDate) => {
     const dm = getDayMonth(birthDate);
     if (!dm) return false;
     const today = new Date();
-    return today.getDate() === dm.day && today.getMonth() + 1 === dm.month;
-  };
+    return today.getUTCDate() === dm.day && today.getUTCMonth() + 1 === dm.month;
+  }, [getDayMonth]);
 
   // Verifica aniversário neste mês (exceto hoje)
-  const isBirthdayThisMonth = (birthDate) => {
+  const isBirthdayThisMonth = useCallback((birthDate) => {
     const dm = getDayMonth(birthDate);
     if (!dm) return false;
     const today = new Date();
-    return today.getMonth() + 1 === dm.month && !isBirthdayToday(birthDate);
-  };
+    return today.getUTCMonth() + 1 === dm.month && !isBirthdayToday(birthDate);
+  }, [getDayMonth, isBirthdayToday]);
 
-  // Notificação
-  const notifyBirthday = (nome) => {
+  // Notificação segura (desktop ou celular)
+  const notifyBirthday = useCallback((nome) => {
     if (typeof Notification === "undefined") return;
     if (Notification.permission === "granted") {
       new Notification("Aniversariante do Dia 🎉", { body: nome });
@@ -41,14 +41,15 @@ export default function AniversariantesDiaMes({ token, onLoad }) {
         if (perm === "granted") new Notification("Aniversariante do Dia 🎉", { body: nome });
       });
     }
-  };
+  }, []);
 
-  const sendNotificationsOncePerDay = (dia) => {
+  // Notifica apenas uma vez por dia
+  const sendNotificationsOncePerDay = useCallback((dia) => {
     const todayKey = `birthday_notified_${new Date().toISOString().slice(0, 10)}`;
     if (localStorage.getItem(todayKey)) return;
     dia.forEach((a) => notifyBirthday(a.name || "Alguém"));
     localStorage.setItem(todayKey, "true");
-  };
+  }, [notifyBirthday]);
 
   useEffect(() => {
     if (!token) return;
