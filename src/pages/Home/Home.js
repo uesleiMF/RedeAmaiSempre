@@ -56,7 +56,7 @@ export default function Home() {
   const carouselImages = [c0, c1, c2, c3, c4, c5, c6, c7, c8, c9];
 
   const celulas = [
-    { img: c1, endereco: "FOLHA 10 QUADRA 00 LOTE 00" },
+    { img: c1, endereco: "FOLHA 23 QUADRA 04 LOTE 02" },
     { img: c2, endereco: "FOLHA 11 QUADRA 02 LOTE 15" },
     { img: c3, endereco: "FOLHA 08 QUADRA 05 LOTE 25" },
     { img: c4, endereco: "FOLHA 20 QUADRA 03 LOTE 30" },
@@ -197,7 +197,7 @@ export default function Home() {
                     <h5>UM SÓ PROPÓSITO</h5>
                     <p>{celula.endereco}</p>
                     <a
-                      href="https://maps.app.goo.gl/KQioa7b9PYGUQrYTA?g_st=am"
+                      href="https://maps.app.goo.gl/yVWqQsfa7N3KhxXU9?g_st=aw"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="icon-map"
