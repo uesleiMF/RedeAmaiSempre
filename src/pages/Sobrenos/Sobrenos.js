@@ -6,10 +6,10 @@ import c2 from "../../components/Img/c0.jpg";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Sobrenos.css";
 
-import g1 from "../../components/Img/c1.jpg";
-import g2 from "../../components/Img/c2.jpg";
-import g3 from "../../components/Img/c3.jpg";
-import g4 from "../../components/Img/c4.jpg";
+import g1 from "../../components/Img/c0.jpg";
+import g2 from "../../components/Img/c00.jpg";
+import g3 from "../../components/Img/c000.jpg";
+import g4 from "../../components/Img/c0.jpg";
 
 export default function Sobrenos() {
   const linkZap = "https://api.whatsapp.com/send?phone=5591982390708";

@@ -9,18 +9,18 @@ import QrCode from "../../components/QrCodeLink.jsx";
 import Calendario from "../../components/Calendario/Calendario";
 
 import c0 from "../../components/Img/c0.jpg";
-import c1 from "../../components/Img/c1.jpg";
-import c2 from "../../components/Img/c2.jpg";
-import c3 from "../../components/Img/c3.jpg";
-import c4 from "../../components/Img/c4.jpg";
-import c5 from "../../components/Img/c5.jpg";
-import c6 from "../../components/Img/c6.jpg";
-import c7 from "../../components/Img/c7.jpg";
-import c8 from "../../components/Img/c8.jpg";
-import c9 from "../../components/Img/c9.jpg";
+import c1 from "../../components/Img/USP.jpg";
+import c2 from "../../components/Img/AlE.jpg";
+import c3 from "../../components/Img/FA.jpg";
+import c4 from "../../components/Img/FP.jpg";
+import c5 from "../../components/Img/LL.jpg";
+import c6 from "../../components/Img/PA.jpg";
+import c7 from "../../components/Img/Rec.jpg";
+import c8 from "../../components/Img/Somos1.jpg";
+import c9 from "../../components/Img/70x7.jpg";
 import ieq from "../../components/Img/ieq2.jpg";
 import bi from "../bib.gif";
-import c00 from "../../components/Img/c00.jpg";
+import c00 from "../../components/Img/c0.jpg";
 
 
 import "./home.css";
@@ -197,7 +197,7 @@ export default function Home() {
                     <h5>UM SÓ PROPÓSITO</h5>
                     <p>{celula.endereco}</p>
                     <a
-                      href="https://maps.app.goo.gl/e9p6hr2WNqNPU19V9"
+                      href="https://maps.app.goo.gl/KQioa7b9PYGUQrYTA?g_st=am"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="icon-map"

@@ -176,75 +176,65 @@ export default function ListaChamadas({ token }) {
     setAniverDia(mapear(dia));
     setAniverMes(mapear(mes));
   };
+// ================= EXPORTAR PDF ====================
+const exportPDF = () => {
+  const doc = new jsPDF();
+  const width = doc.internal.pageSize.getWidth();
+  const marginLeft = 14;
 
-  // ================= EXPORTAR PDF ====================
-  const exportPDF = () => {
-    const doc = new jsPDF();
-    const width = doc.internal.pageSize.getWidth();
-    let startY = 20;
-    const marginLeft = 14;
-    const labelWidth = 48;
-
-    // ===== LOGOS =====
+  // ===== LOGOS =====
   const imgWidth = 30;
   const imgHeight = 30;
+  const logosY = 20;
 
-  doc.addImage(logo1, "PNG", marginLeft, startY, imgWidth, imgHeight); // esquerda
-  doc.addImage(logo2, "PNG", width - imgWidth - marginLeft, startY, imgWidth, imgHeight); // direita
-  startY += imgHeight + 10;
+  // Logo esquerda
+  doc.addImage(logo1, "PNG", marginLeft, logosY, imgWidth, imgHeight);
 
+  // Logo direita
+  doc.addImage(
+    logo2,
+    "PNG",
+    width - imgWidth - marginLeft,
+    logosY,
+    imgWidth,
+    imgHeight
+  );
 
-doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text(`IGREJA DO EVANGELIO QUADRANGULAR (IEQ)`, width / 2, startY, { align: "center" });
- startY += 12;
+  // ===== TÍTULO ENTRE AS LOGOS =====
+  const centerY = logosY + imgHeight / 2;
 
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.text("RELATÓRIO", width / 2, centerY + 5, { align: "center" });
 
+  // ===== SUBTÍTULOS =====
+  let startY = logosY + imgHeight + 15;
 
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text(`CELULA DE CASAIS - (AMAI) - ${formatDateBR(selectedDate)}`, width / 2, startY, { align: "center" });
-    startY += 12;
+  doc.setFontSize(14);
+doc.setFont("helvetica", "bold");
 
-    const addLabel = (label, value) => {
-      doc.setFont("helvetica", "bold");
-      doc.text(label, marginLeft, startY);
-      doc.setFont("helvetica", "normal");
-      doc.text(value || "Não informado", marginLeft + labelWidth, startY);
-      startY += 7;
-    };
+doc.text(
+  [
+    "IGREJA DO EVANGELHO",
+    "QUADRANGULAR (IEQ)"
+  ],
+  width / 2,
+  startY,
+  { align: "center" }
+);
 
-    addLabel("CÉLULA:", nomeCelula);
-    addLabel("HORÁRIO:", `${horaInicio || ""}${horaInicio && horaFim ? " - " : ""}${horaFim || ""}`);
-    addLabel("TEMA:", tema);
-    addLabel("DINÂMICA:", dinamica);
-    addLabel("LOUVOR:", louvor);
-    startY += 10;
+startY += 14; // espaço depois das duas linhas
 
-    // ===== Lista de casais =====
-    if (students.length > 0) {
-      if (startY > doc.internal.pageSize.getHeight() - 50) {
-        doc.addPage();
-        startY = 20;
-      }
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(14);
-      doc.text("CASAIS PRESENTES", width / 2, startY, { align: "center" });
-      startY += 8;
+  doc.setFontSize(12);
+  doc.text(
+    `CÉLULA DE CASAIS - (AMAI) - ${formatDateBR(selectedDate)}`,
+    width / 2,
+    startY,
+    { align: "center" }
+  );
 
-      autoTable(doc, {
-        head: [["#", "Casal", "Presença"]],
-        body: students.map((s, i) => [i + 1, s.nome, s.presenca ? "Presente" : "Ausente"]),
-        startY,
-        didParseCell: (data) => {
-          if (data.column.index === 2) {
-            data.cell.styles.fillColor = data.cell.raw === "Presente" ? [144, 238, 144] : [255, 182, 193];
-          }
-        },
-        margin: { left: marginLeft, right: marginLeft },
-      });
-      startY = doc.lastAutoTable.finalY + 10;
-    }
+  startY += 15;
+
 
     // ===== Aniversariantes do dia e do mês =====
     const gerarTabelaAniversariantes = (titulo, lista) => {
