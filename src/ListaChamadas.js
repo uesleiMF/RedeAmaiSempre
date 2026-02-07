@@ -73,7 +73,7 @@ export default function ListaChamadas({ token }) {
         if (res.data.status) setNameHistory(res.data.history || []);
       })
       .catch((err) => console.log("Erro buscar histórico:", err));
-  }, [token, authHeaders]);
+  }, [token, authHeaders, BASE_URL]);
 
   const saveNameToHistory = (nome) => {
     if (!nome || !token) return;
@@ -86,7 +86,7 @@ export default function ListaChamadas({ token }) {
   };
 
   const deleteNameFromHistory = (nome, e) => {
-    if (e && e.stopPropagation) e.stopPropagation();
+    if (e && e.stopPropagation) e.stopPropagation(); // importante para não disparar setName
     if (!token) return;
     axios
       .delete(`${BASE_URL}/history/delete/${encodeURIComponent(nome)}`, { headers: authHeaders() })
@@ -179,8 +179,7 @@ export default function ListaChamadas({ token }) {
     setAniverDia(mapear(dia));
     setAniverMes(mapear(mes));
   };
-
-  // ================= EXPORTAR PDF ====================
+// ================= EXPORTAR PDF PROFISSIONAL ====================
 const exportPDF = () => {
   const doc = new jsPDF();
   const width = doc.internal.pageSize.getWidth();
@@ -188,30 +187,26 @@ const exportPDF = () => {
   const marginLeft = 14;
 
   // ===== LOGOS =====
-  const imgWidth = 30;
-  const imgHeight = 30;
-  const logosY = 20;
-doc.addImage(logo1, "JPEG", marginLeft, logosY, imgWidth, imgHeight);
+  const imgWidth = 20;
+  const imgHeight = 20;
+  const drawLogos = (yPos = 5) => {
+    doc.addImage(logo1, "JPEG", marginLeft, yPos, imgWidth, imgHeight);
+    doc.addImage(logo2, "JPEG", width - imgWidth - marginLeft, yPos, imgWidth, imgHeight);
+  };
 
-doc.addImage(
-  logo2,
-  "JPEG",
-  width - imgWidth - marginLeft,
-  logosY,
-  imgWidth,
-  imgHeight
-);
-
+  // ===== START Y =====
+  let startY = 20;
+  drawLogos(startY);
 
   // ===== TÍTULO =====
-  const centerY = logosY + imgHeight / 2;
+  const centerY = startY + imgHeight / 2;
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
   doc.text("RELATÓRIO", width / 2, centerY + 5, { align: "center" });
 
-  // ===== SUBTÍTULOS =====
-  let startY = logosY + imgHeight + 15;
+  startY += imgHeight + 15;
 
+  // ===== SUBTÍTULOS =====
   doc.setFontSize(14);
   doc.text(
     ["IGREJA DO EVANGELHO", "QUADRANGULAR", "(IEQ / SEDE)"],
@@ -219,7 +214,6 @@ doc.addImage(
     startY,
     { align: "center", lineHeightFactor: 1.4 }
   );
-
   startY += 30;
 
   doc.setFontSize(12);
@@ -229,18 +223,22 @@ doc.addImage(
     startY,
     { align: "center" }
   );
-
   startY += 18;
+
+  // ===== FUNÇÃO PARA QUEBRA DE PÁGINA =====
+  const ensureSpace = (neededHeight) => {
+    if (startY + neededHeight > height - 20) {
+      doc.addPage();
+      startY = 20;
+      drawLogos(startY); // redesenhar logos em nova página
+      startY += imgHeight + 10;
+    }
+  };
 
   // ===== DADOS =====
   const labelWidth = 45;
-
   const addLabel = (label, value) => {
-    if (startY > height - 30) {
-      doc.addPage();
-      startY = 20;
-    }
-
+    ensureSpace(10);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.text(label, marginLeft, startY);
@@ -259,115 +257,61 @@ doc.addImage(
   addLabel("TEMA:", tema);
   addLabel("DINÂMICA:", dinamica);
   addLabel("LOUVOR:", louvor);
-
   startY += 10;
 
-// ===== CASAIS PRESENTES =====
-const presentes = students.filter(s => s.presenca);
-const ausentes = students.filter(s => !s.presenca);
-const total = students.length;
+  // ===== CASAIS =====
+  const presentes = students.filter(s => s.presenca);
+  const ausentes = students.filter(s => !s.presenca);
+  const total = students.length;
 
-// ===============================
-// PRESENTES
-// ===============================
-if (presentes.length > 0) {
-  if (startY > height - 70) {
-    doc.addPage();
-    startY = 20;
-  }
+  // ===== FUNÇÃO PARA GERAR TABELA =====
+  const gerarTabela = (titulo, lista, color, showPercentual = true) => {
+    if (lista.length === 0) return;
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.text("CASAIS PRESENTES NA REUNIÃO", width / 2, startY, { align: "center" });
-  startY += 8;
+    ensureSpace(30);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text(titulo, width / 2, startY, { align: "center" });
+    startY += 8;
 
-  autoTable(doc, {
-    head: [["#", "Casal"]],
-    body: presentes.map((s, i) => [i + 1, s.nome]),
-    startY: startY,
-    margin: { left: marginLeft, right: marginLeft },
-    styles: {
-      fontSize: 11,
-      textColor: [0, 102, 204], // 🔵 Azul
-    },
-    headStyles: {
-      fillColor: [200, 200, 200],
-      textColor: 0,
-    },
-  });
+    ensureSpace(lista.length * 8 + 30);
 
-  startY = doc.lastAutoTable.finalY + 6;
+    autoTable(doc, {
+      head: [["#", "Casal"]],
+      body: lista.map((s, i) => [i + 1, s.nome]),
+      startY,
+      margin: { left: marginLeft, right: marginLeft },
+      styles: { fontSize: 11, textColor: color },
+      headStyles: { fillColor: [200, 200, 200], textColor: 0 },
+      theme: 'grid',
+      didDrawPage: (data) => {
+        drawLogos(20); // redesenha logos no topo em páginas quebradas
+      },
+    });
 
-  const totalPresentes = presentes.length;
-  const percentualPresentes =
-    total > 0 ? ((totalPresentes / total) * 100).toFixed(0) : 0;
+    startY = doc.lastAutoTable.finalY + 6;
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.text(
-    `Total de Casais Presentes: ${totalPresentes} de ${total} (${percentualPresentes}%)`,
-    marginLeft,
-    startY
-  );
+    if (showPercentual) {
+      const percentual = total > 0 ? ((lista.length / total) * 100).toFixed(0) : 0;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text(
+        `Total: ${lista.length} de ${total} (${percentual}%)`,
+        marginLeft,
+        startY
+      );
+      startY += 14;
+    }
+  };
 
-  startY += 14;
-}
-
-// ===============================
-// AUSENTES
-// ===============================
-if (ausentes.length > 0) {
-  if (startY > height - 70) {
-    doc.addPage();
-    startY = 20;
-  }
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.text("CASAIS AUSENTES NA REUNIÃO", width / 2, startY, { align: "center" });
-  startY += 8;
-
-  autoTable(doc, {
-    head: [["#", "Casal"]],
-    body: ausentes.map((s, i) => [i + 1, s.nome]),
-    startY: startY,
-    margin: { left: marginLeft, right: marginLeft },
-    styles: {
-      fontSize: 11,
-      textColor: [200, 0, 0], // 🔴 Vermelho
-    },
-    headStyles: {
-      fillColor: [200, 200, 200],
-      textColor: 0,
-    },
-  });
-
-  startY = doc.lastAutoTable.finalY + 6;
-
-  const totalAusentes = ausentes.length;
-  const percentualAusentes =
-    total > 0 ? ((totalAusentes / total) * 100).toFixed(0) : 0;
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.text(
-    `Total de Casais Ausentes: ${totalAusentes} de ${total} (${percentualAusentes}%)`,
-    marginLeft,
-    startY
-  );
-
-  startY += 12;
-}
+  gerarTabela("CASAIS PRESENTES NA REUNIÃO", presentes, [0, 102, 204]); // azul
+  gerarTabela("CASAIS AUSENTES NA REUNIÃO", ausentes, [200, 0, 0]); // vermelho
 
   // ===== ANIVERSARIANTES =====
   const gerarTabelaAniversariantes = (titulo, lista) => {
     if (lista.length === 0) return;
 
-    if (startY > height - 60) {
-      doc.addPage();
-      startY = 20;
-    }
-
+    ensureSpace(lista.length * 8 + 40);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.text(titulo, width / 2, startY, { align: "center" });
@@ -375,13 +319,13 @@ if (ausentes.length > 0) {
 
     autoTable(doc, {
       head: [["#", "Nome", "Data de Aniversário"]],
-      body: lista.map((a, i) => [
-        i + 1,
-        a.nome,
-        formatDateBR(a.birthDate),
-      ]),
+      body: lista.map((a, i) => [i + 1, a.nome, formatDateBR(a.birthDate)]),
       startY,
       margin: { left: marginLeft, right: marginLeft },
+      theme: 'grid',
+      didDrawPage: (data) => {
+        drawLogos(20);
+      },
     });
 
     startY = doc.lastAutoTable.finalY + 12;
@@ -392,11 +336,7 @@ if (ausentes.length > 0) {
 
   // ===== OFERTAS =====
   if (ofertas.length > 0) {
-    if (startY > height - 60) {
-      doc.addPage();
-      startY = 20;
-    }
-
+    ensureSpace(ofertas.length * 8 + 40);
     doc.setFontSize(14);
     doc.text("OFERTAS / CONTRIBUIÇÕES", width / 2, startY, { align: "center" });
     startY += 8;
@@ -406,50 +346,69 @@ if (ausentes.length > 0) {
       body: ofertas.map((o, i) => [
         i + 1,
         o.descricao,
-        new Intl.NumberFormat("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        }).format(o.valor),
+        new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(o.valor),
       ]),
       startY,
       margin: { left: marginLeft, right: marginLeft },
+      theme: 'grid',
+      didDrawPage: () => drawLogos(20),
     });
+
+    startY = doc.lastAutoTable.finalY + 12;
   }
+// ===== OBSERVAÇÕES =====
+if (observacoes?.trim()) {
+  ensureSpace(30); // garante espaço suficiente para o título
 
-  // ===== OBSERVAÇÕES =====
-  if (observacoes?.trim()) {
-    doc.addPage();
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text("OBSERVAÇÕES", width / 2, startY, { align: "center" });
+  startY += 8;
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.text("OBSERVAÇÕES", width / 2, 25, { align: "center" });
+  // Criando tabela para observações com destaque azul
+  autoTable(doc, {
+    head: [["Observações"]],
+    body: [[observacoes]],
+    startY: startY,
+    margin: { left: marginLeft, right: marginLeft },
+    styles: { 
+      fontSize: 11,
+      textColor: [0, 102, 204], // 🔵 Azul
+      cellWidth: 'wrap',       // texto quebra dentro da célula
+      halign: 'left',
+      valign: 'top'
+    },
+    headStyles: {
+      fillColor: [200, 200, 200],
+      textColor: 0,
+      fontStyle: 'bold'
+    },
+    bodyStyles: {
+      fillColor: [230, 240, 255], // leve fundo azul claro para destaque
+      textColor: [0, 102, 204],  // reforça azul
+    }
+  });
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    const obs = doc.splitTextToSize(observacoes, width - 28);
-    doc.text(obs, marginLeft, 35);
-  }
-// ===== PÁGINA DE ASSINATURAS =====
+  startY = doc.lastAutoTable.finalY + 12; // atualiza startY
+}
+
+
+  // ===== ASSINATURAS =====
   doc.addPage();
+  drawLogos(20);
+  startY = 60;
 
   const centerX = width / 2;
   const baseY = height - 180;
 
   doc.setFont("helvetica", "bold");
   doc.setFontSize(14);
-  doc.text("ASSINATURAS", centerX, 30, { align: "center" });
+  doc.text("ASSINATURAS", centerX, 40, { align: "center" });
 
-  // ✅ DATA CORRIGIDA (SEM formatDateBR)
   const hoje = new Date().toLocaleDateString("pt-BR");
-
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
-  doc.text(
-    `Marabá - PA, ${hoje}`,
-    centerX,
-    45,
-    { align: "center" }
-  );
+  doc.text(`Marabá - PA, ${hoje}`, centerX, 55, { align: "center" });
 
   const lineWidth = 60;
   const gap = 70;
@@ -466,8 +425,6 @@ if (ausentes.length > 0) {
   // ===== SALVAR =====
   doc.save("lista-casais.pdf");
 };
-
-
 
 
 
@@ -494,34 +451,74 @@ if (ausentes.length > 0) {
       <input type="text" placeholder="Tema" value={tema} onChange={(e) => setTema(e.target.value)} />
       <input type="text" placeholder="Dinâmica" value={dinamica} onChange={(e) => setDinamica(e.target.value)} />
       <input type="text" placeholder="Louvor" value={louvor} onChange={(e) => setLouvor(e.target.value)} />
+<div></div>
 
-      <h2 style={{ marginTop: 24 }}>HISTÓRICO</h2>
-      <input
-        type="text"
-        placeholder="Pesquisar histórico..."
-        value={searchHistorico}
-        onChange={(e) => setSearchHistorico(e.target.value)}
-      />
+<div className="historico-container" style={{ width: "100%" }}>
+  {/* Input de pesquisa continua normal */}
+  <input
+    type="text"
+    placeholder="Buscar no histórico..."
+    value={searchHistorico}
+    onChange={(e) => setSearchHistorico(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "6px 10px",
+      marginBottom: "8px",
+      borderRadius: "4px",
+      border: "1px solid #ccc",
+    }}
+  />
 
-      <div className="historico-box">
-        {historicoFiltrado.map((nome) => (
-          <div key={nome} className="historico-item" onClick={() => setName(nome)}>
-            <span>{nome}</span>
-            <Tooltip title="Excluir do histórico">
-              <IconButton size="small" onClick={(e) => deleteNameFromHistory(nome, e)}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </div>
-        ))}
-        {nameHistory.length > 0 && (
-          <Tooltip title="Limpar todo o histórico">
-            <IconButton onClick={clearHistory} color="secondary">
-              <ClearIcon />
-            </IconButton>
-          </Tooltip>
-        )}
+  <div className="historico-box" style={{ maxHeight: "300px", overflowY: "auto" }}>
+    {historicoFiltrado.map((nome) => (
+      <div
+        key={`${nome}-${nameHistory.indexOf(nome)}`} // chave única
+        className="historico-item"
+        onClick={() => setName(nome)}
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "6px 10px",
+          marginBottom: "4px",
+          borderRadius: "4px",
+          cursor: "pointer",
+          backgroundColor: "#e6f0ff",
+          transition: "0.2s",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#cce0ff")}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#e6f0ff")}
+      >
+        <span>{nome}</span>
+        <Tooltip title="Excluir do histórico">
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation(); // não dispara setName
+              const index = nameHistory.indexOf(nome); // pega índice real no array completo
+              deleteNameFromHistory(index);
+            }}
+            style={{ color: "#007bff" }}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
       </div>
+    ))}
+
+    {nameHistory.length > 0 && (
+      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "6px" }}>
+        <Tooltip title="Limpar todo o histórico">
+          <IconButton onClick={clearHistory} color="secondary">
+            <ClearIcon />
+          </IconButton>
+        </Tooltip>
+      </div>
+    )}
+  </div>
+</div>
+
+  
 
       <h2 style={{ marginTop: 24 }}>CASAIS PRESENTES</h2>
       <div className="input-group" style={{ display: "flex", alignItems: "center", gap: 8 }}>
